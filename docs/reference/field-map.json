@@ -1,0 +1,10887 @@
+{
+ "generated_from": "crmga_full_schema.sql (481 tables, DDL only, no data)",
+ "note": "Per-entity source tables -> columns. 'contactable_base' is the shared SuiteCRM Person base reused by all lead entities. Map varchar->string, tinyint(1)->boolean, datetime->UTC. Email is via EmailAddress morph, not a base column.",
+ "contactable_base": [
+  {
+   "c": "id",
+   "t": "char(36)"
+  },
+  {
+   "c": "date_entered",
+   "t": "datetime"
+  },
+  {
+   "c": "date_modified",
+   "t": "datetime"
+  },
+  {
+   "c": "modified_user_id",
+   "t": "char(36)"
+  },
+  {
+   "c": "created_by",
+   "t": "char(36)"
+  },
+  {
+   "c": "description",
+   "t": "text"
+  },
+  {
+   "c": "deleted",
+   "t": "tinyint(1)"
+  },
+  {
+   "c": "assigned_user_id",
+   "t": "char(36)"
+  },
+  {
+   "c": "salutation",
+   "t": "varchar(255)"
+  },
+  {
+   "c": "first_name",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "last_name",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "title",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "photo",
+   "t": "varchar(255)"
+  },
+  {
+   "c": "department",
+   "t": "varchar(255)"
+  },
+  {
+   "c": "do_not_call",
+   "t": "tinyint(1)"
+  },
+  {
+   "c": "phone_home",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "phone_mobile",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "phone_work",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "phone_other",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "phone_fax",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "lawful_basis",
+   "t": "text"
+  },
+  {
+   "c": "date_reviewed",
+   "t": "date"
+  },
+  {
+   "c": "lawful_basis_source",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "primary_address_street",
+   "t": "varchar(150)"
+  },
+  {
+   "c": "primary_address_city",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "primary_address_state",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "primary_address_postalcode",
+   "t": "varchar(20)"
+  },
+  {
+   "c": "primary_address_country",
+   "t": "varchar(255)"
+  },
+  {
+   "c": "alt_address_street",
+   "t": "varchar(150)"
+  },
+  {
+   "c": "alt_address_city",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "alt_address_state",
+   "t": "varchar(100)"
+  },
+  {
+   "c": "alt_address_postalcode",
+   "t": "varchar(20)"
+  },
+  {
+   "c": "alt_address_country",
+   "t": "varchar(255)"
+  },
+  {
+   "c": "assistant",
+   "t": "varchar(75)"
+  },
+  {
+   "c": "assistant_phone",
+   "t": "varchar(100)"
+  }
+ ],
+ "entities": {
+  "Company": {
+   "ga_companies": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "rating",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "lmia",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "jobpostlink",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "jobtitle",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "hamid_companies_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "employees",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "contactpersonphone",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "contact_person_name",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "contact_person_job_title_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "company_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "company_contact_status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "assigned_client",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "website",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "industry",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "ticker_symbol",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_companies_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "status_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "billing_address_street_c",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "shipping_address_street_c",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "contact_person_email_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "email1_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "user_id_c",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "pnp_program_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "resume_submitted_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "hot_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "warm_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ]
+  },
+  "Lead": {
+   "ga_galead": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "current_status_in_canada",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "afraid_to_return",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "current_situation",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "best_describes",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "looking_to_start",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "interested_in_pr",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "invest_in_canada",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "start_your_pr_pathway",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "interested_in",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "start_your_application",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "refugee_claim_process",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_galead_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "category_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lead_status_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "current_status_in_canada_h_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "seeking_a_humanitarian_pr_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "start_your_application_h_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "best_time_to_call_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "best_time_to_call_r_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "best_time_to_call_bi_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "best_time_to_call_ss_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "own_business_bi_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "whatsapp_number_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "hot_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "warm_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ],
+   "ga_imm_biz": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lead_status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "canadian_permanent_residency",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "estimated_investment_budget",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "immigration_timeline",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_imm_biz_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "call_status_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "call_attempts_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "last_contacted_at_c",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "last_call_summary_c",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "last_call_outcome_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "immigration_goal_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "net_worth_range_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "decline_reason_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "hot_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "warm_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ],
+   "ga_imm_can": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "referred_by",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "referral_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "opportunity_amount",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "occupation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "marital_status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "length_of_stay",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "help_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "date_of_birth",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "campaign_id_c",
+     "t": "char(36)",
+     "nn": false
+    }
+   ],
+   "ga_imm_can_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "source_details_c",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_of_birth2_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "hot_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "warm_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ],
+   "ga_usa": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "help_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "cv",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "dob",
+     "t": "date",
+     "nn": false
+    }
+   ],
+   "ga_canadavisa": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_canadavisa_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "status_c",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_expressentryrequests": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "referred_by",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "opportunity_amount",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "occupation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "field_of_study",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "campaign_id_c",
+     "t": "char(36)",
+     "nn": false
+    }
+   ],
+   "ga_studypermitrequests": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_new_pnp_form": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "name",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "lbl_phone",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "lbl_lname",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "lbl_hearabout",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "lbl_email",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "lbl_country",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_pnp": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_refugee_book": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_entrepreneur": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_bd1": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_bd2": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_resumes": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "document_name",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "filename",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "file_ext",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "file_mime_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "active_date",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "exp_date",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "category_id",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "subcategory_id",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status_id",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "category",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_hqinvestor_": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "participate",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_hqinvestor__cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "hot_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "warm_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ],
+   "ga_gunnessassociates": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "help_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_gunnessassociates_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "hot_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "warm_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ],
+   "ga_associates": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_associates_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "status_c",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_applicant": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "job_applied_for",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_immcan1": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "referred_by",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "campaign_id_c",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "opportunity_amount",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_immcan2": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "referred_by",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "campaign_id_c",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "opportunity_amount",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_immcan3": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "referred_by",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "campaign_id_c",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "opportunity_amount",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_inland": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_client_development1": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ]
+  },
+  "Student": {
+   "ga_hq_students": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "get_started",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "how_hear",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_hq_students_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "hot_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "warm_lead_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ]
+  },
+  "Assessment": {
+   "ga_assessment_request": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "worth_money",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "working_on_field_of_study",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "work_experience_year",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "whycanada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "status_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source_details",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "refused_to_come_to_canada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "referred_by",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "other_interested",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "opportuinity_amount",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "marital_status",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "interested_program",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "interested_course_study",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "highest_level_education",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "have_relative_canda",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "gender",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "ever_visited_canada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "english_language_level",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "employment_status",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "campaign_id_c",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "age",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_assessment_score": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "household_income",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "writing",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_experience_in_canada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_lang_speaking",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_education",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "language_test_latest",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "worth_money",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "job_offer_noc_teer",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "work_experience_canada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_work_experience_score",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "what_language_test",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_total_adaptiblity",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_spouse_lang",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_spoouse_canadian_edu_ada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "obtained_qualifi_certificate",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_score",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_relative_living",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_studyanada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_language_score",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_lang_test_writing",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_job_offer",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_education_score",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_lang_test_reading",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fswanadian_edu_adapt",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_lang_test_listening",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_arranged_employment",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouseitizen",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "fsw_age_score",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "foreign_work_experience",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "speaking",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "field_of_study",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "education",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "crs_score",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "canadian_education_level",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "relative_inanada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "canadian_education",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "reading",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "bring_spouse_toanada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "possess_a_nominationert",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "age",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "additional_test_taken",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "occupation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "additional_language_writing",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "marital_status",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "additional_language_speaking",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "spouse_lan_test",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "additional_language_listenin",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "legitimate_job_offer",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "additional_lang_test_reading",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "listening",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "case_type",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ]
+  },
+  "StudyLead": {
+   "ga_study": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "whatsapp_phone",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "qualified",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "program_interest",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "preferred_study_level",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "institution_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "highest_education_completed",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "field_of_study",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "active_leads",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "dob",
+     "t": "date",
+     "nn": false
+    }
+   ],
+   "ga_study_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_of_birth_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "user_id_c",
+     "t": "char(36)",
+     "nn": false
+    }
+   ]
+  },
+  "LmiaCase": {
+   "ga_lmia_main": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "whatsapp_number",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "commission",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_lmia_main_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "ga_affiliate_id_c",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "username_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "amount_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "status_c",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_lmia_course": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "country",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_lmia_course_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "status_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "have_invest_c",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ],
+   "ga_lmiainquiry": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "lmia_affiliate": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "affiliate_link",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "username",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ]
+  },
+  "Client": {
+   "ga_clients": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "worth_money",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "working_on_study_field",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "work_experience_year",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "utm_term",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "utm_source",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "utm_medium",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "utm_content",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "utm_campaign",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "refused_a_visa",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "other_interested",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "marital_status",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "lead_source",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "interested_programs",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "interested_help_type",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "interested_course_study",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "how_long_in_canada_number",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "how_long_in_canada_",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "highest_education_level",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "hear_about_us",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "have_relative_canada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "gender",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "ever_visited_canada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "english_language_level",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "employment_status",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "dob",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "current_status_in_canada",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "client_status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "campaign_type",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "briefly_describe_issue",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "age",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_clients_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "status_c",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_clientdevelopment2": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_clientdevelopment3": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ],
+   "ga_imm_client": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ]
+  },
+  "Affiliate": {
+   "ga_affiliate": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "username",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "affiliate_link",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ],
+   "ga_affiliate_cstm": [
+    {
+     "c": "id_c",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "commission_c",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "status_c",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "whatsapp_c",
+     "t": "varchar(255)",
+     "nn": false
+    }
+   ]
+  },
+  "NewsletterSubscriber": {
+   "ga_newsletter_subscriber": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "status_description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "referred_by",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "opportunity_amount",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "newsletter_source_details",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "campaign_id_c",
+     "t": "char(36)",
+     "nn": false
+    }
+   ]
+  },
+  "CallSummary": {
+   "ga_call_summaries": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "salutation",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "first_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "last_name",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "title",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "photo",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "department",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "do_not_call",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "phone_home",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_mobile",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_work",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_other",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "phone_fax",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "date_reviewed",
+     "t": "date",
+     "nn": false
+    },
+    {
+     "c": "lawful_basis_source",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "primary_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_street",
+     "t": "varchar(150)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_city",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_state",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_postalcode",
+     "t": "varchar(20)",
+     "nn": false
+    },
+    {
+     "c": "alt_address_country",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "assistant",
+     "t": "varchar(75)",
+     "nn": false
+    },
+    {
+     "c": "assistant_phone",
+     "t": "varchar(100)",
+     "nn": false
+    }
+   ]
+  },
+  "SmsMessage": {
+   "dt_sms": [
+    {
+     "c": "id",
+     "t": "char(36)",
+     "nn": true
+    },
+    {
+     "c": "name",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "date_entered",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "modified_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "created_by",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "description",
+     "t": "text",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "assigned_user_id",
+     "t": "char(36)",
+     "nn": false
+    },
+    {
+     "c": "status",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "direction",
+     "t": "varchar(100)",
+     "nn": false
+    },
+    {
+     "c": "source_number",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "destination_number",
+     "t": "varchar(255)",
+     "nn": false
+    },
+    {
+     "c": "media",
+     "t": "tinyint(1)",
+     "nn": false
+    }
+   ],
+   "dt_sms_accounts_c": [
+    {
+     "c": "id",
+     "t": "varchar(36)",
+     "nn": true
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "dt_sms_accountsaccounts_ida",
+     "t": "varchar(36)",
+     "nn": false
+    },
+    {
+     "c": "dt_sms_accountsdt_sms_idb",
+     "t": "varchar(36)",
+     "nn": false
+    }
+   ],
+   "dt_sms_contacts_c": [
+    {
+     "c": "id",
+     "t": "varchar(36)",
+     "nn": true
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "dt_sms_contactscontacts_ida",
+     "t": "varchar(36)",
+     "nn": false
+    },
+    {
+     "c": "dt_sms_contactsdt_sms_idb",
+     "t": "varchar(36)",
+     "nn": false
+    }
+   ],
+   "dt_sms_leads_c": [
+    {
+     "c": "id",
+     "t": "varchar(36)",
+     "nn": true
+    },
+    {
+     "c": "date_modified",
+     "t": "datetime",
+     "nn": false
+    },
+    {
+     "c": "deleted",
+     "t": "tinyint(1)",
+     "nn": false
+    },
+    {
+     "c": "dt_sms_leadsleads_ida",
+     "t": "varchar(36)",
+     "nn": false
+    },
+    {
+     "c": "dt_sms_leadsdt_sms_idb",
+     "t": "varchar(36)",
+     "nn": false
+    }
+   ]
+  }
+ },
+ "activities": {
+  "Meeting": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "location",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "password",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "join_url",
+    "t": "varchar(200)",
+    "nn": false
+   },
+   {
+    "c": "host_url",
+    "t": "varchar(400)",
+    "nn": false
+   },
+   {
+    "c": "displayed_url",
+    "t": "varchar(400)",
+    "nn": false
+   },
+   {
+    "c": "creator",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "external_id",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "duration_hours",
+    "t": "int(3)",
+    "nn": false
+   },
+   {
+    "c": "duration_minutes",
+    "t": "int(2)",
+    "nn": false
+   },
+   {
+    "c": "date_start",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_end",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "parent_type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "reminder_time",
+    "t": "int(11)",
+    "nn": false
+   },
+   {
+    "c": "email_reminder_time",
+    "t": "int(11)",
+    "nn": false
+   },
+   {
+    "c": "email_reminder_sent",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "outlook_id",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "sequence",
+    "t": "int(11)",
+    "nn": false
+   },
+   {
+    "c": "repeat_type",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "repeat_interval",
+    "t": "int(3)",
+    "nn": false
+   },
+   {
+    "c": "repeat_dow",
+    "t": "varchar(7)",
+    "nn": false
+   },
+   {
+    "c": "repeat_until",
+    "t": "date",
+    "nn": false
+   },
+   {
+    "c": "repeat_count",
+    "t": "int(7)",
+    "nn": false
+   },
+   {
+    "c": "repeat_parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "recurring_source",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "gsync_id",
+    "t": "varchar(1024)",
+    "nn": false
+   },
+   {
+    "c": "gsync_lastsync",
+    "t": "int(11)",
+    "nn": false
+   }
+  ],
+  "Note": [
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "file_mime_type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "filename",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "parent_type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "contact_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "portal_flag",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "embed_flag",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "Document": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "document_name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "doc_id",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "doc_type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "doc_url",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "active_date",
+    "t": "date",
+    "nn": false
+   },
+   {
+    "c": "exp_date",
+    "t": "date",
+    "nn": false
+   },
+   {
+    "c": "category_id",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "subcategory_id",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "status_id",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "document_revision_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "related_doc_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "related_doc_rev_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "is_template",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "template_type",
+    "t": "varchar(100)",
+    "nn": false
+   }
+  ],
+  "DocumentRevision": [
+   {
+    "c": "id",
+    "t": "varchar(36)",
+    "nn": true
+   },
+   {
+    "c": "change_log",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "document_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "doc_id",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "doc_type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "doc_url",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "filename",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "file_ext",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "file_mime_type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "revision",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   }
+  ],
+  "Email": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "orphaned",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "last_synced",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_sent_received",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "message_id",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "flagged",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "reply_to_status",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "intent",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "mailbox_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "parent_type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "uid",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "category_id",
+    "t": "varchar(100)",
+    "nn": false
+   }
+  ],
+  "EmailText": [
+   {
+    "c": "email_id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "from_addr",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "reply_to_addr",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "to_addrs",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "cc_addrs",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "bcc_addrs",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "longtext",
+    "nn": false
+   },
+   {
+    "c": "description_html",
+    "t": "longtext",
+    "nn": false
+   },
+   {
+    "c": "raw_source",
+    "t": "longtext",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "EmailAddress": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "email_address",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "email_address_caps",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "invalid_email",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "opt_out",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "confirm_opt_in",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "confirm_opt_in_date",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "confirm_opt_in_sent_date",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "confirm_opt_in_fail_date",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "confirm_opt_in_token",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "date_created",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "Call": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "duration_hours",
+    "t": "int(2)",
+    "nn": false
+   },
+   {
+    "c": "duration_minutes",
+    "t": "int(2)",
+    "nn": false
+   },
+   {
+    "c": "date_start",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_end",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "parent_type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "direction",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "reminder_time",
+    "t": "int(11)",
+    "nn": false
+   },
+   {
+    "c": "email_reminder_time",
+    "t": "int(11)",
+    "nn": false
+   },
+   {
+    "c": "email_reminder_sent",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "outlook_id",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "repeat_type",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "repeat_interval",
+    "t": "int(3)",
+    "nn": false
+   },
+   {
+    "c": "repeat_dow",
+    "t": "varchar(7)",
+    "nn": false
+   },
+   {
+    "c": "repeat_until",
+    "t": "date",
+    "nn": false
+   },
+   {
+    "c": "repeat_count",
+    "t": "int(7)",
+    "nn": false
+   },
+   {
+    "c": "repeat_parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "recurring_source",
+    "t": "varchar(36)",
+    "nn": false
+   }
+  ],
+  "Task": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "date_due_flag",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "date_due",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_start_flag",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "date_start",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "parent_type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "contact_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "priority",
+    "t": "varchar(100)",
+    "nn": false
+   }
+  ]
+ },
+ "rbac": {
+  "users": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "user_name",
+    "t": "varchar(60)",
+    "nn": false
+   },
+   {
+    "c": "user_hash",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "system_generated_password",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "pwd_last_changed",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "authenticate_id",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "sugar_login",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "first_name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "last_name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "is_admin",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "external_auth_only",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "receive_notifications",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "title",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "photo",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "department",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "phone_home",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "phone_mobile",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "phone_work",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "phone_other",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "phone_fax",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "address_street",
+    "t": "varchar(150)",
+    "nn": false
+   },
+   {
+    "c": "address_city",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "address_state",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "address_country",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "address_postalcode",
+    "t": "varchar(20)",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "portal_only",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "show_on_employees",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "employee_status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "messenger_id",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "messenger_type",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "reports_to_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "is_group",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "factor_auth",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "factor_auth_interface",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "totp_secret",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "is_totp_enabled",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "backup_codes",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "asteriskintegration_show_notification",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "asteriskintegration_server_ip",
+    "t": "varchar(30)",
+    "nn": false
+   },
+   {
+    "c": "asteriskintegration_extension",
+    "t": "varchar(10)",
+    "nn": false
+   },
+   {
+    "c": "asteriskintegration_context",
+    "t": "varchar(50)",
+    "nn": false
+   }
+  ],
+  "acl_roles": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "name",
+    "t": "varchar(150)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "acl_actions": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "name",
+    "t": "varchar(150)",
+    "nn": false
+   },
+   {
+    "c": "category",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "acltype",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "aclaccess",
+    "t": "int(3)",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "acl_roles_actions": [
+   {
+    "c": "id",
+    "t": "varchar(36)",
+    "nn": true
+   },
+   {
+    "c": "role_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "action_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "access_override",
+    "t": "int(3)",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "acl_roles_users": [
+   {
+    "c": "id",
+    "t": "varchar(36)",
+    "nn": true
+   },
+   {
+    "c": "role_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "user_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "securitygroups": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "noninheritable",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "securitygroups_users": [
+   {
+    "c": "id",
+    "t": "varchar(36)",
+    "nn": true
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "securitygroup_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "user_id",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "primary_group",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "noninheritable",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "securitygroups_records": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "securitygroup_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "record_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "module",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ]
+ },
+ "support": {
+  "email_templates": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "varchar(36)",
+    "nn": false
+   },
+   {
+    "c": "published",
+    "t": "varchar(3)",
+    "nn": false
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "subject",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "body",
+    "t": "longtext",
+    "nn": false
+   },
+   {
+    "c": "body_html",
+    "t": "longtext",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "text_only",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "sms_module",
+    "t": "varchar(100)",
+    "nn": false
+   }
+  ],
+  "outbound_email": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "type",
+    "t": "varchar(15)",
+    "nn": false
+   },
+   {
+    "c": "user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "smtp_from_name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "smtp_from_addr",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "reply_to_name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "reply_to_addr",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "signature",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "mail_sendtype",
+    "t": "varchar(8)",
+    "nn": false
+   },
+   {
+    "c": "mail_smtptype",
+    "t": "varchar(20)",
+    "nn": false
+   },
+   {
+    "c": "mail_smtpserver",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "mail_smtpport",
+    "t": "varchar(5)",
+    "nn": false
+   },
+   {
+    "c": "mail_smtpuser",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "mail_smtppass",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "mail_smtpauth_req",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "mail_smtpssl",
+    "t": "varchar(1)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   }
+  ],
+  "inbound_email": [
+   {
+    "c": "id",
+    "t": "varchar(36)",
+    "nn": true
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "email_body_filtering",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "server_url",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "connection_string",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "email_user",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "email_password",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "port",
+    "t": "int(5)",
+    "nn": false
+   },
+   {
+    "c": "service",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "mailbox",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "delete_seen",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "move_messages_to_trash_after_import",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "mailbox_type",
+    "t": "varchar(10)",
+    "nn": false
+   },
+   {
+    "c": "template_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "stored_options",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "group_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "is_personal",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "groupfolder_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "auth_type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "protocol",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "is_ssl",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "distribution_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "outbound_email_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "create_case_template_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "external_oauth_connection_id",
+    "t": "char(36)",
+    "nn": false
+   }
+  ],
+  "asteriskintegration_servers": [
+   {
+    "c": "id",
+    "t": "int(11)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(100)",
+    "nn": true
+   },
+   {
+    "c": "server_ip",
+    "t": "varchar(15)",
+    "nn": true
+   },
+   {
+    "c": "socket_port",
+    "t": "int(5)",
+    "nn": true
+   },
+   {
+    "c": "ami_username",
+    "t": "varchar(50)",
+    "nn": true
+   },
+   {
+    "c": "ami_secret",
+    "t": "varchar(100)",
+    "nn": true
+   },
+   {
+    "c": "ami_port",
+    "t": "int(5)",
+    "nn": true
+   },
+   {
+    "c": "recordinglink_ip",
+    "t": "varchar(15)",
+    "nn": true
+   },
+   {
+    "c": "recordinglink_port",
+    "t": "int(5)",
+    "nn": true
+   }
+  ],
+  "asteriskintegration": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "description",
+    "t": "text",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "assigned_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "direction",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "call_date",
+    "t": "date",
+    "nn": false
+   },
+   {
+    "c": "call_time",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "asterisk_server",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "disposition",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "extension",
+    "t": "varchar(20)",
+    "nn": false
+   },
+   {
+    "c": "number",
+    "t": "varchar(50)",
+    "nn": false
+   },
+   {
+    "c": "duration_hours",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "duration_minutes",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "duration_seconds",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "duration",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "parent_type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "parent_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "recording_link",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "unique_id",
+    "t": "varchar(50)",
+    "nn": false
+   }
+  ],
+  "ga_lead_notification_log": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "notification_date",
+    "t": "date",
+    "nn": true
+   },
+   {
+    "c": "date_created",
+    "t": "datetime",
+    "nn": true
+   }
+  ],
+  "ga_student_notification_log": [
+   {
+    "c": "id",
+    "t": "char(36)",
+    "nn": true
+   },
+   {
+    "c": "notification_date",
+    "t": "date",
+    "nn": true
+   },
+   {
+    "c": "date_created",
+    "t": "datetime",
+    "nn": true
+   }
+  ],
+  "schedulers": [
+   {
+    "c": "id",
+    "t": "varchar(36)",
+    "nn": true
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "date_entered",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "created_by",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "modified_user_id",
+    "t": "char(36)",
+    "nn": false
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "job",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "date_time_start",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "date_time_end",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "job_interval",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "time_from",
+    "t": "time",
+    "nn": false
+   },
+   {
+    "c": "time_to",
+    "t": "time",
+    "nn": false
+   },
+   {
+    "c": "last_run",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "status",
+    "t": "varchar(100)",
+    "nn": false
+   },
+   {
+    "c": "catch_up",
+    "t": "tinyint(1)",
+    "nn": false
+   }
+  ],
+  "fields_meta_data": [
+   {
+    "c": "id",
+    "t": "varchar(255)",
+    "nn": true
+   },
+   {
+    "c": "name",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "vname",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "comments",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "help",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "custom_module",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "type",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "len",
+    "t": "int(11)",
+    "nn": false
+   },
+   {
+    "c": "required",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "default_value",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "date_modified",
+    "t": "datetime",
+    "nn": false
+   },
+   {
+    "c": "deleted",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "audited",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "massupdate",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "duplicate_merge",
+    "t": "smallint(6)",
+    "nn": false
+   },
+   {
+    "c": "reportable",
+    "t": "tinyint(1)",
+    "nn": false
+   },
+   {
+    "c": "importable",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "ext1",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "ext2",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "ext3",
+    "t": "varchar(255)",
+    "nn": false
+   },
+   {
+    "c": "ext4",
+    "t": "text",
+    "nn": false
+   }
+  ]
+ }
+}
