@@ -87,6 +87,7 @@ Internal beta usable after **M4 (~wk6)**: new leads flow via n8n against the new
 - `[A]` Bulk-import performance + tenant seeding from data. **(1.5d)**
 - `[B]` Verify migrated data renders in Filament; fix field/display mismatches. **(1.5d)**
 - **DoD (M5):** staging tenant loaded; row counts reconcile to the audit (Company ≈ 21,014, Assessment_Score ≈ 8,147, Study ≈ 4,782…); spot-checks pass.
+- **Runs LOCALLY** (needs the sanitized dump + a local DB) — exact step-by-step runbook in **Appendix A**.
 
 ### Phase 6 — Integrations (Weeks 7–8)
 - `[C]` Re-point n8n workflows to the new API (pilot 1–2 per family → bulk); per-tenant SMTP send + IMAP intake. **(4d)**
@@ -117,3 +118,54 @@ Internal beta usable after **M4 (~wk6)**: new leads flow via n8n against the new
 2. Take the current phase → **Plan Mode** → get approval → build the phase's tasks as **small PRs** in owner order.
 3. Before each commit: `pint` → `phpstan` → `pest`. Before merge: `/code-review`. Before go-live: `/security-review`.
 4. Only advance a phase when its **DoD** passes. Keep `CLAUDE.md` updated as decisions land.
+
+---
+
+## 8. Environments — where each phase runs (cloud vs local)
+- **Cloud / web Claude Code** (isolated container — **no access to your PC or live server**): everything that needs only the **schema + specs** — Phase 1–4 building, migrations code, the V8-compatible API. Delivers via commits/PRs.
+- **Local Claude Code / dev machines** (your computers, with your permissions + local DB/services): anything that needs the **sanitized data dump**, a **prod-copy DB**, or the **telephony/SMS/email providers** — i.e. **Phase 5 (ETL)** and **Phase 6 integration testing**. The sanitized dump stays here and never passes through the cloud session.
+
+## 9. What we exactly need to do (execution checklist)
+**Setup (once):**
+- [ ] Push the repo foundation to `Gunness-and-Associates/crm` (the bundle) — or link GitHub so Claude Code can push directly.
+- [ ] Assign 3 developers to lanes **A / B / C** (Section 2).
+- [ ] Stand up a dev environment (PHP 8.3, MySQL/MariaDB, Redis) + a staging host.
+
+**Inputs the Product Owner provides, by phase:**
+- [ ] Phase 1–2: field-mapping answers as they arise; confirm/adjust the 2 defaults (Study/LMIA as `Lead` verticals; SMS provider).
+- [ ] Phase 5: the **`crmga_sanitized.sql.gz`** dump — used **locally** by Dev C (Appendix A). **Not** uploaded to the cloud session.
+- [ ] Phase 6: provider credentials in `.env` (never committed): Vapi, Asterisk/PBX AMI, SMS gateway, SMTP/IMAP.
+- [ ] Phase 7: UAT sign-off; approve credential rotation.
+
+**Build (Devs + Claude Code):** run Phases 1 → 7 in order (Section 4), one phase at a time, small PRs, DoD gates.
+
+## Appendix A — Phase 5: run the data migration LOCALLY (Dev C)
+**Why local:** the sanitized dump + database live on your machine; the cloud session can't (and shouldn't) touch them. Run this with **local Claude Code** or by hand on a dev machine.
+
+**Prereqs (local machine):** PHP 8.3, Composer, MySQL/MariaDB, the repo cloned with Phase 1–2 done, Claude Code (`claude`), and the file `crmga_sanitized.sql.gz`.
+
+1. **Load the source dump into a local, read-only DB:**
+   ```bash
+   mysql -e "CREATE DATABASE crmga_source CHARACTER SET utf8mb4;"
+   gunzip -c crmga_sanitized.sql.gz | mysql crmga_source
+   ```
+2. **Add a read-only `legacy` DB connection** (via `.env` → `config/database.php`) pointing at `crmga_source`.
+3. **Create + migrate the target tenant:**
+   ```bash
+   php artisan tenant:create gunness
+   php artisan tenants:migrate --tenant=gunness
+   ```
+4. **Dry-run the ETL** (reads legacy, maps, reports counts, writes nothing):
+   ```bash
+   php artisan crm:migrate-legacy --tenant=gunness --dry-run
+   ```
+5. **Reconcile** the printed per-entity counts against the audited targets (Company ≈ 21,014, Assessment_Score ≈ 8,147, Study ≈ 4,782, HQ_Students ≈ 548, GALead ≈ 394 …). Fix mappings until they line up.
+6. **Run for real** (idempotent — safe to re-run):
+   ```bash
+   php artisan crm:migrate-legacy --tenant=gunness
+   ```
+7. **Spot-check in Filament:** emails (from the `email_addresses` join → `primary_email`), dropdown values, and dates (UTC `Y-m-d H:i:s`).
+
+**Driving it with local Claude Code:** `cd` into the repo, run `claude`, then prompt: *"Build/extend the `crm:migrate-legacy` command per `docs/DATA_MODEL.md` + `docs/reference/field-map.json`; source = the `legacy` connection (`crmga_source`); run `--dry-run` and reconcile to the audited counts."* Local Claude Code reads the dump and queries `crmga_source` directly.
+
+**Safety:** work on a copy — never point the ETL at the live production DB. The dump is sanitized but may hold residual PII in untagged free-text; keep it on the dev machine and delete it when done.
