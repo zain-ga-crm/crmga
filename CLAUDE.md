@@ -1,10 +1,12 @@
 # CLAUDE.md — crmga CRM (Laravel rebuild)
 
 ## What this is
-Multi-tenant **Laravel** rebuild of the Gunness & Associates SuiteCRM 8.8.0 ("crmga") — an
-immigration-consulting CRM + HQ Learning Hub course sales. This repo currently holds the
-**plan + specs** in `/docs`; the Laravel app gets scaffolded starting in Phase 1
-(see `docs/PHASE1_KICKOFF.md`).
+A **multi-tenant SaaS CRM** (Laravel + Filament) **sold to other immigration firms**, rebuilt from the
+Gunness & Associates SuiteCRM 8.8.0 system ("crmga"). **Each customer company = one tenant = its own
+database.** First tenant live = Gunness & Associates. This repo currently holds the **plan + specs** in
+`/docs`; the Laravel app gets scaffolded starting in Phase 1.
+- **Master plan (timelines + who-does-what):** `docs/PROJECT_PLAN.md`
+- **Start here to build:** `docs/PHASE1_KICKOFF.md`
 
 ## Stack (pin these)
 - PHP 8.3, Laravel 11

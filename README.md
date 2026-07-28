@@ -1,9 +1,10 @@
 # crmga — Multi-tenant CRM (Laravel rebuild)
 
-A **database-per-tenant Laravel + Filament** rebuild of the Gunness & Associates SuiteCRM 8.8.0
-instance ("crmga") — immigration-consulting CRM + HQ Learning Hub. It keeps the existing n8n
-automation, Asterisk telephony, Vapi voice, and SMS working by exposing a
+A **multi-tenant SaaS CRM** (Laravel + Filament, **database-per-tenant**) **sold to other immigration
+firms** — rebuilt from the Gunness & Associates SuiteCRM 8.8.0 system ("crmga"). It keeps the existing
+n8n automation, Asterisk telephony, Vapi voice, and SMS working by exposing a
 **SuiteCRM-V8-compatible API**, while replacing the CRM core with a clean, maintainable schema.
+First tenant live = Gunness & Associates; more companies onboarded after.
 
 > **Status:** planning + specs. The Laravel application is scaffolded from Phase 1 onward.
 > **Secrets:** none in this repo, by design. Configure via `.env` (never commit it).
@@ -11,6 +12,7 @@ automation, Asterisk telephony, Vapi voice, and SMS working by exposing a
 ## Documentation (`/docs`)
 | File | What |
 |---|---|
+| `docs/PROJECT_PLAN.md` | **Master plan — 9-week timeline, phases, who-does-what (start here)** |
 | `docs/PLAN.md` | Architecture + full build plan |
 | `docs/CLAUDE_CODE_BUILD_PLAN.md` | 8–9 week phased plan for building **with Claude Code** |
 | `docs/DATA_MODEL.md` | Target data model (from the live 481-table DDL) |
