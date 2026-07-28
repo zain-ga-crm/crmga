@@ -178,3 +178,100 @@ API + platform integrations, and rewriting 133 workflows lands realistically at 
 
 **Non-negotiable sequencing:** metadata engine (P1–P2) → dynamic ACL (P2) → Studio UI (P3) →
 dynamic API from the same metadata (P5). Anything hardcoded before the engine exists gets rewritten twice.
+
+---
+
+## Appendix — Verified against the live SuiteCRM 8.8 schema (2026-07-28)
+
+`docs.suitecrm.com` is blocked by this environment's egress policy, so these were verified against the
+**authoritative source for this install**: the real DDL of `crmga_crm_prod` (`docs/reference/schema.json`).
+Corrections below are already folded into the design.
+
+### A1. Studio field metadata — `fields_meta_data` (21 columns)
+```
+id, name, vname, comments, help, custom_module, type, len, required, default_value,
+date_modified, deleted, audited, massupdate, duplicate_merge, reportable, importable, ext1..ext4
+```
+**Flags we were missing → add to `tenant_fields`:** `help` (tooltip), `comments`, `massupdate`
+(mass-update allowed), `duplicate_merge` (participates in dedupe/merge), `reportable`, `importable`, `len`.
+
+**`ext1..ext4` are SuiteCRM's type-specific extras** — we model them as explicit typed columns instead:
+`options_list_id` (enum/multienum ← ext1) · `related_module_id` + `related_display_field`
+(relate ← ext2/ext3) · `precision` (decimal) · `default_value`. Cleaner and self-documenting.
+
+**`vname` is a language key, not a label.** Studio stores `LBL_*` and resolves it through the module's
+language files — this is exactly their documented gotcha (raw text in `vname` renders blank in the
+Angular "Choose Columns" picker, and Studio then bakes the broken string into `listviewdefs.php`).
+**Our Field Manager must auto-generate a `label_key` (`LBL_…`) and store the human label separately**, so
+this class of bug cannot occur.
+
+### A2. ACL — the real model (correcting our sketch)
+```
+acl_actions        id, name(action), category(= MODULE), acltype, aclaccess(int = default level)
+acl_roles_actions  role_id, action_id, access_override(int = this role's level)
+acl_roles          id, name, description
+acl_roles_users    role_id, user_id
+```
+- Permissions are **(category = module) × (name = action)** rows in `acl_actions`; a role attaches with an
+  **integer `access_override`**. Actions: `access, view, list, edit, delete, import, export, massupdate`
+  (+ admin/developer levels for admins).
+- Access levels in the UI are **All · Owner · Group · Not Set (inherit default) · None**.
+  ⚠️ The exact integer constants live in `modules/ACLActions/actiondefs.php`; rather than assume them,
+  read the values actually used in this install:
+  ```sql
+  SELECT DISTINCT category, name, acltype, aclaccess FROM acl_actions ORDER BY category, name;
+  SELECT DISTINCT access_override, COUNT(*) FROM acl_roles_actions GROUP BY access_override;
+  ```
+  Our `role_module_permissions` stores a **named enum** (`all|owner|group|none|not_set`) and maps to/from
+  those integers only in the ETL — no magic numbers in the app.
+- **Field-level ACL is NOT in use here:** there is **no `acl_fields` table** among the 481 (matches the
+  blueprint's note). → **Scope saving: field-level ACL moves to fast-follow**, keep the hook in the model.
+- **Security groups ("Group" level)** are real and modelled by
+  `securitygroups`, `securitygroups_users`, `securitygroups_records` (record ↔ group ↔ module),
+  `securitygroups_acl_roles` (roles granted via a group), `securitygroups_default`, plus a
+  `noninheritable` flag. Only 2 groups exist in their install → implement `Group` level, low priority.
+
+### A3. User types — confirmed by `users` (48 columns)
+`is_admin` (= **System Administrator**) · `is_group` (group user) · `portal_only` (portal user) · `status`
+· **2FA is real**: `factor_auth`, `factor_auth_interface`, `totp_secret`, `is_totp_enabled`, `backup_codes`
+· **`reports_to_id`** = reporting hierarchy (enables an optional "manager sees their reports' records" level).
+
+**Telephony correction:** the `users` table carries **per-user Asterisk settings** —
+`asteriskintegration_server_ip`, `asteriskintegration_extension`, `asteriskintegration_context`,
+`asteriskintegration_show_notification`. So click-to-call needs **per-user extension/context**, not only
+per-tenant PBX credentials. Added to the telephony design.
+
+### A4. Relationships — enrich `tenant_relationships`
+The real `relationships` table stores: `relationship_name, lhs_module, lhs_table, lhs_key, rhs_module,
+rhs_table, rhs_key, join_table, join_key_lhs, join_key_rhs, relationship_type,
+relationship_role_column, relationship_role_column_value, reverse`.
+→ Add **`role_column` + `role_column_value`** (role-based / self-referencing relations) and **`reverse`**
+to our metadata, and keep the explicit `join_table` + both join keys for M-M.
+
+### A5. API / OAuth — `oauth2clients` / `oauth2tokens`
+`oauth2clients`: `secret, redirect_url, is_confidential, allowed_grant_type, duration_value,
+duration_amount, duration_unit, assigned_user_id`.
+→ **API clients are owned by a user** (`assigned_user_id`) — which is precisely why the V8 datetime bug
+depended on `api_user`'s own date-format/timezone preferences. Two consequences, both adopted:
+1. Our REST API is **locale-independent** — parsing/formatting never depends on the authenticated
+   principal's preferences (always UTC `Y-m-d H:i:s` on the wire boundary).
+2. Our API-client model mirrors these fields (owner user for attribution + ACL, grant type, configurable
+   token TTL, confidential flag, redirect URL).
+
+### A6. Legacy storage to ignore
+`custom_fields` (`bean_id, set_num, field0..field9`) is the **pre-`_cstm` SugarCRM custom-field store** —
+deprecated. The live custom data is in the `*_cstm` sidecars. ETL reads `*_cstm`; check `custom_fields`
+for stray rows once and otherwise ignore it.
+
+### A7. Sources
+Official docs pages identified (currently unreachable from this environment — read them locally if you
+want the prose): [Studio](https://docs.suitecrm.com/admin/administration-panel/studio/) ·
+[Field Types (8.x developer/metadata)](https://docs.suitecrm.com/8.x/developer/metadata/fields/field-types/) ·
+[Roles and Security Groups](https://docs.suitecrm.com/admin/administration-panel/roles-and-security-groups/) ·
+[Security Suite (Groups)](https://docs.suitecrm.com/user/security-suite-groups/) ·
+[Vardefs](https://docs.suitecrm.com/developer/vardefs/) ·
+[Administrator Guide 8.x](https://docs.suitecrm.com/8.x/admin/).
+Confirmed from those pages via search: Studio supports dropdown, multi-select dropdown, relate/link-to-module
+and related-bean field types, and dropdown fields reference a named dropdown list; ACL access options are
+**All / Owner / Not Set / None** (+ Group via SecuritySuite), with levels defined in
+`modules/ACLActions/actiondefs.php`.
