@@ -1,24 +1,30 @@
-# crmga SaaS CRM — Master Project Plan (9 weeks, 3 devs, Claude Code)
+# crmga SaaS CRM — Master Project Plan (14 weeks, 3 devs, Claude Code)
 
 **Product:** A multi-tenant SaaS CRM (Laravel + Filament) sold to **other immigration firms**, rebuilt
 from the Gunness & Associates SuiteCRM 8.8.0 system. **Each customer company = one tenant = its own
 database.** First tenant live = Gunness & Associates; more companies onboarded after.
 
-> **For Claude Code:** read `CLAUDE.md` first. Work **one phase at a time**, always start in **Plan
-> Mode**, ship **one entity/feature per PR**, and run `pint` → `phpstan` → `pest` before every commit.
-> Each task below has a **Definition of Done (DoD)** — don't mark it done until the DoD passes.
-> Detailed starter prompts are in `docs/PHASE1_KICKOFF.md`; the schema truth is `docs/reference/`.
+**Revised 2026-07-28** — now includes a **per-tenant Studio** (runtime fields/layouts/relationships/
+modules, governed by super admin), a **modern RESTful API** with social/WordPress/any-stack integrations
+(replacing the SuiteCRM-V8-compatible API), and **per-tenant roles/ACL** with user types.
+Design detail: **`docs/STUDIO_API_RBAC.md`**.
+
+> **For Claude Code:** read `CLAUDE.md`, then `docs/ARCHITECTURE.md` + `docs/STUDIO_API_RBAC.md` +
+> `docs/DATA_MODEL.md`. Work **one phase at a time**, always start in **Plan Mode**, ship **one
+> feature/entity per PR**, run `pint` → `phpstan` → `pest` before every commit, `/code-review` before
+> merge. Don't advance a phase until its **Definition of Done (DoD)** passes.
 
 ---
 
 ## 1. Locked decisions
-- **SaaS, tenants = other companies.** Database-per-tenant (`stancl/tenancy`), full isolation, per-tenant settings (SMTP, telephony, branding, users/roles).
-- **Keep n8n + telephony/SMS/Vapi external**; the CRM exposes a **SuiteCRM-V8-compatible API** so the 133 workflows keep working with only a base-URL change.
-- **Consolidate** the 43 GA modules into ~11 clean entities (see `docs/DATA_MODEL.md`).
+- **SaaS, tenants = other companies.** Database-per-tenant (`stancl/tenancy`), full isolation, per-tenant settings.
+- **Metadata-driven engine.** Schema, UI, permissions and API are generated from **per-tenant metadata** — this is what makes Studio possible. Built in Phases 1–2, before any hardcoding.
+- **Studio per tenant**, with **super-admin governance** (disabled / request-only / self-serve + limits, approval queue, audit, rollback, blueprints).
+- **Modern RESTful API** (versioned, OpenAPI, OAuth2 + tokens + API keys, scopes) + **signed outbound webhooks**; integrations for **WordPress, Meta/Instagram, WhatsApp, LinkedIn/TikTok/Google**, and a generic ingest endpoint for anything else.
+- **Per-tenant roles/ACL:** module × action × access level (All/Owner/Group/None) + field-level ACL; **user types** = Super Admin (platform), System Administrator (per tenant), Regular User.
 - **Activity modules in scope:** Meetings, Notes, Documents, Emails (+ Calls, Tasks) — polymorphic.
-- **Migrate real data** from the sanitized dump (Phase 5).
-
-**Defaults (change anytime, non-blocking):** Study & LMIA = `Lead` verticals; SMS = provider-agnostic adapter; self-serve signup + billing = fast-follow (not in the 9 weeks).
+- **Migrate real data** from the sanitized dump (Phase 7, run locally).
+- **No SuiteCRM-V8-compatible API** (your decision) → the **133 n8n workflows are rewritten** against the new REST API in Phase 6. *Optional cheap insurance: a thin legacy adapter as a transition bridge — see `STUDIO_API_RBAC.md` §2.4.*
 
 ---
 
@@ -26,146 +32,163 @@ database.** First tenant live = Gunness & Associates; more companies onboarded a
 
 | Role | Owner | Responsible for |
 |---|---|---|
-| **Dev A — Platform/Backend Lead** (most senior) | `[A]` | Architecture, DB-per-tenant + tenant provisioning, super-admin (landlord) panel, the V8-compatible API + OAuth2, CI/CD, performance, security, deployment & cutover |
-| **Dev B — CRM App & UI** | `[B]` | Filament panels, all entity screens (CRUD), RBAC/roles, DNC + Hot/Warm, dashboards & notifications, per-tenant settings UI |
-| **Dev C — Data & Integrations** | `[C]` | Migrations authoring, the ETL/data migration + reconciliation, n8n re-pointing, Asterisk/Vapi/SMS/email wiring, API contract tests |
-| **Product Owner** | **You** | Field-mapping answers, priorities, UAT sign-off, providing the sanitized dump + provider credentials |
-
-Pairing rule: A leads architecture-defining PRs; B and C build against A's foundations. Anyone can pick up an entity in Phase 2 (parallel).
+| **Dev A — Platform / Metadata & API Lead** (most senior) | `[A]` | Architecture; DB-per-tenant + provisioning; **metadata engine + SchemaManager (runtime DDL)**; super-admin/landlord panel + Studio governance; **RESTful API + OpenAPI + webhooks**; CI/CD; performance; security; deployment & cutover |
+| **Dev B — Studio & CRM UI** | `[B]` | **Studio UI** (field/dropdown/layout/relationship/module builders); **dynamic Filament rendering** from metadata; all CRM screens; **role-matrix UI**; DNC + Hot/Warm; dashboards; per-tenant settings |
+| **Dev C — Data, ACL & Integrations** | `[C]` | Core migrations; **ACL engine** (matrix, policies, query scopes); **ETL/data migration** + reconciliation; **WordPress + social integrations**; n8n rewrite; Asterisk/Vapi/SMS/email; API contract tests |
+| **Product Owner** | **You** | Field-mapping answers; Studio governance policy; priorities; UAT sign-off; sanitized dump (locally, P7); provider credentials (P6) |
 
 ---
 
-## 3. Timeline at a glance (9 weeks)
+## 3. Timeline at a glance (14 weeks)
 
-| Wk | Phase | Primary focus | Owners | Milestone |
+| Wk | Phase | Focus | Owners | Milestone |
 |---|---|---|---|---|
-| 1 | 1 Foundation + tenancy | App, DB-per-tenant, auth, roles, CI, landlord skeleton | A lead, B, C | **M1** tenant create→login→roles |
-| 2–3 | 2 Data model | Shared base, all entities, polymorphic activities, migrations | C lead, A, B | **M2** migrations clean + tests |
-| 3–4 | 3 CRM UI | Filament screens, DNC, Hot/Warm, per-tenant settings | B lead, A | **M3** staff can operate CRM |
-| 4–6 | 4 V8 API | OAuth2 + JSON:API + aliasing + contract tests | A lead, C | **M4** n8n works vs new API |
-| 6–7 | 5 Data migration | ETL from sanitized dump + reconcile | C lead, A, B | **M5** data loaded + counts match |
-| 7–8 | 6 Integrations | n8n re-point, telephony/Vapi/SMS/email | C lead, A, B | **M6** end-to-end lead lifecycle |
-| 8–9 | 7 Hardening + go-live | Roles, security, perf, UAT, cutover | A lead, B, C | **M7** go-live (Gunness) |
+| 1–2 | 1 Foundation + tenancy + metadata core | App, DB-per-tenant, auth, super-admin, **metadata registry + SchemaManager** | A lead, B, C | **M1** tenant + metadata engine live |
+| 3–5 | 2 Core data model + ACL engine | Entities, activities, **per-tenant roles/ACL + user types** | C lead, A, B | **M2** schema + ACL enforced |
+| 5–8 | 3 **Studio** (per tenant) | Field/dropdown/layout/relationship/module builders, dynamic rendering, governance | B lead, A | **M3** a tenant customises itself |
+| 7–9 | 4 CRM UI + DNC + Hot/Warm + settings | All screens on the dynamic renderer, role matrix UI, tenant settings | B lead, A, C | **M4** staff operate the CRM |
+| 9–11 | 5 **RESTful API** + webhooks | v1 REST (incl. custom modules), auth/scopes, OpenAPI, signed webhooks | A lead, C | **M5** API + docs + webhooks live |
+| 11–13 | 6 Integrations | WordPress, Meta/WhatsApp/LinkedIn/TikTok/Google, **n8n rewrite**, telephony/SMS/email | C lead, A, B | **M6** end-to-end lead lifecycle |
+| 12–13 | 7 Data migration (LOCAL) | ETL + **import existing custom fields into Studio** + reconcile | C lead, B | **M7** data migrated + counts match |
+| 13–14 | 8 Hardening, UAT, go-live | Security, perf, backups, UAT, cutover | A lead, B, C | **M8** first company LIVE |
 
-Internal beta usable after **M4 (~wk6)**: new leads flow via n8n against the new CRM while later phases finish.
-
----
-
-## 4. Phases in detail (tasks, owner, effort, DoD)
-
-### Phase 1 — Foundation + tenancy (Week 1)
-- `[A]` Scaffold Laravel 11 + Filament v3 + stancl/tenancy + spatie/permission + Passport + Horizon; central + tenant DBs; `tenant:create` (provision DB, migrate, seed); subdomain routing. **(3d)**
-- `[A]` Super-admin "landlord" panel skeleton: list/create tenants (companies), per-tenant subdomain. **(1.5d)**
-- `[B]` Filament auth panel + base theme; `config/roles.php` from `docs/reference/roles.php`; RolesSeeder per tenant; role gating. **(2d)**
-- `[A]` CI (GitHub Actions: pint/phpstan/pest) + `.claude/settings.json` SessionStart hook + permission allow-list. **(1d)**
-- `[C]` Stand up dev DB from the sanitized dump; profile data; refine `field-map.json`; extract enum option lists (`SELECT DISTINCT`). **(2d, needs the dump)**
-- **DoD (M1):** create a tenant → log into its panel → role gating works; a Pest test proves tenant A can't read tenant B; CI green.
-
-### Phase 2 — Core data model + migrations (Weeks 2–3)
-- `[A]` Shared **Contactable** base (trait + migration) from `field-map.json contactable_base`; soft deletes; users FKs. **(1.5d)**
-- `[A]` **Polymorphic activities**: Meeting, Note, Document(+revision), Email(+text, EmailAddress morph), Call, Task; polymorphic Audit log; `primary_email` denormalization. **(3d)**
-- `[B]` **Company** + **Lead**(`vertical`,`stage`) entities: migration+model+factory+relationships; dropdowns as PHP enums (label convention preserved). **(3d)**
-- `[C]` Remaining entities — Student, Assessment (88-field CRS/FSW → `scores` JSON + key columns), StudyLead, LmiaCase, Client, Affiliate, NewsletterSubscriber, SmsMessage — migration+model+factory each. **(5d)**
-- **DoD (M2):** all core migrations run clean on a fresh tenant DB; relationship + factory tests green; schema matches `field-map.json`.
-
-### Phase 3 — CRM UI + DNC + Hot/Warm (Weeks 3–4, overlaps P2)
-- `[B]` Filament resources (list/detail/edit) for every entity; global search; role-gated. **(4d)**
-- `[B]` DNC filter/toggle; Hot/Warm toggles + two dashboard widgets aggregating across verticals. **(2d)**
-- `[A]` Per-tenant **settings** module (own SMTP, telephony creds, branding, enabled verticals) — SaaS essential. **(2.5d)**
-- `[C]` ETL transformer skeleton (source→new mapping) using profiled data. **(2d)**
-- **DoD (M3):** staff operate the CRM in a tenant; DNC + Hot/Warm work; each company can set its own SMTP/branding.
-
-### Phase 4 — SuiteCRM-V8-compatible API + OAuth2 (Weeks 4–6)
-- `[A]` Passport `client_credentials`; JSON:API `module/{m}`, `meta/modules`, `meta/fields`; pagination `meta` (record counts). **(3d)**
-- `[A]` Server-side **datetime normalisation (UTC `Y-m-d H:i:s`)** + **Meta value canonicalisation**; module aliasing (`GA_*` ↔ entities). **(2d)**
-- `[C]` Contract tests capturing SuiteCRM's real response shapes; validate a cloned real n8n workflow does CRUD. **(3d)**
-- `[B]` Daily lead/student count notifications (Horizon jobs); per-tenant API-client management UI. **(2d)**
-- **DoD (M4):** a real n8n workflow authenticates + CRUD against the new API; contract tests green.
-
-### Phase 5 — Data migration / ETL (Weeks 6–7)
-- `[C]` Full ETL from the sanitized dump → tenant DB: field mapping, dropdown/Meta cleanup, UTC datetimes, join `email_addresses`→`primary_email`, dedup legacy modules; **idempotent + `--dry-run`**. **(4d)**
-- `[A]` Bulk-import performance + tenant seeding from data. **(1.5d)**
-- `[B]` Verify migrated data renders in Filament; fix field/display mismatches. **(1.5d)**
-- **DoD (M5):** staging tenant loaded; row counts reconcile to the audit (Company ≈ 21,014, Assessment_Score ≈ 8,147, Study ≈ 4,782…); spot-checks pass.
-- **Runs LOCALLY** (needs the sanitized dump + a local DB) — exact step-by-step runbook in **Appendix A**.
-
-### Phase 6 — Integrations (Weeks 7–8)
-- `[C]` Re-point n8n workflows to the new API (pilot 1–2 per family → bulk); per-tenant SMTP send + IMAP intake. **(4d)**
-- `[A]` Click-to-call endpoint (Reverb/socket) + Vapi inbound/post-call webhooks; SMS adapter (provider-agnostic). **(3d)**
-- `[B]` In-CRM activity timeline (calls/SMS/emails); per-tenant integration settings UI. **(2d)**
-- **DoD (M6):** Meta lead → n8n → new CRM; follow-ups fire; Vapi post-call tags back; click-to-call works.
-
-### Phase 7 — Hardening, roles, UAT, go-live (Weeks 8–9)
-- `[A]` `/security-review`; performance (Octane/FrankenPHP); backups + per-tenant export; deployment + cutover runbook (parallel-run → switch). **(3d)**
-- `[B]` Finalise the 29 roles + permission matrix; UAT fixes; user docs. **(2.5d)**
-- `[C]` Reconciliation re-run; full n8n cutover; basic monitoring/alerts. **(2d)**
-- **DoD (M7):** UAT sign-off; security review clean; backups + rollback tested; **first company (Gunness) live**; a second tenant can be onboarded by an admin.
+Internal beta usable after **M4 (~wk 9)**. Second tenant onboarding demo-able after **M3**.
 
 ---
 
-## 5. SaaS specifics (because tenants = other companies)
-- **In v1:** DB-per-tenant isolation, **admin-provisioned** tenants (super-admin creates a company → gets its own DB + subdomain), per-tenant settings (SMTP, telephony, branding, roles, enabled verticals), per-tenant backup/export.
-- **Fast-follow (after wk9):** self-serve signup, subscription **billing (Stripe)**, plan/usage limits, tenant-facing onboarding wizard, per-tenant custom-field designer (Studio-like), native telephony/SMS rebuild, full email-template library migration, advanced reporting.
+## 4. Phases in detail (tasks · owner · DoD)
+
+### Phase 1 — Foundation + tenancy + metadata core (Weeks 1–2)
+- `[A]` Scaffold Laravel 11 + Filament v3 + stancl/tenancy + spatie/permission + Passport/Sanctum + Horizon; central + tenant DBs; `tenant:create`; subdomain routing; CI (pint/phpstan/pest). **(4d)**
+- `[A]` **Metadata registry** (`tenant_modules`, `tenant_fields`, `tenant_option_lists`, `tenant_layouts`, `tenant_relationships`, `tenant_studio_changes`) + **SchemaManager**: plan→snapshot→apply DDL→audit→cache-bump. **(4d)**
+- `[A]` Super-admin (landlord) panel: create/manage companies, per-tenant **Studio governance flags + limits**. **(2d)**
+- `[B]` Tenant auth panel (+2FA), base theme, **FieldTypeRegistry** skeleton (type → Filament component/cast/validation). **(3d)**
+- `[C]` Load sanitized dump locally; profile data; refine `field-map.json`; extract enum option lists. **(2d)**
+- **DoD (M1):** create a tenant → log in → add a field via the metadata API → column appears in that tenant's DB only, audited, cache-bumped; tenant-isolation test green; CI green.
+
+### Phase 2 — Core data model + ACL engine (Weeks 3–5)
+- `[A]` Shared **Contactable** base + `HasCustomFields` trait (sidecar `_custom` tables) + **polymorphic activities** (Meeting/Note/Document/Email/Call/Task) + audit log + `EmailAddress` morph/`primary_email`. **(4d)**
+- `[C]` **ACL engine:** `role_module_permissions` matrix (view/list/edit/delete/import/export/mass_update × All/Owner/Group/None), field-level ACL, Policies + **global query scopes shared by UI and API**, dynamic permission registration for new modules, user types (Super Admin / System Administrator / Regular). **(5d)**
+- `[C]` Core entity migrations/models/factories: Company, Lead(`vertical`,`stage`), Student, Assessment (88-field CRS/FSW), StudyLead, LmiaCase, Client, Affiliate, NewsletterSubscriber, SmsMessage. **(5d)**
+- `[B]` Seed the 29 starter roles per tenant; first dynamic list/form rendering from metadata. **(3d)**
+- **DoD (M2):** migrations clean on a fresh tenant DB; a Regular User with *Owner*-level access sees only their records **in both UI and API**; System Administrator sees all; tests cover each access level.
+
+### Phase 3 — Studio, per tenant (Weeks 5–8)
+- `[B]` **Field Manager** (all types incl. relate) + **Dropdown Editor** (label convention preserved). **(5d)**
+- `[B]` **Layout Editor** — drag-and-drop for list/detail/edit/search; versioned layout JSON. **(5d)**
+- `[B]` **Dynamic rendering** hardening: `DynamicResource` builds form/table/infolist/filters from metadata; metadata cache per tenant. **(4d)**
+- `[A]` **Relationship Manager** (1-M / M-M / 1-1 → FK or pivot via SchemaManager) + **Module Builder** (tenant-defined modules with base, activities, permissions, API). **(5d)**
+- `[A]` **Governance:** change-request queue with **DDL preview**, approve/reject, audit, **rollback**, per-tenant limits, **blueprints** (save a config → push to other tenants). **(3d)**
+- **DoD (M3):** a tenant admin adds a field, a dropdown, reorders a layout, creates a relationship and a new module — visible immediately in UI **and** API, with no deploy; super admin can gate/approve/roll back; another tenant is unaffected.
+
+### Phase 4 — CRM UI + DNC + Hot/Warm + settings (Weeks 7–9)
+- `[B]` Screens for every core entity on the dynamic renderer; activity timeline relation managers; global search. **(5d)**
+- `[B]` **DNC** filter/toggle; **Hot/Warm** toggles + dashboard widgets across verticals; daily count notifications (Horizon). **(3d)**
+- `[B]` **Role matrix UI** (SuiteCRM-like editor) + user management for tenant admins. **(3d)**
+- `[A]` Per-tenant settings (SMTP, telephony, branding, enabled verticals/modules), secrets encrypted. **(3d)**
+- **DoD (M4):** staff operate the CRM per tenant; DNC + Hot/Warm work; a tenant admin creates users/roles; each company has its own SMTP/branding.
+
+### Phase 5 — RESTful API + webhooks (Weeks 9–11)
+- `[A]` **v1 REST** for every module **including Studio-created ones** (metadata-driven): filtering/sorting/sparse fields/includes, cursor pagination, problem-details errors, ETag, idempotency. **(5d)**
+- `[A]` **Auth & limits:** OAuth2 client_credentials + PATs + API keys, **scopes**, per-tenant rate limits, request logs; **OpenAPI 3.1 per tenant** + Swagger UI. **(4d)**
+- `[A]` **Outbound webhooks:** subscriptions, HMAC signing, retries/backoff, delivery log + replay. **(3d)**
+- `[C]` API contract tests + a reference integration (Postman/n8n collection) proving the flows. **(3d)**
+- **DoD (M5):** external app authenticates, CRUDs a **custom** module created in Studio, receives a signed webhook; OpenAPI docs match reality; ACL access levels enforced identically to the UI.
+
+### Phase 6 — Integrations (Weeks 11–13)
+- `[C]` **WordPress**: plugin + form mappers (Gravity/CF7/WPForms/Elementor) → `/api/v1/leads`. **(3d)**
+- `[C]` **Meta Lead Ads + Instagram + WhatsApp Cloud API** (leadgen webhook → fetch → map, keeping **Meta value canonicalisation**); **LinkedIn/TikTok/Google** lead forms; generic `/ingest/{source}`; shared **FieldMapper** + dedupe. **(5d)**
+- `[C]` **Rewrite the 133 n8n workflows** against the new REST API, in waves per family, with pilots first. **(5d)**
+- `[A]` Click-to-call (Reverb + Asterisk AMI, per-tenant creds) + **Vapi** webhooks; **SMS** provider-agnostic adapter; per-tenant SMTP send (+ IMAP intake if in scope). **(4d)**
+- `[B]` In-CRM activity timeline for calls/SMS/emails; per-tenant integration settings UI. **(3d)**
+- **DoD (M6):** a Meta/WordPress lead lands via the API, follow-ups fire, a Vapi call tags back, click-to-call works, SMS/email logged — all inside the correct tenant.
+
+### Phase 7 — Data migration / ETL (Weeks 12–13, runs LOCALLY)
+- `[C]` ETL sanitized dump → tenant DB: mapping, cleanup, UTC datetimes, `primary_email` join, dedupe legacy modules; **idempotent + `--dry-run` + reconciliation report**. **(4d)**
+- `[C]` **Import `fields_meta_data` + view defs → Studio metadata** (their existing custom fields/layouts become tenant metadata). **(2d)**
+- `[B]` Verify migrated data renders; fix field/display mismatches. **(2d)**
+- **DoD (M7):** staging tenant loaded; counts reconcile to the audit (Company ≈ 21,014, Assessment_Score ≈ 8,147, Study ≈ 4,782 …); existing custom fields appear in Studio. **Runbook: Appendix A.**
+
+### Phase 8 — Hardening, UAT, go-live (Weeks 13–14)
+- `[A]` `/security-review` (incl. **tenant isolation, Studio DDL safety, API scope/authz**); performance (Octane/FrankenPHP, metadata cache); backups + per-tenant export; deploy + **cutover runbook** (parallel-run → switch). **(4d)**
+- `[B]` Finalise roles/permission matrix; UAT fixes; admin + user docs (incl. a Studio guide for tenant admins). **(3d)**
+- `[C]` Reconciliation re-run; full n8n cutover; monitoring/alerts. **(3d)**
+- **DoD (M8):** UAT sign-off; security review clean; backups + rollback tested; **first company LIVE**; a second company onboardable from a blueprint.
+
+---
+
+## 5. Timeline options
+| Option | Team | Duration | Notes |
+|---|---|---|---|
+| **A — Full scope (this plan)** | 3 devs | **~14 weeks** | Everything, built in the correct order |
+| **B — Compress** | **4 devs** | ~11–12 weeks | Studio (B+1) and API (A) run as parallel tracks |
+| **C — Staged** | 3 devs | 9 wks to go-live, Studio wks 10–15 | Ship CRM + REST API + roles first, Studio after. **Metadata engine still built in P1–P2.** |
+
+**Fast-follow (post go-live):** self-serve signup + **Stripe billing**, plan/usage limits, report builder, native telephony/SMS rebuild, email-template library migration, tenant-facing onboarding wizard, mobile app.
 
 ## 6. Risks & mitigations
-- **API compatibility** with 133 workflows → contract-test first; buffer in Phase 4.
-- **Data cleanup** (Meta values, duplicate modules, datetime) → handled in ETL with reconciliation; the audited counts are the acceptance bar.
-- **Timeline** assumes 3 Laravel+Claude Code devs and the sanitized dump available by Phase 5; 2 devs → ~12–13 weeks.
-- **PII/compliance** (immigration data, multi-company) → per-tenant isolation, encryption at rest, access logging, credential rotation.
+- **Studio scope** (biggest new risk) → build the engine first (P1–P2), ship Studio in slices (fields → dropdowns → layouts → relationships → modules); hard limits + approval queue + snapshots/rollback.
+- **Runtime DDL** → SchemaManager only; snapshot before every change; DB-per-tenant limits blast radius to one company; full audit.
+- **133 n8n workflows rewritten** → pilot one per family, migrate in waves, keep the old CRM running in parallel; *consider the thin legacy adapter as insurance*.
+- **Dynamic everything vs performance** → compiled metadata cache per tenant, real indexed columns for filterable fields, query-scope tests.
+- **Timeline** assumes 3 Laravel+Claude Code devs, decisions locked, dump available by P7. 2 devs → ~19–21 weeks.
+- **PII/compliance** → per-tenant isolation, encrypted secrets, audit log, access logging, retention, credential rotation.
 
 ## 7. How Claude Code executes this
-1. Open the repo, read `CLAUDE.md` + this plan + `docs/DATA_MODEL.md` + `docs/reference/field-map.json`.
-2. Take the current phase → **Plan Mode** → get approval → build the phase's tasks as **small PRs** in owner order.
-3. Before each commit: `pint` → `phpstan` → `pest`. Before merge: `/code-review`. Before go-live: `/security-review`.
-4. Only advance a phase when its **DoD** passes. Keep `CLAUDE.md` updated as decisions land.
+1. Read `CLAUDE.md` → `docs/ARCHITECTURE.md` → `docs/STUDIO_API_RBAC.md` → `docs/DATA_MODEL.md` → `docs/reference/*`.
+2. Current phase → **Plan Mode** → approval → build as **small PRs** in owner order.
+3. `pint` → `phpstan` → `pest` before each commit; `/code-review` before merge; `/security-review` in P8.
+4. Advance only when the phase **DoD** passes. Keep `CLAUDE.md` current as decisions land.
 
 ---
 
 ## 8. Environments — where each phase runs (cloud vs local)
-- **Cloud / web Claude Code** (isolated container — **no access to your PC or live server**): everything that needs only the **schema + specs** — Phase 1–4 building, migrations code, the V8-compatible API. Delivers via commits/PRs.
-- **Local Claude Code / dev machines** (your computers, with your permissions + local DB/services): anything that needs the **sanitized data dump**, a **prod-copy DB**, or the **telephony/SMS/email providers** — i.e. **Phase 5 (ETL)** and **Phase 6 integration testing**. The sanitized dump stays here and never passes through the cloud session.
+- **Cloud / web Claude Code** (isolated container — **no access to your PC or live server**): everything needing only schema + specs — Phases 1–6, 8.
+- **Local Claude Code / dev machines** (your computers, local DB/services): anything needing the **sanitized dump**, a **prod-copy DB**, or **provider credentials** — **Phase 7 (ETL)** and Phase 6 integration testing. The dump stays local and never passes through the cloud session.
 
 ## 9. What we exactly need to do (execution checklist)
 **Setup (once):**
-- [ ] Push the repo foundation to `Gunness-and-Associates/crm` (the bundle) — or link GitHub so Claude Code can push directly.
-- [ ] Assign 3 developers to lanes **A / B / C** (Section 2).
-- [ ] Stand up a dev environment (PHP 8.3, MySQL/MariaDB, Redis) + a staging host.
+- [ ] Push the repo foundation to `Gunness-and-Associates/crm` — or link GitHub so Claude Code can push directly.
+- [ ] Assign 3 developers to lanes **A / B / C** (§2).
+- [ ] Stand up dev + staging (PHP 8.3, MySQL 8/MariaDB, Redis) with wildcard DNS/TLS.
 
-**Inputs the Product Owner provides, by phase:**
-- [ ] Phase 1–2: field-mapping answers as they arise; confirm/adjust the 2 defaults (Study/LMIA as `Lead` verticals; SMS provider).
-- [ ] Phase 5: the **`crmga_sanitized.sql.gz`** dump — used **locally** by Dev C (Appendix A). **Not** uploaded to the cloud session.
-- [ ] Phase 6: provider credentials in `.env` (never committed): Vapi, Asterisk/PBX AMI, SMS gateway, SMTP/IMAP.
-- [ ] Phase 7: UAT sign-off; approve credential rotation.
+**Decisions to lock before Phase 1** (see `ARCHITECTURE.md` §5):
+- [ ] Hosting/infra + backup plan · [ ] domain + wildcard DNS/TLS · [ ] confirm Filament UI · [ ] keep source UUID PKs
+- [ ] **Studio governance policy** — default mode per tenant (disabled / request-only / self-serve) + limits
+- [ ] **Legacy adapter yes/no** (insurance for the 133 workflows) · [ ] which social platforms are **must-have in v1** vs later
 
-**Build (Devs + Claude Code):** run Phases 1 → 7 in order (Section 4), one phase at a time, small PRs, DoD gates.
+**Inputs by phase:** field-mapping answers (P2–P3) · Studio limits (P3) · **social/WordPress API credentials (P6)** · SMS gateway choice (P6) · Vapi/Asterisk/SMTP creds (P6) · **sanitized dump, locally (P7)** · UAT sign-off + credential rotation (P8).
 
-## Appendix A — Phase 5: run the data migration LOCALLY (Dev C)
-**Why local:** the sanitized dump + database live on your machine; the cloud session can't (and shouldn't) touch them. Run this with **local Claude Code** or by hand on a dev machine.
+---
 
-**Prereqs (local machine):** PHP 8.3, Composer, MySQL/MariaDB, the repo cloned with Phase 1–2 done, Claude Code (`claude`), and the file `crmga_sanitized.sql.gz`.
+## Appendix A — Phase 7: run the data migration LOCALLY (Dev C)
+**Why local:** the dump + database live on your machine; the cloud session can't (and shouldn't) touch them.
 
-1. **Load the source dump into a local, read-only DB:**
+**Prereqs:** PHP 8.3, Composer, MySQL/MariaDB, repo with P1–P2 done, Claude Code (`claude`), and `crmga_sanitized.sql.gz`.
+
+1. **Load the source dump into a local read-only DB:**
    ```bash
    mysql -e "CREATE DATABASE crmga_source CHARACTER SET utf8mb4;"
    gunzip -c crmga_sanitized.sql.gz | mysql crmga_source
    ```
-2. **Add a read-only `legacy` DB connection** (via `.env` → `config/database.php`) pointing at `crmga_source`.
+2. Add a read-only **`legacy`** DB connection (`.env` → `config/database.php`) pointing at `crmga_source`.
 3. **Create + migrate the target tenant:**
    ```bash
    php artisan tenant:create gunness
    php artisan tenants:migrate --tenant=gunness
    ```
-4. **Dry-run the ETL** (reads legacy, maps, reports counts, writes nothing):
+4. **Import existing customisation into Studio metadata:**
+   ```bash
+   php artisan crm:import-studio-metadata --tenant=gunness   # fields_meta_data + view defs
+   ```
+5. **Dry-run the ETL** (reads legacy, maps, reports counts, writes nothing):
    ```bash
    php artisan crm:migrate-legacy --tenant=gunness --dry-run
    ```
-5. **Reconcile** the printed per-entity counts against the audited targets (Company ≈ 21,014, Assessment_Score ≈ 8,147, Study ≈ 4,782, HQ_Students ≈ 548, GALead ≈ 394 …). Fix mappings until they line up.
-6. **Run for real** (idempotent — safe to re-run):
-   ```bash
-   php artisan crm:migrate-legacy --tenant=gunness
-   ```
-7. **Spot-check in Filament:** emails (from the `email_addresses` join → `primary_email`), dropdown values, and dates (UTC `Y-m-d H:i:s`).
+6. **Reconcile** the printed per-entity counts against the audited targets; fix mappings until they line up.
+7. **Run for real** (idempotent): `php artisan crm:migrate-legacy --tenant=gunness`
+8. **Spot-check** in the UI: emails (from the `email_addresses` join), dropdown values, dates (UTC `Y-m-d H:i:s`).
 
-**Driving it with local Claude Code:** `cd` into the repo, run `claude`, then prompt: *"Build/extend the `crm:migrate-legacy` command per `docs/DATA_MODEL.md` + `docs/reference/field-map.json`; source = the `legacy` connection (`crmga_source`); run `--dry-run` and reconcile to the audited counts."* Local Claude Code reads the dump and queries `crmga_source` directly.
+**Driving it with local Claude Code:** `cd` into the repo, run `claude`, then: *"Build/extend `crm:migrate-legacy` per `docs/DATA_MODEL.md` + `docs/reference/field-map.json`; source = the `legacy` connection; run `--dry-run` and reconcile to the audited counts."*
 
-**Safety:** work on a copy — never point the ETL at the live production DB. The dump is sanitized but may hold residual PII in untagged free-text; keep it on the dev machine and delete it when done.
+**Safety:** work on a copy — never point the ETL at live production. The dump is sanitized but may hold residual PII in untagged free-text; keep it local and delete it when done.

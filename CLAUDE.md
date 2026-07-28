@@ -7,7 +7,16 @@ database.** First tenant live = Gunness & Associates. This repo currently holds 
 `/docs`; the Laravel app gets scaffolded starting in Phase 1.
 - **Master plan (timelines + who-does-what):** `docs/PROJECT_PLAN.md`
 - **Technical approach / architecture + open decisions:** `docs/ARCHITECTURE.md`
+- **Studio · REST API · per-tenant RBAC design:** `docs/STUDIO_API_RBAC.md`
 - **Start here to build:** `docs/PHASE1_KICKOFF.md`
+
+## The core architectural rule
+This app is a **metadata-driven engine**, not a set of hardcoded models. Per-tenant **metadata**
+(`tenant_modules`, `tenant_fields`, `tenant_option_lists`, `tenant_layouts`, `tenant_relationships`)
+generates the **schema** (via `SchemaManager` runtime DDL into `{table}_custom` sidecars), the **UI**
+(`DynamicResource` + `FieldTypeRegistry` build Filament forms/tables), the **permissions** (auto-registered
+per module), and the **REST API** (endpoints + OpenAPI per tenant). Build the engine before any entity —
+anything hardcoded first gets rewritten twice.
 
 ## Stack (pin these)
 - PHP 8.3, Laravel 11
@@ -39,9 +48,15 @@ database.** First tenant live = Gunness & Associates. This repo currently holds 
 - **Activities are polymorphic** (Meeting/Note/Document/Email/Call/Task morph to any record) — do NOT recreate the 154 SuiteCRM `_c` link tables.
 - **Email** = related `EmailAddress` (morph) + a denormalized `primary_email`; it is not a base column.
 
-## Integrations — kept EXTERNAL for v1 (we integrate, not rebuild)
-- **n8n** (133 workflows): stays running. The app exposes a **SuiteCRM-V8-compatible JSON:API** (`/Api/V8/module/{m}`, `/meta/modules`, `/meta/fields`) + OAuth2 `client_credentials`, so each workflow only re-points its base URL.
-- **Asterisk** click-to-call, **Vapi** voice, **dt_sms** SMS, **email** (SMTP/IMAP) — integrate via API + webhooks.
+## API & integrations
+- **Modern RESTful API** `/api/v1/*` — versioned, metadata-driven (custom modules get endpoints automatically), OAuth2 + PATs + API keys with **scopes**, **OpenAPI 3.1 per tenant**, signed **outbound webhooks**. **No SuiteCRM-V8-compatible API** (dropped by decision; an optional thin `/Api/V8/*` adapter exists only as a migration bridge).
+- **Inbound integrations:** WordPress (plugin + form mappers), Meta Lead Ads/Instagram, WhatsApp Cloud, LinkedIn/TikTok/Google lead forms, generic signed `/ingest/{source}` — all via one **FieldMapper** (canonicalise → validate → dedupe → assign → events).
+- **n8n** (133 workflows): **rewritten** against the new REST API in Phase 6 (waves, pilot per family).
+- **Asterisk** click-to-call (per-tenant AMI creds), **Vapi** voice, **SMS** (provider-agnostic adapter), **email** (per-tenant SMTP/IMAP) — integrate via API + webhooks.
+
+## Roles & ACL (per tenant)
+- **User types:** Super Admin (platform, central panel) · System Administrator (per tenant) · Regular User · optional API principal.
+- **ACL matrix:** module × action (view/list/edit/delete/import/export/mass_update) × **access level `All | Owner | Group | None`**, plus field-level ACL. Enforced by Policies + **global query scopes shared by UI and API**. Roles live in the **tenant DB** — every company defines its own. New Studio modules auto-register permissions (default deny).
 
 ## Commands (once the app is scaffolded)
 - Install: `composer install && npm install`
