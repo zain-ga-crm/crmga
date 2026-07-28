@@ -13,6 +13,7 @@ First tenant live = Gunness & Associates; more companies onboarded after.
 | File | What |
 |---|---|
 | `docs/PROJECT_PLAN.md` | **Master plan — 9-week timeline, phases, who-does-what (start here)** |
+| `docs/ARCHITECTURE.md` | **Technical approach per layer + concern×phase map + open decisions to lock first** |
 | `docs/PLAN.md` | Architecture + full build plan |
 | `docs/CLAUDE_CODE_BUILD_PLAN.md` | 8–9 week phased plan for building **with Claude Code** |
 | `docs/DATA_MODEL.md` | Target data model (from the live 481-table DDL) |
