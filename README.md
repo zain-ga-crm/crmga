@@ -19,6 +19,7 @@ First tenant live = Gunness & Associates; more companies onboarded after.
 | `docs/CLAUDE_CODE_BUILD_PLAN.md` | 8–9 week phased plan for building **with Claude Code** |
 | `docs/DATA_MODEL.md` | Target data model (from the live 481-table DDL) |
 | `docs/PHASE1_KICKOFF.md` | Copy-paste Claude Code prompts + per-entity checklist to start |
+| `docs/crmga_CRM_Functional_Screen_Spec.docx` | **Functional & screen specification — every screen, what it shows, what it does** |
 | `docs/reference/field-map.json` | Per-entity source tables → columns |
 | `docs/reference/schema.json` | Full parsed source DDL (481 tables) |
 | `docs/reference/roles.php` | The 29 ACL roles to seed |
