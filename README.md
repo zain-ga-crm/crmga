@@ -12,7 +12,8 @@ First tenant live = Gunness & Associates; more companies onboarded after.
 ## Documentation (`/docs`)
 | File | What |
 |---|---|
-| `docs/PROJECT_PLAN.md` | **Master plan — 9-week timeline, phases, who-does-what (start here)** |
+| `docs/PROJECT_PLAN.md` | **Master plan — 14-week timeline, 8 phases, milestones (start here)** |
+| `docs/TASK_BREAKDOWN.md` | **Task-by-task assignments per developer (Zain / Shahmeer / Shahab) + load analysis** |
 | `docs/ARCHITECTURE.md` | **Technical approach per layer + concern×phase map + open decisions to lock first** |
 | `docs/PLAN.md` | Architecture + full build plan |
 | `docs/CLAUDE_CODE_BUILD_PLAN.md` | 8–9 week phased plan for building **with Claude Code** |

@@ -5,7 +5,8 @@ A **multi-tenant SaaS CRM** (Laravel + Filament) **sold to other immigration fir
 Gunness & Associates SuiteCRM 8.8.0 system ("crmga"). **Each customer company = one tenant = its own
 database.** First tenant live = Gunness & Associates. This repo currently holds the **plan + specs** in
 `/docs`; the Laravel app gets scaffolded starting in Phase 1.
-- **Master plan (timelines + who-does-what):** `docs/PROJECT_PLAN.md`
+- **Master plan (timelines + phases):** `docs/PROJECT_PLAN.md`
+- **Task-by-task assignments per developer:** `docs/TASK_BREAKDOWN.md`
 - **Technical approach / architecture + open decisions:** `docs/ARCHITECTURE.md`
 - **Studio · REST API · per-tenant RBAC design:** `docs/STUDIO_API_RBAC.md`
 - **Start here to build:** `docs/PHASE1_KICKOFF.md`
