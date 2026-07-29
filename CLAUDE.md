@@ -24,7 +24,7 @@ anything hardcoded first gets rewritten twice.
 - **Filament v3** — staff CRM UI
 - **stancl/tenancy** — database-per-tenant (central DB = tenant registry/auth; **tenant DB = all CRM data**)
 - **spatie/laravel-permission** — RBAC (29 roles, see `docs/reference/roles.php`)
-- **Laravel Passport** — OAuth2 `client_credentials` for the V8-compatible API
+- **Laravel Passport** (OAuth2 `client_credentials`) + **Sanctum** (PATs) + API keys — for the REST API
 - **Horizon + Redis** — queues & scheduled jobs (replace SuiteCRM schedulers)
 - MySQL/MariaDB; FrankenPHP or Octane for performance
 - Tests **Pest** · Format **Pint** · Static analysis **Larastan/PHPStan**
@@ -37,7 +37,7 @@ anything hardcoded first gets rewritten twice.
 - Work against a **copy** of prod data (the sanitized dump), never the live DB.
 
 ## SuiteCRM behaviours we MUST preserve (learned the hard way)
-1. **Datetimes → always `Y-m-d H:i:s` in UTC.** The old V8 API silently blanked mismatched datetimes; our V8-compatible API must normalise every inbound datetime to this.
+1. **Datetimes → always `Y-m-d H:i:s` in UTC.** The old V8 API silently blanked mismatched datetimes because it parsed against the *authenticated API user's* locale. Our REST API must be **locale-independent**: normalise every inbound datetime to UTC at the boundary, never using the principal's preferences.
 2. **Meta-Ads value canonicalisation** — incoming dropdown values are lowercased/underscored/punctuated and carry invisible Unicode marks. Canonicalise both the value and each enum key (`strtolower` + strip non-alphanumerics) before matching; unmatched → `null`.
 3. **Label convention** — dropdown labels capitalise only the first character (`follow_up` → "Follow up"). Do NOT Title-Case.
 
