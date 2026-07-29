@@ -12,20 +12,24 @@ First tenant live = Gunness & Associates; more companies onboarded after.
 ## Documentation (`/docs`)
 | File | What |
 |---|---|
+| `START-HERE.md` | **Handover guide — read this first** |
 | `docs/PROJECT_PLAN.md` | **Master plan — 14-week timeline, 8 phases, milestones (start here)** |
 | `docs/TASK_BREAKDOWN.md` | **Task-by-task assignments per developer (Zain / Shahmeer / Shahab) + load analysis** |
+| `docs/STUDIO_API_RBAC.md` | Studio · REST API · per-tenant RBAC design |
 | `docs/ARCHITECTURE.md` | **Technical approach per layer + concern×phase map + open decisions to lock first** |
-| `docs/PLAN.md` | Architecture + full build plan |
-| `docs/CLAUDE_CODE_BUILD_PLAN.md` | 8–9 week phased plan for building **with Claude Code** |
 | `docs/DATA_MODEL.md` | Target data model (from the live 481-table DDL) |
 | `docs/PHASE1_KICKOFF.md` | Copy-paste Claude Code prompts + per-entity checklist to start |
 | `docs/crmga_CRM_Functional_Screen_Spec.docx` | **Functional & screen specification — every screen, what it shows, what it does** |
 | `docs/reference/field-map.json` | Per-entity source tables → columns |
 | `docs/reference/schema.json` | Full parsed source DDL (481 tables) |
 | `docs/reference/roles.php` | The 29 ACL roles to seed |
+| `docs/reference/crmga_full_schema.sql` | Raw source DDL (structure only, no data) |
+| `scripts/` | Read-only audit scripts for the source system |
+| `docs/archive/` | Superseded earlier plans (history only) |
 | `CLAUDE.md` | Project memory for Claude Code (stack, rules, gotchas) |
 
 ## Getting started
-1. Read `CLAUDE.md`, then `docs/DATA_MODEL.md`.
-2. Follow `docs/PHASE1_KICKOFF.md` to scaffold Laravel + tenancy + RBAC.
+1. Read `START-HERE.md`, then `CLAUDE.md`.
+2. Follow `docs/PROJECT_PLAN.md` (phases) and `docs/TASK_BREAKDOWN.md` (your tasks).
+3. Start building with `docs/PHASE1_KICKOFF.md`.
 3. Build in small PRs; tests + lint + static analysis must pass before merge.

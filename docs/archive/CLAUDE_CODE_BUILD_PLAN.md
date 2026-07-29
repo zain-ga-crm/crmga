@@ -1,3 +1,9 @@
+> ## ⚠️ SUPERSEDED — DO NOT BUILD FROM THIS DOCUMENT
+> This was the earlier 9-week plan. It assumed a SuiteCRM-V8-compatible API and treated
+> Studio as a later addition. Both changed. The current plan is **`docs/PROJECT_PLAN.md`**
+> (14 weeks, Studio in v1, modern REST API) with tasks in **`docs/TASK_BREAKDOWN.md`**.
+> Kept only for history.
+
 # crmga → Laravel — Claude Code Build Plan (8–9 week v1)
 
 Build the multi-tenant Laravel CRM **with Claude Code + your dev team**, targeting a

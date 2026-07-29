@@ -1,3 +1,9 @@
+> ## ⚠️ SUPERSEDED — DO NOT BUILD FROM THIS DOCUMENT
+> This was the earlier 9-week plan. It assumed a SuiteCRM-V8-compatible API and treated
+> Studio as a later addition. Both changed. The current plan is **`docs/PROJECT_PLAN.md`**
+> (14 weeks, Studio in v1, modern REST API) with tasks in **`docs/TASK_BREAKDOWN.md`**.
+> Kept only for history.
+
 # crmga → Laravel Rebuild — Review & Build Plan
 
 **Source:** "crmga SuiteCRM — Complete System Reference" (SuiteCRM 8.8.0 audit, 2026‑07‑27).
