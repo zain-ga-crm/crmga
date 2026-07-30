@@ -34,6 +34,7 @@ tenant #1** on conversion — which is only cheap if the ten **tenancy-ready rul
 | 7 | `docs/STUDIO_API_RBAC.md` | Studio, REST API and permissions design (read the revision-3 scope note first) | Zain, Shahmeer |
 | 8 | `docs/DATA_MODEL.md` | Entities and how the 43 legacy modules consolidate | Zain |
 | 9 | `docs/crmga_CRM_Functional_Screen_Spec.docx` | Every screen, what each page shows and does | Shahmeer |
+| 9b | `docs/crmga_Frontend_Design_Spec.docx` | **How every screen is built — design tokens, layout shells, component library, wireframes, fields per screen** | Shahmeer (primary) |
 | 10 | `docs/PHASE1_KICKOFF.md` | **Copy-paste Claude Code prompts — start here on day one** | Both |
 
 `docs/reference/` is data, not reading: the parsed source schema, the field map, the roles list and the raw
@@ -159,6 +160,7 @@ Approve the plan, then work through `docs/PHASE1_KICKOFF.md`, **one pull request
 | `docs/DATA_MODEL.md` | Target entities and the consolidation of the 43 legacy modules |
 | `docs/PHASE1_KICKOFF.md` | Claude Code prompts for Phases 1–2 and the per-entity checklist |
 | `docs/crmga_CRM_Functional_Screen_Spec.docx` | Functional and screen specification |
+| `docs/crmga_Frontend_Design_Spec.docx` | Frontend design specification — tokens, shells, components, wireframes |
 | `docs/crmga_CRM_Build_Plan.pdf` | Plan summary for the team and stakeholders |
 | `docs/reference/schema.json` | Parsed DDL of all 481 source tables |
 | `docs/reference/crmga_full_schema.sql` | The raw source DDL (structure only, no data) |

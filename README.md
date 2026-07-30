@@ -20,6 +20,7 @@ First live: Gunness & Associates (single tenant); other companies onboarded afte
 | `docs/ARCHITECTURE.md` | **Technical approach per layer + concern×phase map + open decisions to lock first** |
 | `docs/DATA_MODEL.md` | Target data model (from the live 481-table DDL) |
 | `docs/PHASE1_KICKOFF.md` | Copy-paste Claude Code prompts + per-entity checklist to start |
+| `docs/crmga_Frontend_Design_Spec.docx` | **Frontend design spec — tokens, shells, components, wireframes, every screen's fields** |
 | `docs/crmga_CRM_Functional_Screen_Spec.docx` | **Functional & screen specification — every screen, what it shows, what it does** |
 | `docs/reference/field-map.json` | Per-entity source tables → columns |
 | `docs/reference/schema.json` | Full parsed source DDL (481 tables) |
