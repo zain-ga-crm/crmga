@@ -5,6 +5,15 @@ Three subsystems added/changed by the 2026-07-28 revision:
 2. **Modern RESTful API** — integrates with social platforms, WordPress, any stack (replaces the SuiteCRM-V8-compatible API).
 3. **Per-tenant roles & ACL** — SuiteCRM-style module × action matrix + user types.
 
+> ### Scope note — revision 3 (2026-07-29)
+> With two developers and a fixed 14-week date, **v1 of Studio is fields, dropdowns and layouts**.
+> The **Module Builder** and **Relationship Manager** described in Part 1 are **deferred to post-launch**
+> (the engine supports them; they are additive). **Multi-tenancy arrives in Phase 8**, so everything below
+> written as "per tenant" applies to the single installation first and becomes per-tenant on conversion —
+> the metadata tables and `SchemaManager` are unchanged by that switch. In Part 2, **outbound webhooks are
+> deferred** and a **thin `/Api/V8/*` legacy adapter ships in v1** to keep the 133 n8n workflows running.
+> In Part 3, the **Group access level and field-level ACL are deferred** (the source system uses neither).
+
 > **The architectural consequence:** all three are **metadata-driven**. The CRM is no longer a set of
 > hardcoded models — it is an **engine** that reads per-tenant metadata and produces the schema, the UI,
 > the permissions, and the API. This must be built **up front** (Phase 1–2), because retrofitting Studio

@@ -3,10 +3,12 @@
 How every layer is actually built, mapped to the phases, plus the **open decisions to lock before we
 start** (§5). Read with `PROJECT_PLAN.md` (timeline/ownership) and `DATA_MODEL.md` (entities).
 
-> **Revised 2026-07-28.** The app is now a **metadata-driven engine**: per-tenant metadata generates the
-> schema, UI, permissions and API. This enables **Studio per tenant**, a **modern RESTful API**
-> (the SuiteCRM-V8-compatible API is dropped), and **per-tenant roles/ACL**.
-> Full design of those three subsystems: **`docs/STUDIO_API_RBAC.md`**.
+> **Revised 2026-07-29 (revision 3).** Two changes: **multi-tenancy moves to the final phase** (build and
+> go live single-tenant first, convert to SaaS in Phase 8), and the team is **two developers** —
+> Zain on backend, Shahmeer on frontend. The app remains a **metadata-driven engine**: metadata generates
+> the schema, UI, permissions and API, which is what makes **Studio** and the dynamic REST API possible.
+> Scope was reduced to hold the 14-week date — see `PROJECT_PLAN.md` §6.
+> Subsystem design: **`docs/STUDIO_API_RBAC.md`**. Tenancy-ready rules: **`PROJECT_PLAN.md` §3**.
 
 ## 1. Stack (definitive)
 
@@ -15,7 +17,7 @@ start** (§5). Read with `PROJECT_PLAN.md` (timeline/ownership) and `DATA_MODEL.
 | Runtime | **PHP 8.3, Laravel 11** | core framework |
 | App server | **FrankenPHP** (worker mode) or Octane+Swoole; Caddy/Nginx front | 3–10× throughput vs FPM |
 | Staff UI | **Filament v3** (Livewire + Alpine + Tailwind) | CRM screens without a separate SPA |
-| Multi-tenancy | **stancl/tenancy v3** | database-per-tenant, auto connection switching |
+| Multi-tenancy | **stancl/tenancy v3** | database-per-tenant — **installed in Phase 8 only**; until then a single database built to become tenant #1 |
 | **Metadata engine** | **custom** (metadata registry + `SchemaManager` + `FieldTypeRegistry` + `DynamicResource`) | powers **Studio**, dynamic UI, dynamic API — the core of the app |
 | RBAC | **spatie/laravel-permission** + custom **ACL matrix** (module × action × access level) | per-tenant roles; access levels All/Owner/Group/None |
 | API auth | **Laravel Passport** (OAuth2 `client_credentials`) + **Sanctum** (PATs) + API keys, with scopes | server-to-server, per-user, and simple integrations |
@@ -36,7 +38,7 @@ start** (§5). Read with `PROJECT_PLAN.md` (timeline/ownership) and `DATA_MODEL.
 
 **Auth & user types**
 - Staff log in per tenant at their subdomain (`acme.crm.<domain>`); users live in the **tenant DB**; Filament session auth; **TOTP 2FA** (source had 2FA) + password policy.
-- **Super Admin (platform)** = a separate Filament panel on the central domain, backed by the **central DB**: manages companies, **Studio governance per tenant**, plans, support. **System Administrator (per tenant)** = full admin inside their company (users, roles, Studio, settings). **Regular User** = access strictly per roles. Optional **API/portal principal** for integrations.
+- **Super Admin (platform)** = a separate Filament panel on the central domain, backed by the **central DB**: manages companies, **Studio governance per tenant**, plans, support. **Built in Phase 8** — before then there is a single company and its System Administrator. **System Administrator (per tenant)** = full admin inside their company (users, roles, Studio, settings). **Regular User** = access strictly per roles. Optional **API/portal principal** for integrations.
 - **API** = OAuth2 `client_credentials` (Passport) + **Personal Access Tokens** (Sanctum) + **API keys**, all **tenant-scoped with scopes** (`leads:read`, `leads:write`, …), per-tenant rate limits and request logs.
 
 **Studio (per-tenant customisation)** — see `STUDIO_API_RBAC.md` Part 1
@@ -46,10 +48,10 @@ start** (§5). Read with `PROJECT_PLAN.md` (timeline/ownership) and `DATA_MODEL.
 - **Dynamic UI:** `DynamicResource` builds Filament form/table/infolist/filters from metadata; `FieldTypeRegistry` maps field type → component + cast + validation; compiled metadata cached per tenant with version bumps.
 - **Governance (super admin, per tenant):** mode `disabled | request-only | self-serve`, limits (max fields/modules, allowed types), **change-request queue with DDL preview + approve/reject**, audit + **rollback**, and **blueprints** to push a standard config to new tenants.
 
-**Multi-tenancy (DB-per-tenant)**
-- **Central DB:** tenants, domains, super-admins, plans/settings. **Tenant DB:** all CRM data (§ DATA_MODEL).
-- Identify tenant by **subdomain** (wildcard DNS + wildcard TLS). stancl bootstrappers switch DB, cache, filesystem, queue, and Redis prefix automatically per request/job.
-- Provisioning: `php artisan tenant:create <company>` → creates DB, runs tenant migrations, seeds roles + first admin. Per-tenant settings (SMTP, telephony, branding, enabled verticals) stored in the tenant DB, secrets **encrypted** at rest.
+**Multi-tenancy — deferred to Phase 8, prepared from day one**
+- **Phases 1–7:** one database. All CRM migrations live in `database/migrations/tenant/`; no `tenant_id` columns anywhere; per-company configuration in a `settings` table; `routes/central.php` a stub; storage via the `Storage` facade; cache/queue keys through one helper. A CI test fails the build if these are violated. Full list: `PROJECT_PLAN.md` §3.
+- **Phase 8 conversion:** install stancl/tenancy; add the **central DB** (tenants, domains, platform super-admins) and the `Tenant` model; **subdomain identification** with wildcard DNS and TLS; bootstrappers switching DB, cache, queue and filesystem per request and job; **promote the existing live database to tenant #1 with no data movement**; add `tenant:create` provisioning (create DB, migrate, seed roles and first admin); move `settings` rows to per-tenant scope; per-tenant backup and export.
+- **Why this is affordable:** database-per-tenant needs no schema or query changes — unlike row-level tenancy, which would require a `tenant_id` column and a scope on every table and is genuinely expensive to retrofit.
 
 **Frontend**
 - **Filament v3** panels (server-driven Livewire — no Angular). Per entity: list/table (filters incl. **DNC toggle**, bulk actions), infolist (detail), form (create/edit), **relation managers** for the activity timeline (meetings/notes/docs/emails/calls/tasks).
@@ -117,7 +119,9 @@ start** (§5). Read with `PROJECT_PLAN.md` (timeline/ownership) and `DATA_MODEL.
 - Modules not emphasised by the business: **Quotes/Invoices/Contracts/Products (aos_*)**, **Reports builder (aor_*)**, **Campaigns**, **Knowledge Base (aok_*)**, **Events (fp_*)**, **Projects (am_/project)**, **Google Maps (jjwg_*)**, **Surveys** → **out of v1 unless you flag them** (§5). *(Note: tenants can build simple versions of these themselves via Studio's Module Builder.)*
 - 154 activity link tables + 79 audit tables → collapsed to polymorphic relations + one audit log.
 
-**Now explicitly IN v1** (revised): **Studio** (fields, dropdowns, layouts, relationships, custom modules — per tenant, super-admin governed) · **per-tenant roles/ACL with access levels + user types** · **RESTful API + webhooks + social/WordPress integrations**.
+**IN v1 (revision 3):** **Studio** — fields, dropdowns and layouts · **roles/ACL** with All/Owner/None access levels and user types · **RESTful API** with OAuth2 and tokens · the **legacy `/Api/V8/*` adapter** keeping the 133 n8n workflows alive · **WordPress + Meta intake** and a generic signed ingest endpoint · **click-to-call**.
+
+**Deferred to post-launch (see `PROJECT_PLAN.md` §6):** Studio Module Builder and Relationship Manager · ACL Group level and field-level permissions · outbound webhooks · native WhatsApp/LinkedIn/TikTok/Google connectors · Vapi and SMS native handling (both keep working through n8n) · import wizard · email template editor and IMAP intake · report builder · rewriting the 133 workflows · self-service signup and billing.
 
 ## 5. OPEN DECISIONS TO LOCK BEFORE STARTING  ← work these first
 

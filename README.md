@@ -1,10 +1,11 @@
-# crmga — Multi-tenant CRM (Laravel rebuild)
+# crmga — CRM (Laravel rebuild, multi-tenant in its final phase)
 
-A **multi-tenant SaaS CRM** (Laravel + Filament, **database-per-tenant**) **sold to other immigration
-firms** — rebuilt from the Gunness & Associates SuiteCRM 8.8.0 system ("crmga"). It keeps the existing
-n8n automation, Asterisk telephony, Vapi voice, and SMS working by exposing a
-**SuiteCRM-V8-compatible API**, while replacing the CRM core with a clean, maintainable schema.
-First tenant live = Gunness & Associates; more companies onboarded after.
+A CRM (Laravel + Filament) rebuilt from the Gunness & Associates SuiteCRM 8.8.0 system ("crmga"), which
+becomes a **multi-tenant SaaS** (database-per-tenant) in its final phase.
+**Built and launched single-tenant first**, then converted for other immigration firms. It keeps the existing
+n8n automation, Asterisk telephony, Vapi voice and SMS working — a thin legacy adapter means the 133 existing
+n8n workflows only change their base URL — while replacing the CRM core with a clean, maintainable schema.
+First live: Gunness & Associates (single tenant); other companies onboarded after the Phase 8 conversion.
 
 > **Status:** planning + specs. The Laravel application is scaffolded from Phase 1 onward.
 > **Secrets:** none in this repo, by design. Configure via `.env` (never commit it).
@@ -13,9 +14,9 @@ First tenant live = Gunness & Associates; more companies onboarded after.
 | File | What |
 |---|---|
 | `START-HERE.md` | **Handover guide — read this first** |
-| `docs/PROJECT_PLAN.md` | **Master plan — 14-week timeline, 8 phases, milestones (start here)** |
-| `docs/TASK_BREAKDOWN.md` | **Task-by-task assignments per developer (Zain / Shahmeer / Shahab) + load analysis** |
-| `docs/STUDIO_API_RBAC.md` | Studio · REST API · per-tenant RBAC design |
+| `docs/PROJECT_PLAN.md` | **Master plan — 14 weeks, 8 phases, tenancy last (start here)** |
+| `docs/TASK_BREAKDOWN.md` | **Task-by-task assignments — Zain (backend) / Shahmeer (frontend) + load analysis** |
+| `docs/STUDIO_API_RBAC.md` | Studio · REST API · RBAC design (+ live-schema verification) |
 | `docs/ARCHITECTURE.md` | **Technical approach per layer + concern×phase map + open decisions to lock first** |
 | `docs/DATA_MODEL.md` | Target data model (from the live 481-table DDL) |
 | `docs/PHASE1_KICKOFF.md` | Copy-paste Claude Code prompts + per-entity checklist to start |

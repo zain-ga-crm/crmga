@@ -1,7 +1,13 @@
 # crmga → Laravel — Target Data Model v1 (from live DDL, 481 tables)
 
 Derived from `crmga_full_schema.sql` (exact DDL). This is the Phase‑2 build spec: entities, the
-shared base, how the 43 GA modules consolidate, and how 481 tables become ~30–40. Tenancy = **DB‑per‑tenant** (`stancl/tenancy`); every table below lives in the **tenant** DB.
+shared base, how the 43 GA modules consolidate, and how 481 tables become ~30–40.
+
+**Revision 3:** the system is built **single-tenant first**; every table below lives in the one CRM
+database, whose migrations sit in `database/migrations/tenant/` and which **becomes tenant #1's database**
+when multi-tenancy is added in Phase 8. **No table gets a `tenant_id` column** — isolation will be by
+database. Also: **Study Permit and LMIA are Lead verticals in v1**, not separate entities (this reduces both
+the entity count and the ETL surface); their fields live in the Lead vertical attribute groups.
 
 ## 1. The shared "Contactable" base (identical across all GA lead modules)
 Every GA person/lead table repeats these columns — model once as a trait/base migration:
@@ -27,8 +33,8 @@ Plus, on the 7 core modules (in `_cstm`): `hot_lead` (bool), `warm_lead` (bool).
 | **Lead** (`vertical`, `stage`) | `ga_galead`, `ga_imm_biz`, `ga_imm_can`, `ga_usa`, `ga_canadavisa`, `ga_expressentryrequests`, `ga_studypermitrequests`, `ga_new_pnp_form`/`ga_pnp`, `ga_refugee_book`, `ga_entrepreneur`, `ga_bd1/2`, `ga_resumes`, `ga_hqinvestor_`, `ga_gunnessassociates`, `ga_associates`, `ga_applicant`, `ga_immcan1/2/3`, `ga_inland`, `ga_client_development1` | ~3.5k | Shared base + `vertical` enum + `stage`; vertical‑specific dropdowns (own_business_bi, invest_in_canada, current_status_in_canada, seeking_a_humanitarian_pr, best_time_to_call*, etc.) as typed columns or `vertical_attributes` JSON; DNC + hot/warm |
 | **Student** | `ga_hq_students` (+`_cstm`) | 548 | HQ Learning Hub; base + get_started, status, how_hear, hot/warm; Vapi calling target |
 | **Assessment** | `ga_assessment_request` + `ga_assessment_score` | 484 / 8,147 | Express‑Entry **CRS/FSW calculator** — 88 scoring fields → `scores` JSON + key typed columns (crs_score, fsw_score, marital_status, education, language tests, spouse_*) |
-| **StudyLead** | `ga_study` (+`_cstm`) | 4,782 | Study‑permit pipeline (or fold into Lead `vertical=StudyPermit` — see open items) |
-| **LmiaCase** | `ga_lmia_main` (+`_cstm`), `ga_lmia_course`, `ga_lmiainquiry`, `lmia_affiliate` | ~4.4k | LMIA job‑offer/training/inquiry; links to Affiliate; course has have_invest, status |
+| ~~StudyLead~~ → **Lead** `vertical=StudyPermit` | `ga_study` (+`_cstm`) | 4,782 | **Revision 3: folded into Lead**; study-specific fields become that vertical's attribute group |
+| ~~LmiaCase~~ → **Lead** `vertical=LMIA` | `ga_lmia_main` (+`_cstm`), `ga_lmia_course`, `ga_lmiainquiry`, `lmia_affiliate` | ~4.4k | **Revision 3: folded into Lead**; employer link and case fields become that vertical's attribute group |
 | **Client** | `ga_clients` (+`_cstm`), `ga_clientdevelopment2/3`, `ga_imm_client` | ~325 | Post‑conversion client lifecycle |
 | **Affiliate** | `ga_affiliate` (+`_cstm`) | 49 | Referral partners (commission, status, whatsapp) |
 | **NewsletterSubscriber** | `ga_newsletter_subscriber` | 2,023 | Simple subscriber list |
