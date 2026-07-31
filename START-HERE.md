@@ -33,6 +33,8 @@ tenant #1** on conversion — which is only cheap if the ten **tenancy-ready rul
 | 6 | `docs/ARCHITECTURE.md` | How each layer is built, plus **§5 open decisions** | Zain, then Shahmeer |
 | 7 | `docs/STUDIO_API_RBAC.md` | Studio, REST API and permissions design (read the revision-3 scope note first) | Zain, Shahmeer |
 | 8 | `docs/DATA_MODEL.md` | Entities and how the 43 legacy modules consolidate | Zain |
+| 8b | `docs/BACKEND_BRIEF_ZAIN.md` | **The complete backend specification — rules, conventions, every subsystem, task order and copy-paste Claude Code prompts** | Zain (primary) |
+| 8c | `docs/contracts/` | **Frozen contracts both lanes depend on:** `layout.schema.json`, `field-types.json`, `api-contract.md` | Both |
 | 9 | `docs/crmga_CRM_Functional_Screen_Spec.docx` | Every screen, what each page shows and does | Shahmeer |
 | 9b | `docs/crmga_Frontend_Design_Spec.docx` | **How every screen is built — design tokens, layout shells, component library, wireframes, fields per screen** | Shahmeer (primary) |
 | 10 | `docs/PHASE1_KICKOFF.md` | **Copy-paste Claude Code prompts — start here on day one** | Both |
