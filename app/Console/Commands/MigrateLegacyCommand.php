@@ -302,6 +302,21 @@ final class MigrateLegacyCommand extends Command
                     stageColumn: 'status',
                     verticalAttributeColumns: ['status_details', 'source', 'source_details', 'referred_by', 'campaign_id_c', 'opportunity_amount'],
                 ),
+                // `ga_immcan3` itself holds only 1 near-empty row. The real 735 rows for
+                // this module live in `hamid_immcan` -- confirmed via email_addr_bean_rel,
+                // whose `bean_module` for those rows' emails is still tagged 'GA_ImmCan3'
+                // (a leftover from a Studio module rebuild that left the old physical table
+                // renamed but never repointed the ETL spec). No id overlap with ga_immcan3,
+                // no _cstm sidecar, and no status column, so this is otherwise a bare source.
+                new LeadModuleSpec(
+                    key: 'leads_hamid_immcan',
+                    table: 'hamid_immcan',
+                    cstmTable: null,
+                    emailBeanModule: 'GA_ImmCan3',
+                    fixedVertical: 'InCanada',
+                    verticalDeriveColumn: null,
+                    stageColumn: null,
+                ),
                 new LeadModuleSpec(
                     key: 'leads_imm_can',
                     table: 'ga_imm_can',

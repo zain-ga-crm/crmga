@@ -84,6 +84,13 @@ beforeEach(function () {
         $table->string('source')->nullable();
     });
 
+    Schema::connection('legacy')->create('hamid_immcan', function (Blueprint $table) {
+        $table->string('id', 36)->primary();
+        $table->boolean('deleted')->default(false);
+        $table->string('date_modified')->nullable();
+        $table->string('first_name')->nullable();
+    });
+
     Schema::connection('legacy')->create('email_addresses', function (Blueprint $table) {
         $table->string('id', 36)->primary();
         $table->string('email_address')->nullable();
@@ -176,6 +183,23 @@ it('migrates a dedup-group sibling table (ga_immcan1) onto the shared InCanada v
     expect($lead->vertical->value)->toBe('InCanada')
         ->and($lead->source)->toBe('ga_immcan1')
         ->and($lead->vertical_attributes)->toBe(['source' => 'Web']);
+});
+
+it('migrates hamid_immcan -- the real ga_immcan3 data left under a leftover table name -- onto InCanada', function () {
+    DB::connection('legacy')->table('hamid_immcan')->insert(['id' => 'lead-7']);
+    DB::connection('legacy')->table('email_addresses')->insert(['id' => 'email-7', 'email_address' => 'leftover@example.com']);
+    DB::connection('legacy')->table('email_addr_bean_rel')->insert([
+        'id' => 'rel-7', 'email_address_id' => 'email-7', 'bean_id' => 'lead-7',
+        'bean_module' => 'GA_ImmCan3', 'primary_address' => true, 'deleted' => false,
+    ]);
+
+    $this->artisan('crm:migrate-legacy', ['--only' => 'leads_hamid_immcan'])->assertExitCode(0);
+
+    $lead = Lead::withoutGlobalScopes()->find('lead-7');
+    expect($lead->vertical->value)->toBe('InCanada')
+        ->and($lead->stage->value)->toBe('new')
+        ->and($lead->source)->toBe('hamid_immcan')
+        ->and($lead->primary_email)->toBe('leftover@example.com');
 });
 
 it('re-runs idempotently without duplicating the row', function () {
