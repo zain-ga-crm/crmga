@@ -515,7 +515,10 @@ final class SchemaManager
     {
         $change = Change::query()->findOrFail($changeId);
 
-        if ($change->snapshot_path === null) {
+        // 'field.delete' is metadata-only (the column and its data stay put, BACKEND_BRIEF
+        // §6.5) — no DDL ever ran, no snapshot was ever taken, and none is needed to undo it.
+        $requiresSnapshot = $change->kind !== 'field.delete';
+        if ($requiresSnapshot && $change->snapshot_path === null) {
             throw new SnapshotFailed('This change has no snapshot to roll back to.');
         }
 
@@ -525,7 +528,9 @@ final class SchemaManager
         }
 
         try {
-            $this->snapshotter->restore($change->snapshot_path);
+            if ($requiresSnapshot) {
+                $this->snapshotter->restore($change->snapshot_path);
+            }
 
             if ($change->target_module !== null && $change->target_field !== null) {
                 $this->rollbackFieldMetadata($change);
@@ -542,8 +547,9 @@ final class SchemaManager
 
     /**
      * A rolled-back 'field.add' never should have existed — force-delete the metadata
-     * row entirely. A rolled-back 'field.modify' should return to its prior attributes,
-     * not disappear — restore them from the change log's "before" state.
+     * row entirely. A rolled-back 'field.delete' un-soft-deletes it. A rolled-back
+     * 'field.modify' should return to its prior attributes, not disappear — restore
+     * them from the change log's "before" state.
      */
     private function rollbackFieldMetadata(Change $change): void
     {
@@ -563,6 +569,12 @@ final class SchemaManager
 
         if ($change->kind === 'field.add') {
             $field->forceDelete();
+
+            return;
+        }
+
+        if ($change->kind === 'field.delete') {
+            $field->restore();
 
             return;
         }

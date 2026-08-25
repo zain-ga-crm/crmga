@@ -194,6 +194,30 @@ it('soft-deletes the metadata row on delete and keeps the column', function () {
         ->and(Schema::hasColumn('leads_sm_test_custom', 'temp_field'))->toBeTrue();
 });
 
+it('rolls back a delete without a snapshot, un-soft-deleting the field metadata', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+    $actor = User::factory()->create();
+
+    $manager->apply(
+        $manager->plan(new FieldChangeRequest('add', $module->key, 'zrollback_delete', 'text')),
+        actorId: null,
+    );
+    $deleteResult = $manager->apply(
+        $manager->plan(new FieldChangeRequest('delete', $module->key, 'zrollback_delete')),
+        actorId: null,
+    );
+
+    expect($deleteResult->snapshotPath)->toBeNull();
+
+    $rollbackResult = $manager->rollback($deleteResult->changeId, actorId: $actor->id);
+
+    expect($rollbackResult->success)->toBeTrue()
+        ->and(Field::query()->where('module_id', $module->id)->where('name', 'zrollback_delete')->exists())->toBeTrue()
+        ->and(Schema::hasColumn('leads_sm_test_custom', 'zrollback_delete'))->toBeTrue()
+        ->and(Change::query()->findOrFail($deleteResult->changeId)->status)->toBe('rolled_back');
+});
+
 it('createSidecar is idempotent', function () {
     $manager = app(SchemaManager::class);
 
