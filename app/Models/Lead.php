@@ -10,6 +10,7 @@ use App\Models\Concerns\HasCustomFields;
 use App\Models\Concerns\HasEmailAddresses;
 use App\Support\Acl\Aclable;
 use App\Support\Acl\HasAcl;
+use App\Support\Casts\SafeBackedEnumCast;
 use Database\Factories\LeadFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,8 +25,8 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * and LMIA are verticals here, not separate entities.
  *
  * @property string $id
- * @property LeadVertical|null $vertical
- * @property LeadStage $stage
+ * @property LeadVertical|string|null $vertical
+ * @property LeadStage|string $stage
  * @property array<string, mixed>|null $vertical_attributes
  * @property bool $hot_lead
  * @property bool $warm_lead
@@ -67,8 +68,8 @@ class Lead extends Model implements Aclable, AuditableContract
     protected function casts(): array
     {
         return array_merge($this->contactableCasts(), [
-            'vertical' => LeadVertical::class,
-            'stage' => LeadStage::class,
+            'vertical' => SafeBackedEnumCast::class.':'.LeadVertical::class,
+            'stage' => SafeBackedEnumCast::class.':'.LeadStage::class,
             'vertical_attributes' => 'array',
             'hot_lead' => 'boolean',
             'warm_lead' => 'boolean',

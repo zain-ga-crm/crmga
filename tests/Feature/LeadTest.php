@@ -59,6 +59,20 @@ it('scopes leads to their owner', function () {
     expect(Lead::query()->count())->toBe(1);
 });
 
+it('hydrates a vertical or stage value outside the enum without throwing, keeping the raw value', function () {
+    $lead = Lead::factory()->create(['vertical' => LeadVertical::Refugee, 'stage' => LeadStage::New]);
+
+    // A value Studio added, or a legacy value the ETL carried over, that the hardcoded
+    // enum doesn't know about -- must not crash hydration (BACKEND_BRIEF §20 item 6:
+    // the option list, not the enum, is the source of truth).
+    Lead::query()->where('id', $lead->id)->update(['vertical' => 'FutureVertical', 'stage' => 'archived']);
+
+    $fresh = Lead::find($lead->id);
+
+    expect($fresh->vertical)->toBe('FutureVertical')
+        ->and($fresh->stage)->toBe('archived');
+});
+
 it('has all 16 verticals registered in the option list', function () {
     $this->seed(MetadataFixtureSeeder::class);
 
