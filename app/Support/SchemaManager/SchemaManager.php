@@ -113,6 +113,13 @@ final class SchemaManager
                 $class = $this->classifyModify($existing, $r);
                 if ($class === 'blocked') {
                     $errors[] = "Changing [{$r->name}] from {$existing->type} to {$toType} is blocked.";
+                } elseif ($class === 'unknown') {
+                    // Fail closed: §6.3 frames the matrix as an allowlist ("type change is
+                    // allowed by the matrix in the contract"), not a denylist. A pair the
+                    // contract doesn't classify at all is not proven safe -- it must not run
+                    // silently just because nothing named it lossy.
+                    $errors[] = "Changing [{$r->name}] from {$existing->type} to {$toType} is not a recognized ".
+                        'type change in the contract and cannot be applied.';
                 } elseif ($class === 'requires_confirmation' && ! $r->confirmLossy) {
                     $errors[] = "Changing [{$r->name}] from {$existing->type} to {$toType} requires confirm_lossy.";
                 }
@@ -233,6 +240,24 @@ final class SchemaManager
         }
 
         return 'safe';
+    }
+
+    /**
+     * §6.4: a default is applied with a bound parameter in a follow-up UPDATE, never
+     * embedded in the DDL itself. Only backfills rows currently NULL -- a value someone
+     * already set (including on 'add', where every row is NULL, this simply fills all of
+     * them) is never overwritten by a default assigned after the fact.
+     */
+    private function backfillDefault(ChangePlan $plan): void
+    {
+        $default = $this->stringOption($plan->request, 'default');
+        if ($default === null) {
+            return;
+        }
+
+        DB::table($plan->table)
+            ->whereNull($plan->request->name)
+            ->update([$plan->request->name => $default]);
     }
 
     private function relateColumnHasData(Field $existing): bool
@@ -418,6 +443,10 @@ final class SchemaManager
                 foreach ($plan->ddl as $statement) {
                     $executed[] = $statement;
                     DB::statement($statement);
+                }
+
+                if (in_array($plan->request->action, ['add', 'modify'], true)) {
+                    $this->backfillDefault($plan);
                 }
 
                 $before = null;

@@ -128,6 +128,56 @@ it('never embeds an injected default value into the ddl', function () {
     expect(implode(' ', $plan->ddl))->not->toContain('DROP TABLE');
 });
 
+it('blocks a type change the contract does not classify, rather than allowing it silently', function () {
+    $module = leadsModule();
+    $field = Field::factory()->create(['module_id' => $module->id, 'name' => 'contact_email', 'type' => 'email']);
+    $manager = app(SchemaManager::class);
+
+    // The contract's type_change_matrix only lists a handful of explicit pairs
+    // (text<->textarea, int<->decimal, date<->datetime, enum->text). email->phone
+    // is not one of them -- it must fail closed (audit finding: it used to fall
+    // through classifyModify() as 'unknown' and be treated as freely allowed).
+    expect(fn () => $manager->plan(new FieldChangeRequest('modify', $module->key, $field->name, 'phone')))
+        ->toThrow(SchemaValidationException::class);
+});
+
+it('applies a default via a bound follow-up UPDATE, backfilling existing NULL rows on add', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    // First field creates the sidecar; insert a row so there's something to backfill.
+    $manager->apply($manager->plan(new FieldChangeRequest('add', $module->key, 'first_field', 'text')), actorId: null);
+    $rowId = (string) Str::uuid();
+    DB::table('leads_sm_test_custom')->insert(['id' => $rowId, 'first_field' => 'x']);
+
+    $plan = $manager->plan(new FieldChangeRequest(
+        'add', $module->key, 'welcome_message', 'text', ['default' => 'Hello'],
+    ));
+    $result = $manager->apply($plan, actorId: null);
+
+    expect($result->success)->toBeTrue()
+        ->and(DB::table('leads_sm_test_custom')->where('id', $rowId)->value('welcome_message'))->toBe('Hello');
+});
+
+it('backfills a default on modify only for rows that are still NULL', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $manager->apply($manager->plan(new FieldChangeRequest('add', $module->key, 'note', 'text')), actorId: null);
+    $filledId = (string) Str::uuid();
+    $nullId = (string) Str::uuid();
+    DB::table('leads_sm_test_custom')->insert([
+        ['id' => $filledId, 'note' => 'already set'],
+        ['id' => $nullId, 'note' => null],
+    ]);
+
+    $plan = $manager->plan(new FieldChangeRequest('modify', $module->key, 'note', 'text', ['default' => 'Untitled']));
+    $manager->apply($plan, actorId: null);
+
+    expect(DB::table('leads_sm_test_custom')->where('id', $filledId)->value('note'))->toBe('already set')
+        ->and(DB::table('leads_sm_test_custom')->where('id', $nullId)->value('note'))->toBe('Untitled');
+});
+
 it('soft-deletes the metadata row on delete and keeps the column', function () {
     $module = leadsModule();
     $manager = app(SchemaManager::class);
