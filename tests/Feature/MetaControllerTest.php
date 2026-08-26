@@ -2,6 +2,7 @@
 
 use App\Models\Lead;
 use App\Models\User;
+use App\Support\Acl\AccessLevel;
 use Database\Seeders\MetadataFixtureSeeder;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 
@@ -27,6 +28,21 @@ it('lists modules with a record count', function () {
 
     expect($leads)->not->toBeNull()
         ->and($leads['count'])->toBe(2);
+});
+
+it('lists only modules the caller\'s role grants view access to', function () {
+    $user = User::factory()->create();
+    grantAccess($user, 'leads', AccessLevel::All, 'view');
+    grantAccess($user, 'companies', AccessLevel::None, 'view');
+    actingAsApiUser($user, ['metadata:read']);
+
+    $response = $this->getJson('/api/v1/meta/modules');
+
+    $response->assertOk();
+    $keys = collect($response->json('data'))->pluck('key');
+
+    expect($keys)->toContain('leads')
+        ->and($keys)->not->toContain('companies');
 });
 
 it('lists every field for a module, with its flags and enum options', function () {

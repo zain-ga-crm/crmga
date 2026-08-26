@@ -6,6 +6,8 @@ use App\Exceptions\Api\ApiException;
 use App\Http\Controllers\Controller;
 use App\Models\Metadata\OptionItem;
 use App\Models\Metadata\OptionList;
+use App\Support\Acl;
+use App\Support\Acl\AccessLevel;
 use App\Support\Api\ApiModuleRegistry;
 use App\Support\Api\ApiResponse;
 use App\Support\MetadataRepository;
@@ -21,15 +23,24 @@ final class MetaController extends Controller
     public function __construct(
         private readonly MetadataRepository $repository,
         private readonly ApiModuleRegistry $registry,
+        private readonly Acl $acl,
     ) {}
 
     public function modules(): JsonResponse
     {
         $modules = $this->repository->compiled()['modules'] ?? [];
         $data = [];
+        $user = auth()->user();
 
         foreach (is_array($modules) ? $modules : [] as $key => $module) {
             if (! is_string($key) || ! is_array($module) || ! ($module['enabled'] ?? true)) {
+                continue;
+            }
+
+            // §1.4: "modules the caller may see" — same 'view' check the record-level
+            // AppliesRecordAccess scope uses, so this list and what a request against
+            // the module actually returns can never disagree.
+            if ($user === null || $this->acl->effective($user, $key, 'view') === AccessLevel::None) {
                 continue;
             }
 
