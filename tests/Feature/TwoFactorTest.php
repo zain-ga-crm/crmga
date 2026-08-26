@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
 
 uses(DatabaseTruncation::class);
@@ -36,6 +37,19 @@ it('consumes a recovery code once', function () {
 
     expect($user->useRecoveryCode($code))->toBeTrue()
         ->and($user->fresh()->useRecoveryCode($code))->toBeFalse();  // already used
+});
+
+it('stores recovery codes hashed, never in a reversible or plaintext form', function () {
+    $user = User::factory()->create();
+    $codes = $user->enableTwoFactor();
+
+    $raw = DB::table('users')->where('id', $user->id)->value('two_factor_recovery_codes');
+    $stored = json_decode($raw, true);
+
+    foreach ($codes as $index => $code) {
+        expect($stored[$index])->not->toBe($code)
+            ->and(Hash::check($code, $stored[$index]))->toBeTrue();
+    }
 });
 
 it('stores the two-factor secret encrypted at rest', function () {

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 use OwenIt\Auditing\Auditable;
@@ -91,7 +92,7 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'two_factor_secret' => 'encrypted',
-            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_recovery_codes' => 'array',
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
@@ -135,6 +136,10 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
 
     /**
      * Generate a fresh secret + recovery codes (unconfirmed until confirmTwoFactor()).
+     * Recovery codes are stored hashed, never in a reversible form (BACKEND_BRIEF §15:
+     * "TOTP with encrypted secret and hashed backup codes") -- unlike the TOTP secret,
+     * a recovery code is only ever compared against user input, never decrypted back
+     * out, so it gets the same one-way protection as a password.
      *
      * @return list<string> the plaintext recovery codes, shown to the user once
      */
@@ -145,7 +150,7 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
 
         $this->forceFill([
             'two_factor_secret' => $service->generateSecret(),
-            'two_factor_recovery_codes' => $codes,
+            'two_factor_recovery_codes' => array_map(static fn (string $code): string => Hash::make($code), $codes),
             'two_factor_confirmed_at' => null,
         ])->save();
 
@@ -171,14 +176,24 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
 
     public function useRecoveryCode(string $code): bool
     {
-        $codes = $this->two_factor_recovery_codes ?? [];
+        $hashes = $this->two_factor_recovery_codes ?? [];
 
-        if (! in_array($code, $codes, true)) {
+        $matchedKey = null;
+        foreach ($hashes as $key => $hash) {
+            if (Hash::check($code, $hash)) {
+                $matchedKey = $key;
+                break;
+            }
+        }
+
+        if ($matchedKey === null) {
             return false;
         }
 
+        unset($hashes[$matchedKey]);
+
         $this->forceFill([
-            'two_factor_recovery_codes' => array_values(array_diff($codes, [$code])),
+            'two_factor_recovery_codes' => array_values($hashes),
         ])->save();
 
         return true;
