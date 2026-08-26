@@ -3,7 +3,9 @@
 use App\Models\Company;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Str;
 
 uses(DatabaseTruncation::class);
 
@@ -40,4 +42,9 @@ it('scopes companies to their owner', function () {
     $this->actingAs($owner);
 
     expect(Company::query()->count())->toBe(1);
+});
+
+it('rejects a company assigned to a non-existent user with a foreign key violation', function () {
+    expect(fn () => Company::factory()->create(['assigned_user_id' => (string) Str::uuid()]))
+        ->toThrow(QueryException::class);
 });

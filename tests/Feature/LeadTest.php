@@ -7,7 +7,9 @@ use App\Models\Metadata\OptionList;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
 use Database\Seeders\MetadataFixtureSeeder;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Str;
 
 uses(DatabaseTruncation::class);
 
@@ -71,6 +73,11 @@ it('hydrates a vertical or stage value outside the enum without throwing, keepin
 
     expect($fresh->vertical)->toBe('FutureVertical')
         ->and($fresh->stage)->toBe('archived');
+});
+
+it('rejects a lead assigned to a non-existent user with a foreign key violation', function () {
+    expect(fn () => Lead::factory()->create(['assigned_user_id' => (string) Str::uuid()]))
+        ->toThrow(QueryException::class);
 });
 
 it('has all 16 verticals registered in the option list', function () {

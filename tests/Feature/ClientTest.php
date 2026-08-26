@@ -3,7 +3,9 @@
 use App\Models\Client;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Str;
 
 uses(DatabaseTruncation::class);
 
@@ -40,4 +42,9 @@ it('scopes clients to their owner', function () {
     $this->actingAs($owner);
 
     expect(Client::query()->count())->toBe(1);
+});
+
+it('rejects a client assigned to a non-existent user with a foreign key violation', function () {
+    expect(fn () => Client::factory()->create(['assigned_user_id' => (string) Str::uuid()]))
+        ->toThrow(QueryException::class);
 });

@@ -4,7 +4,9 @@ use App\Models\Assessment;
 use App\Models\Lead;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Str;
 
 uses(DatabaseTruncation::class);
 
@@ -53,4 +55,9 @@ it('scopes assessments to their owner', function () {
     $this->actingAs($owner);
 
     expect(Assessment::query()->count())->toBe(1);
+});
+
+it('rejects an assessment assigned to a non-existent user with a foreign key violation', function () {
+    expect(fn () => Assessment::factory()->create(['assigned_user_id' => (string) Str::uuid()]))
+        ->toThrow(QueryException::class);
 });

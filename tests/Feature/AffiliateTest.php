@@ -3,7 +3,9 @@
 use App\Models\Affiliate;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Str;
 
 uses(DatabaseTruncation::class);
 
@@ -40,4 +42,9 @@ it('scopes affiliates to their owner', function () {
     $this->actingAs($owner);
 
     expect(Affiliate::query()->count())->toBe(1);
+});
+
+it('rejects an affiliate assigned to a non-existent user with a foreign key violation', function () {
+    expect(fn () => Affiliate::factory()->create(['assigned_user_id' => (string) Str::uuid()]))
+        ->toThrow(QueryException::class);
 });
