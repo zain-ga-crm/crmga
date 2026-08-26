@@ -15,8 +15,10 @@ Schedule::command('schema:prune-snapshots')->daily();
 
 // Z-4.2: scheduled jobs and notifications. Both run on the queue (Horizon in
 // production, the database driver locally/CI) rather than inline on the scheduler.
-Schedule::job(new SendDailyCountReportJob)->dailyAt('07:00');
-Schedule::job(new SendReminderNotificationsJob)->dailyAt('08:00');
+// BACKEND_BRIEF §11: daily report at 10:07 (cron "7 10 * * *"), reminders every
+// 15 minutes (the job itself gates on business_hours and dedupes per subject/day).
+Schedule::job(new SendDailyCountReportJob)->dailyAt('10:07')->withoutOverlapping();
+Schedule::job(new SendReminderNotificationsJob)->everyFifteenMinutes()->withoutOverlapping();
 
 // Z-7.3: BACKEND_BRIEF's own open-question default -- "nightly dump to
 // object storage." withoutOverlapping guards against a slow dump still

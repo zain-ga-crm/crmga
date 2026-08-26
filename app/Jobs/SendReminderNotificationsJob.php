@@ -6,6 +6,8 @@ use App\Models\Client;
 use App\Models\Lead;
 use App\Models\Task;
 use App\Notifications\ReminderNotification;
+use App\Support\NotificationDedupGuard;
+use App\Support\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -14,10 +16,13 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 
 /**
- * Daily task and follow-up reminders (Z-4.2). Runs with no authenticated user,
- * so the ACL-scoped models (Lead, Client) must bypass AppliesRecordAccess —
- * this reads across every owner's records to notify each one, it is not
- * acting on behalf of a single signed-in user.
+ * Task and follow-up reminders, run every 15 minutes (BACKEND_BRIEF §11) but
+ * gated to `business_hours` settings and deduplicated per subject per day
+ * (via NotificationDedupGuard) -- without that guard, anything still overdue
+ * would be re-notified on every single run instead of once a day. Runs with
+ * no authenticated user, so the ACL-scoped models (Lead, Client) must bypass
+ * AppliesRecordAccess -- this reads across every owner's records to notify
+ * each one, it is not acting on behalf of a single signed-in user.
  */
 final class SendReminderNotificationsJob implements ShouldQueue
 {
@@ -26,17 +31,29 @@ final class SendReminderNotificationsJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function handle(): void
+    public function handle(Settings $settings, NotificationDedupGuard $guard): void
     {
-        $today = Carbon::today();
+        $timezoneRaw = $settings->get('system.timezone', config('app.timezone'));
+        $timezone = is_string($timezoneRaw) ? $timezoneRaw : 'UTC';
+        $now = Carbon::now($timezone);
+
+        if (! $this->isWithinBusinessHours($settings, $now)) {
+            return;
+        }
+
+        $today = $now->toDateString();
 
         Task::query()
             ->whereNotNull('assigned_user_id')
             ->where('status', '!=', 'completed')
             ->whereNotNull('due_date')
-            ->where('due_date', '<=', $today)
+            ->where('due_date', '<=', $now)
             ->with('assignedUser')
-            ->each(function (Task $task): void {
+            ->each(function (Task $task) use ($guard, $today): void {
+                if (! $guard->claim("follow_up:task:{$task->id}:{$today}")) {
+                    return;
+                }
+
                 $task->assignedUser?->notify(new ReminderNotification(
                     reason: 'task_due',
                     subjectType: Task::class,
@@ -49,10 +66,10 @@ final class SendReminderNotificationsJob implements ShouldQueue
         Lead::withoutGlobalScopes()
             ->whereNotNull('assigned_user_id')
             ->whereNotNull('next_follow_up_at')
-            ->where('next_follow_up_at', '<=', now())
+            ->where('next_follow_up_at', '<=', $now)
             ->with('assignedUser')
-            ->each(function (Lead $lead): void {
-                if ($lead->next_follow_up_at === null) {
+            ->each(function (Lead $lead) use ($guard, $today): void {
+                if ($lead->next_follow_up_at === null || ! $guard->claim("follow_up:lead:{$lead->id}:{$today}")) {
                     return;
                 }
 
@@ -68,10 +85,10 @@ final class SendReminderNotificationsJob implements ShouldQueue
         Client::withoutGlobalScopes()
             ->whereNotNull('assigned_user_id')
             ->whereNotNull('next_action_at')
-            ->where('next_action_at', '<=', now())
+            ->where('next_action_at', '<=', $now)
             ->with('assignedUser')
-            ->each(function (Client $client): void {
-                if ($client->next_action_at === null) {
+            ->each(function (Client $client) use ($guard, $today): void {
+                if ($client->next_action_at === null || ! $guard->claim("follow_up:client:{$client->id}:{$today}")) {
                     return;
                 }
 
@@ -83,5 +100,26 @@ final class SendReminderNotificationsJob implements ShouldQueue
                     dueAt: $client->next_action_at,
                 ));
             });
+    }
+
+    /**
+     * Default Mon-Fri 09:00-17:00 company time zone (BACKEND_BRIEF §21 open
+     * question #10's own stated default).
+     */
+    private function isWithinBusinessHours(Settings $settings, Carbon $now): bool
+    {
+        $days = $settings->get('business_hours.days', [1, 2, 3, 4, 5]);
+        if (! is_array($days) || ! in_array($now->dayOfWeekIso, $days, true)) {
+            return false;
+        }
+
+        $startRaw = $settings->get('business_hours.start', '09:00');
+        $endRaw = $settings->get('business_hours.end', '17:00');
+        $start = is_string($startRaw) ? $startRaw : '09:00';
+        $end = is_string($endRaw) ? $endRaw : '17:00';
+
+        $time = $now->format('H:i');
+
+        return $time >= $start && $time <= $end;
     }
 }

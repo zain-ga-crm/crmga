@@ -6,6 +6,7 @@ use App\Enums\LeadStage;
 use App\Mail\DailyCountReportMail;
 use App\Models\Lead;
 use App\Models\Student;
+use App\Support\NotificationDedupGuard;
 use App\Support\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,7 +21,10 @@ use Illuminate\Support\Facades\Mail;
  * administrator configured in the settings store (never .env — tenancy-ready
  * rule 3). A no-op until that list is set. Runs with no authenticated user,
  * so the ACL-scoped Lead model must bypass AppliesRecordAccess — this is a
- * company-wide digest, not scoped to any one owner.
+ * company-wide digest, not scoped to any one owner. Guarded by
+ * NotificationDedupGuard so it can never send twice for one company-local day
+ * (BACKEND_BRIEF §11), computed in the company time zone rather than the
+ * server's.
  */
 final class SendDailyCountReportJob implements ShouldQueue
 {
@@ -29,14 +33,20 @@ final class SendDailyCountReportJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function handle(Settings $settings): void
+    public function handle(Settings $settings, NotificationDedupGuard $guard): void
     {
         $recipients = $settings->get('notifications.daily_report_recipients', []);
         if (! is_array($recipients) || $recipients === []) {
             return;
         }
 
-        $today = Carbon::today();
+        $timezoneRaw = $settings->get('system.timezone', config('app.timezone'));
+        $timezone = is_string($timezoneRaw) ? $timezoneRaw : 'UTC';
+        $today = Carbon::now($timezone)->startOfDay();
+
+        if (! $guard->claim('daily_count_report:'.$today->toDateString())) {
+            return;
+        }
 
         $counts = [
             'new_leads_today' => Lead::withoutGlobalScopes()->whereDate('created_at', $today)->count(),

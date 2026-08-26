@@ -6,12 +6,28 @@ use App\Models\Lead;
 use App\Models\Task;
 use App\Models\User;
 use App\Notifications\ReminderNotification;
+use App\Support\NotificationDedupGuard;
+use App\Support\Settings;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Tests\Fixtures\ContactableFixture;
 
 uses(DatabaseTruncation::class);
+
+// A fixed Wednesday within the Mon-Fri 09:00-17:00 default business-hours
+// window (BACKEND_BRIEF §21 open question #10), so these tests aren't at the
+// mercy of whatever real wall-clock time CI happens to run at.
+beforeEach(function () {
+    Carbon::setTestNow('2026-08-26 10:00:00');
+    $this->run = fn () => app(SendReminderNotificationsJob::class)
+        ->handle(app(Settings::class), app(NotificationDedupGuard::class));
+});
+
+afterEach(function () {
+    Carbon::setTestNow();
+});
 
 it('notifies the assigned user of an overdue task, but not a completed one', function () {
     Notification::fake();
@@ -34,7 +50,7 @@ it('notifies the assigned user of an overdue task, but not a completed one', fun
         'status' => 'completed',
     ]);
 
-    (new SendReminderNotificationsJob)->handle();
+    ($this->run)();
 
     Notification::assertSentTo(
         $user,
@@ -57,7 +73,7 @@ it('notifies the assigned user of a lead whose follow-up is due', function () {
         'next_follow_up_at' => now()->addDay(),
     ]);
 
-    (new SendReminderNotificationsJob)->handle();
+    ($this->run)();
 
     Notification::assertSentTo(
         $user,
@@ -76,7 +92,7 @@ it('notifies the assigned user of a client whose next action is due', function (
         'next_action_at' => now()->subHour(),
     ]);
 
-    (new SendReminderNotificationsJob)->handle();
+    ($this->run)();
 
     Notification::assertSentTo(
         $user,
@@ -92,8 +108,53 @@ it('writes a real in-app notification row, not just the fake assertion', functio
         'next_follow_up_at' => now()->subHour(),
     ]);
 
-    (new SendReminderNotificationsJob)->handle();
+    ($this->run)();
 
     expect($user->notifications()->count())->toBe(1)
         ->and($user->unreadNotifications()->count())->toBe(1);
+});
+
+it('does not re-notify the same overdue lead on a second run within the same day', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+    Lead::factory()->create([
+        'assigned_user_id' => $user->id,
+        'next_follow_up_at' => now()->subHour(),
+    ]);
+
+    ($this->run)();
+    ($this->run)();
+
+    Notification::assertSentToTimes($user, ReminderNotification::class, 1);
+});
+
+it('sends nothing outside business hours', function () {
+    Carbon::setTestNow('2026-08-26 20:00:00'); // still Wednesday, just after 17:00
+    Notification::fake();
+
+    $user = User::factory()->create();
+    Lead::factory()->create([
+        'assigned_user_id' => $user->id,
+        'next_follow_up_at' => now()->subHour(),
+    ]);
+
+    ($this->run)();
+
+    Notification::assertNothingSent();
+});
+
+it('sends nothing on a weekend', function () {
+    Carbon::setTestNow('2026-08-29 10:00:00'); // a Saturday
+    Notification::fake();
+
+    $user = User::factory()->create();
+    Lead::factory()->create([
+        'assigned_user_id' => $user->id,
+        'next_follow_up_at' => now()->subHour(),
+    ]);
+
+    ($this->run)();
+
+    Notification::assertNothingSent();
 });
