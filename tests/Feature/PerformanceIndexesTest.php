@@ -22,3 +22,41 @@ it('indexes clients.next_action_at', function () {
 
     expect($indexed)->toBeTrue();
 });
+
+/**
+ * BACKEND_BRIEF §4's index table requires created_at and phone_mobile on
+ * every Contactable entity -- neither was ever indexed on any of them.
+ */
+it('indexes created_at and phone_mobile on every Contactable table', function (string $table) {
+    $indexes = collect(Schema::getIndexes($table));
+
+    expect($indexes->contains(fn (array $index): bool => in_array('created_at', $index['columns'], true)))
+        ->toBeTrue("expected $table to index created_at")
+        ->and($indexes->contains(fn (array $index): bool => in_array('phone_mobile', $index['columns'], true)))
+        ->toBeTrue("expected $table to index phone_mobile");
+})->with(['leads', 'companies', 'students', 'clients', 'affiliates', 'newsletter_subscribers']);
+
+/**
+ * §4: "leads additionally needs a composite (vertical, stage,
+ * assigned_user_id)" -- leads had separate single-column vertical and stage
+ * indexes, but never this composite.
+ */
+it('indexes the leads (vertical, stage, assigned_user_id) composite', function () {
+    $indexed = collect(Schema::getIndexes('leads'))->contains(
+        fn (array $index): bool => array_slice($index['columns'], 0, 3) === ['vertical', 'stage', 'assigned_user_id'],
+    );
+
+    expect($indexed)->toBeTrue();
+});
+
+/**
+ * Every other status-bearing Contactable table (company_contact_status,
+ * students.status, client_status, newsletter_subscribers.status) already
+ * indexes its status column; affiliates.status was the one left out.
+ */
+it('indexes affiliates.status', function () {
+    $indexed = collect(Schema::getIndexes('affiliates'))
+        ->contains(fn (array $index): bool => in_array('status', $index['columns'], true));
+
+    expect($indexed)->toBeTrue();
+});
