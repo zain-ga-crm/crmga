@@ -24,6 +24,7 @@ use App\Support\Etl\NewsletterSubscriberTransformer;
 use App\Support\Etl\NoteTransformer;
 use App\Support\Etl\StudentTransformer;
 use App\Support\Etl\UserTransformer;
+use App\Support\Ingest\Canon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -121,6 +122,7 @@ final class MigrateLegacyCommand extends Command
     {
         $result = new MigrationResult($transformer->key());
         $modelClass = $transformer->modelClass();
+        Canon::resetUnmatchedReport();
 
         $transformer->query($fromId)->orderBy('id')->chunk(
             self::BATCH_SIZE,
@@ -209,6 +211,14 @@ final class MigrateLegacyCommand extends Command
 
         foreach ($result->errors as $error) {
             $this->warn("  [{$result->key}:{$error['id']}] {$error['message']}");
+        }
+
+        $unmatched = Canon::unmatchedReport();
+        if ($unmatched !== []) {
+            $this->warn("  [{$result->key}] ".count($unmatched).' unmatched dropdown value(s):');
+            foreach ($unmatched as $entry) {
+                $this->warn("    field={$entry['field']} option_list={$entry['option_list']} raw=\"{$entry['raw_value']}\"");
+            }
         }
     }
 

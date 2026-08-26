@@ -131,11 +131,14 @@ it('derives vertical from category_c for GA_GALead and keeps unmodelled fields i
         ]);
 });
 
-it('leaves vertical null when category_c does not match any known vertical', function () {
+it('leaves vertical null when category_c does not match any known vertical, and reports it', function () {
     DB::connection('legacy')->table('ga_galead')->insert(['id' => 'lead-2']);
     DB::connection('legacy')->table('ga_galead_cstm')->insert(['id_c' => 'lead-2', 'category_c' => 'NotARealVertical']);
 
-    $this->artisan('crm:migrate-legacy', ['--only' => 'leads_galead'])->assertExitCode(0);
+    $this->artisan('crm:migrate-legacy', ['--only' => 'leads_galead'])
+        ->assertExitCode(0)
+        ->expectsOutputToContain('1 unmatched dropdown value(s)')
+        ->expectsOutputToContain('raw="NotARealVertical"');
 
     expect(Lead::withoutGlobalScopes()->find('lead-2')->vertical)->toBeNull();
 });

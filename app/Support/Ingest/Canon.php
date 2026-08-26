@@ -13,6 +13,19 @@ use Illuminate\Support\Facades\Log;
  */
 final class Canon
 {
+    /**
+     * BACKEND_BRIEF §13's "dropdown canonicalisation with an error report for
+     * unmatched values" -- an in-memory tally an ETL command can drain into a
+     * printed per-run summary (MigrateLegacyCommand::report()), on top of the
+     * shared Log::channel('api') line every unmatched value also gets. The log
+     * line alone is fine for live ingest (one record, an operator can search
+     * it); a bulk migration run needs a report artifact, not one line per row
+     * buried in the same channel as production traffic.
+     *
+     * @var list<array{source: string, field: string, raw_value: string, option_list: string}>
+     */
+    private static array $unmatched = [];
+
     public static function value(?string $value): string
     {
         return (string) preg_replace('/[^a-z0-9]/', '', strtolower($value ?? ''));
@@ -39,6 +52,13 @@ final class Canon
             }
         }
 
+        self::$unmatched[] = [
+            'source' => $source,
+            'field' => $field,
+            'raw_value' => (string) $incoming,
+            'option_list' => $list->key,
+        ];
+
         Log::channel('api')->warning('ingest_unmatched_option', [
             'source' => $source,
             'field' => $field,
@@ -47,5 +67,16 @@ final class Canon
         ]);
 
         return null;
+    }
+
+    public static function resetUnmatchedReport(): void
+    {
+        self::$unmatched = [];
+    }
+
+    /** @return list<array{source: string, field: string, raw_value: string, option_list: string}> */
+    public static function unmatchedReport(): array
+    {
+        return self::$unmatched;
     }
 }
