@@ -4,7 +4,10 @@ namespace App\Support\Ingest;
 
 use App\Models\User;
 use App\Support\Settings;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * §21 Q4: "Assignment rule for inbound leads (round-robin or by vertical) ->
@@ -18,18 +21,45 @@ final class LeadAssigner
 {
     private const CURSOR_KEY = 'ingest.assignment.leads.last_user_id';
 
+    private const LOCK_KEY = 'ingest.assignment.leads.lock';
+
     public function __construct(private readonly Settings $settings) {}
 
     public function assign(Model $record): void
     {
-        $user = $this->nextUser();
+        try {
+            $user = $this->nextUser();
+        } catch (LockTimeoutException) {
+            // Contention is expected to be rare (low ingest volume today) and a
+            // stuck lead can be assigned manually — failing the whole ingest
+            // request/job over a busy cursor would be a worse outcome than the
+            // race this lock exists to close.
+            Log::channel('api')->warning('lead_assignment_lock_timeout', ['record_id' => $record->getKey()]);
+
+            return;
+        }
+
         if ($user !== null) {
             $record->setAttribute('assigned_user_id', $user->id);
             $record->save();
         }
     }
 
+    /**
+     * Read-then-write on the cursor, so concurrent ingest processing (webhook
+     * requests, queue workers) must be serialised here or two callers could read
+     * the same cursor and double-assign the same user while skipping the next
+     * one. block(5) waits up to 5s for the lock rather than failing immediately.
+     */
     private function nextUser(): ?User
+    {
+        /** @var User|null $user Lock::block()'s return type is generic (mixed); this is the closure's own known return type, not an override of an inferred one. */
+        $user = Cache::lock(self::LOCK_KEY, 10)->block(5, fn (): ?User => $this->nextUserUnderLock());
+
+        return $user;
+    }
+
+    private function nextUserUnderLock(): ?User
     {
         $candidates = User::query()
             ->where('status', 'active')
