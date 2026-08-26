@@ -7,14 +7,17 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property string $id
  * @property string $key
  * @property string $label
+ * @property string|null $label_plural
  * @property string|null $table_name
  * @property string $base_type
  * @property string|null $icon
+ * @property string|null $menu_group
  * @property bool $is_custom
  * @property bool $is_system
  * @property bool $enabled
@@ -26,10 +29,12 @@ class Module extends Model
     use HasFactory;
 
     use HasUuids;
+    use SoftDeletes;
 
     /** @var list<string> */
     protected $fillable = [
-        'key', 'label', 'table_name', 'base_type', 'icon', 'is_custom', 'is_system', 'enabled', 'sort_order',
+        'key', 'label', 'label_plural', 'table_name', 'base_type', 'icon', 'menu_group',
+        'is_custom', 'is_system', 'enabled', 'sort_order',
     ];
 
     /** @return array<string, string> */

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $option_list_id
  * @property string $value
  * @property string $label
+ * @property bool $is_active
  * @property int $sort_order
  */
 class OptionItem extends Model
@@ -23,12 +24,12 @@ class OptionItem extends Model
     use HasUuids;
 
     /** @var list<string> */
-    protected $fillable = ['option_list_id', 'value', 'label', 'sort_order'];
+    protected $fillable = ['option_list_id', 'value', 'label', 'is_active', 'sort_order'];
 
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['sort_order' => 'integer'];
+        return ['is_active' => 'boolean', 'sort_order' => 'integer'];
     }
 
     /** @return BelongsTo<OptionList, $this> */

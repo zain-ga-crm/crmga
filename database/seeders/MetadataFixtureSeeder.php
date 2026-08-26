@@ -50,7 +50,7 @@ class MetadataFixtureSeeder extends Seeder
     {
         $leads = Module::updateOrCreate(
             ['key' => 'leads'],
-            ['label' => 'Leads', 'table_name' => 'leads', 'base_type' => 'person', 'enabled' => true],
+            ['label' => 'Leads', 'label_plural' => 'Leads', 'table_name' => 'leads', 'base_type' => 'person', 'enabled' => true],
         );
 
         $this->field($leads, 'full_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
@@ -84,7 +84,7 @@ class MetadataFixtureSeeder extends Seeder
     {
         $companies = Module::updateOrCreate(
             ['key' => 'companies'],
-            ['label' => 'Companies', 'table_name' => 'companies', 'base_type' => 'company', 'enabled' => true],
+            ['label' => 'Companies', 'label_plural' => 'Companies', 'table_name' => 'companies', 'base_type' => 'company', 'enabled' => true],
         );
 
         $this->field($companies, 'full_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
@@ -105,7 +105,7 @@ class MetadataFixtureSeeder extends Seeder
     {
         $assessments = Module::updateOrCreate(
             ['key' => 'assessments'],
-            ['label' => 'Assessments', 'table_name' => 'assessments', 'base_type' => 'generic', 'enabled' => true],
+            ['label' => 'Assessments', 'label_plural' => 'Assessments', 'table_name' => 'assessments', 'base_type' => 'generic', 'enabled' => true],
         );
 
         $this->field($assessments, 'first_name', 'text', ['filterable' => true, 'max_length' => 100]);
@@ -120,7 +120,7 @@ class MetadataFixtureSeeder extends Seeder
     {
         $students = Module::updateOrCreate(
             ['key' => 'students'],
-            ['label' => 'Students', 'table_name' => 'students', 'base_type' => 'person', 'enabled' => true],
+            ['label' => 'Students', 'label_plural' => 'Students', 'table_name' => 'students', 'base_type' => 'person', 'enabled' => true],
         );
 
         $this->field($students, 'full_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
@@ -138,7 +138,7 @@ class MetadataFixtureSeeder extends Seeder
     {
         $clients = Module::updateOrCreate(
             ['key' => 'clients'],
-            ['label' => 'Clients', 'table_name' => 'clients', 'base_type' => 'person', 'enabled' => true],
+            ['label' => 'Clients', 'label_plural' => 'Clients', 'table_name' => 'clients', 'base_type' => 'person', 'enabled' => true],
         );
 
         $this->field($clients, 'full_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
@@ -155,7 +155,7 @@ class MetadataFixtureSeeder extends Seeder
     {
         $affiliates = Module::updateOrCreate(
             ['key' => 'affiliates'],
-            ['label' => 'Affiliates', 'table_name' => 'affiliates', 'base_type' => 'person', 'enabled' => true],
+            ['label' => 'Affiliates', 'label_plural' => 'Affiliates', 'table_name' => 'affiliates', 'base_type' => 'person', 'enabled' => true],
         );
 
         $this->field($affiliates, 'full_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
@@ -171,7 +171,7 @@ class MetadataFixtureSeeder extends Seeder
     {
         $subscribers = Module::updateOrCreate(
             ['key' => 'newsletter_subscribers'],
-            ['label' => 'Newsletter subscribers', 'table_name' => 'newsletter_subscribers', 'base_type' => 'person', 'enabled' => true],
+            ['label' => 'Newsletter subscribers', 'label_plural' => 'Newsletter subscribers', 'table_name' => 'newsletter_subscribers', 'base_type' => 'person', 'enabled' => true],
         );
 
         $this->field($subscribers, 'full_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
@@ -205,9 +205,16 @@ class MetadataFixtureSeeder extends Seeder
      */
     private function field(Module $module, string $name, string $type, array $attributes = []): Field
     {
+        $defaults = [
+            'type' => $type,
+            'label' => ucfirst(str_replace('_', ' ', $name)),
+            'label_key' => 'LBL_'.strtoupper($name),
+            'storage' => 'column',
+        ];
+
         return Field::updateOrCreate(
             ['module_id' => $module->id, 'name' => $name],
-            array_merge(['type' => $type, 'label_key' => 'LBL_'.strtoupper($name), 'storage' => 'column'], $attributes),
+            array_merge($defaults, $attributes),
         );
     }
 

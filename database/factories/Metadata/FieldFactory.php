@@ -23,6 +23,7 @@ class FieldFactory extends Factory
         return [
             'module_id' => Module::factory(),
             'name' => $name,
+            'label' => ucfirst(str_replace('_', ' ', $name)),
             'type' => 'text',
             'label_key' => 'LBL_'.strtoupper($name),
             'storage' => 'column',

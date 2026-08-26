@@ -340,6 +340,26 @@ it('records before/after on the change log for add and modify', function () {
         ->and($modifyChange->payload['after']['max_length'])->toBe(200);
 });
 
+it('derives a label from the field name when none is given, and accepts an explicit one', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $auto = $manager->plan(new FieldChangeRequest('add', $module->key, 'call_status', 'text'));
+    $manager->apply($auto, actorId: null);
+    expect(Field::query()->where('module_id', $module->id)->where('name', 'call_status')->value('label'))
+        ->toBe('Call status');
+
+    $explicit = $manager->plan(new FieldChangeRequest('add', $module->key, 'crs_score', 'int', ['label' => 'CRS score']));
+    $manager->apply($explicit, actorId: null);
+    expect(Field::query()->where('module_id', $module->id)->where('name', 'crs_score')->value('label'))
+        ->toBe('CRS score');
+
+    $modify = $manager->plan(new FieldChangeRequest('modify', $module->key, 'call_status', 'text', ['label' => 'Call outcome']));
+    $manager->apply($modify, actorId: null);
+    expect(Field::query()->where('module_id', $module->id)->where('name', 'call_status')->value('label'))
+        ->toBe('Call outcome');
+});
+
 it('rollback of an add removes only that field, leaving the sidecar table and sibling columns intact', function () {
     $module = leadsModule();
     $manager = app(SchemaManager::class);

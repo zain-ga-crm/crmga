@@ -27,7 +27,7 @@ final class SchemaManager
      * "before" state, and what rollback() restores for a rolled-back modify.
      */
     private const MODIFIABLE_ATTRIBUTE_KEYS = [
-        'type', 'required', 'default_value', 'help', 'comments', 'max_length',
+        'type', 'label', 'required', 'default_value', 'help', 'comments', 'max_length',
         'precision', 'scale', 'option_list_id', 'related_module_id',
         'related_display_field', 'filterable', 'sortable',
     ];
@@ -358,6 +358,7 @@ final class SchemaManager
                 'module_id' => $module->id,
                 'name' => $r->name,
                 'type' => $r->type,
+                'label' => $this->stringOption($r, 'label') ?? ucfirst(str_replace('_', ' ', $r->name)),
                 'label_key' => 'LBL_'.strtoupper($r->name),
                 'storage' => 'column',
                 'required' => (bool) $r->option('required', false),
@@ -403,6 +404,7 @@ final class SchemaManager
             ddl: $ddl,
             metadataAttributes: [
                 'type' => $type,
+                'label' => $this->stringOption($r, 'label') ?? $existing->label,
                 'required' => $required,
                 'default_value' => $this->stringOption($r, 'default') ?? $existing->default_value,
                 'help' => $this->stringOption($r, 'help') ?? $existing->help,

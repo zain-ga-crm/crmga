@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Metadata\Module;
+use App\Models\Metadata\OptionItem;
 use App\Support\LayoutValidator;
 use App\Support\MetadataRepository;
 use Database\Seeders\MetadataFixtureSeeder;
@@ -21,6 +22,29 @@ it('compiles the seeded leads module and its option lists', function () {
         ->toHaveKeys(['full_name', 'vertical', 'stage', 'primary_email', 'phone_mobile'])
         ->and($meta['option_lists'])->toHaveKeys(['lead_vertical', 'lead_stage'])
         ->and($meta['option_lists']['lead_stage']['items'])->toContain(['value' => 'follow_up', 'label' => 'Follow up']);
+});
+
+it('gives every seeded field a real label and every module a label_plural', function () {
+    $this->seed(MetadataFixtureSeeder::class);
+
+    $leads = Module::query()->where('key', 'leads')->firstOrFail();
+
+    expect($leads->label_plural)->toBe('Leads')
+        ->and($leads->fields()->whereNull('label')->exists())->toBeFalse()
+        ->and($leads->fields()->where('name', 'primary_email')->value('label'))->toBe('Primary email');
+});
+
+it('defaults a seeded option item to active, and a module can be soft-deleted', function () {
+    $this->seed(MetadataFixtureSeeder::class);
+
+    $item = OptionItem::query()->whereHas('optionList', fn ($q) => $q->where('key', 'lead_stage'))->firstOrFail();
+    expect($item->is_active)->toBeTrue();
+
+    $leads = Module::query()->where('key', 'leads')->firstOrFail();
+    $leads->delete();
+
+    expect(Module::query()->where('key', 'leads')->exists())->toBeFalse()
+        ->and(Module::withTrashed()->where('key', 'leads')->exists())->toBeTrue();
 });
 
 it('seeds layouts that satisfy the frozen contract', function () {

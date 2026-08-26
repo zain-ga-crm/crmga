@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $module_id
  * @property string $name
+ * @property string|null $label
  * @property string $type
  * @property string $label_key
  * @property string $storage
@@ -48,7 +49,7 @@ class Field extends Model
 
     /** @var list<string> */
     protected $fillable = [
-        'module_id', 'name', 'type', 'label_key', 'storage', 'required', 'default_value',
+        'module_id', 'name', 'label', 'type', 'label_key', 'storage', 'required', 'default_value',
         'validation', 'audited', 'filterable', 'sortable', 'mass_update', 'duplicate_merge',
         'reportable', 'importable', 'help', 'comments', 'max_length', 'precision', 'scale',
         'option_list_id', 'related_module_id', 'related_display_field', 'is_custom', 'is_system', 'sort_order',
