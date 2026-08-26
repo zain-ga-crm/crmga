@@ -11,17 +11,12 @@ use App\Http\Middleware\Api\SetETag;
 use App\Http\Middleware\Api\VerifyApiKey;
 use App\Http\Middleware\Api\VerifyHmacSignature;
 use App\Http\Middleware\EndTenancyAfterResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 
 // Z-8.3 (BACKEND_BRIEF_ZAIN.md §14 step 4) — gated behind tenant resolution now
 // that tenant #1 exists (crm:promote-primary-tenant).
 Route::middleware([InitializeTenancyByDomain::class, EndTenancyAfterResponse::class])->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    })->middleware('auth:sanctum');
-
     // docs/contracts/api-contract.md Part 3 — inbound integration endpoints (Z-5.6).
     // A separate auth scheme per source (X-Api-Key, HMAC signature, Meta's own
     // verify token), never the OAuth2 bearer tokens the rest of /api/v1/* uses — so
