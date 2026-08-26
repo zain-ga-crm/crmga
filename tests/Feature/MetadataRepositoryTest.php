@@ -53,7 +53,8 @@ it('seeds layouts that satisfy the frozen contract', function () {
 
     $leads = Module::query()->where('key', 'leads')->firstOrFail();
 
-    expect($leads->layouts)->toHaveCount(2);
+    expect($leads->layouts)->toHaveCount(4)
+        ->and($leads->layouts->pluck('view')->sort()->values()->all())->toBe(['detail', 'edit', 'list', 'search']);
     foreach ($leads->layouts as $layout) {
         expect($validator->errors($layout->definition))->toBe([]);
     }

@@ -78,6 +78,14 @@ class MetadataFixtureSeeder extends Seeder
             ['module_id' => $leads->id, 'view' => 'detail'],
             ['definition' => $this->leadsDetailLayout(), 'version' => 1, 'is_published' => true],
         );
+        Layout::updateOrCreate(
+            ['module_id' => $leads->id, 'view' => 'edit'],
+            ['definition' => $this->leadsEditLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $leads->id, 'view' => 'search'],
+            ['definition' => $this->leadsSearchLayout(), 'version' => 1, 'is_published' => true],
+        );
     }
 
     private function seedCompanies(): void
@@ -261,6 +269,78 @@ class MetadataFixtureSeeder extends Seeder
                             [['field' => 'full_name', 'span' => 'full']],
                         ],
                     ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function leadsEditLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'edit',
+            'module' => 'leads',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'primary_email'], ['field' => 'phone_mobile']],
+                        ],
+                    ],
+                    [
+                        'key' => 'qualification',
+                        'label' => 'Qualification',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'vertical'], ['field' => 'stage']],
+                            [['field' => 'source', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'flags',
+                        'label' => 'Flags',
+                        'order' => 2,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'hot_lead'], ['field' => 'warm_lead']],
+                            [['field' => 'do_not_call', 'span' => 'full']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function leadsSearchLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'search',
+            'module' => 'leads',
+            'content' => [
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1],
+                    ['field' => 'vertical', 'priority' => 1],
+                    ['field' => 'stage', 'priority' => 1],
+                    ['field' => 'source', 'priority' => 2],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'phone_mobile', 'priority' => 2],
+                    ['field' => 'hot_lead', 'priority' => 2],
+                    ['field' => 'warm_lead', 'priority' => 2],
+                    ['field' => 'do_not_call', 'priority' => 2],
+                    ['field' => 'last_contacted_at', 'priority' => 3],
                 ],
             ],
         ];
