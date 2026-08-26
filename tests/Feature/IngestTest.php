@@ -194,7 +194,7 @@ it('queues a job per leadgen change on a signed Meta webhook POST', function () 
         'CONTENT_TYPE' => 'application/json',
         'HTTP_X-Hub-Signature-256' => $signature,
         'HTTP_ACCEPT' => 'application/json',
-    ], $body)->assertOk();
+    ], $body)->assertStatus(202);
 
     Queue::assertPushedOn('integrations', ProcessMetaLeadJob::class, fn ($job) => $job->leadgenId === 'lead-123');
 });

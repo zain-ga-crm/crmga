@@ -86,7 +86,7 @@ final class IngestController extends Controller
             }
         }
 
-        return response()->json(['status' => 'ok']);
+        return response()->json(['status' => 'ok'], 202);
     }
 
     private function dispatchIfLeadgen(mixed $change): void
