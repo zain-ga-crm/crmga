@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  */
 class EmailAddressRelation extends MorphPivot
 {
-    use HasUuids;
+    use HasVersion7Uuids;
 
     public $incrementing = false;
 

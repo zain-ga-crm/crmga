@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Support\TwoFactorAuthentication;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -41,7 +41,7 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
     /** @use HasFactory<UserFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
     use Notifiable;
 
     /** @var array<string, mixed> */

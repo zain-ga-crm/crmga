@@ -3,7 +3,7 @@
 namespace App\Models\Metadata;
 
 use Database\Factories\Metadata\OptionListFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,7 +19,7 @@ class OptionList extends Model
     /** @use HasFactory<OptionListFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
 
     /** @var list<string> */
     protected $fillable = ['key', 'label', 'is_system'];

@@ -9,7 +9,7 @@ use App\Models\Concerns\HasEmailAddresses;
 use App\Support\Acl\Aclable;
 use App\Support\Acl\HasAcl;
 use Database\Factories\StudentFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -38,7 +38,7 @@ class Student extends Model implements Aclable, AuditableContract
     /** @use HasFactory<StudentFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
     use SoftDeletes;
 
     /** @var list<string> */

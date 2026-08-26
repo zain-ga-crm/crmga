@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\Subjectable;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -23,7 +23,7 @@ use Illuminate\Support\Carbon;
  */
 class Email extends Model
 {
-    use HasUuids;
+    use HasVersion7Uuids;
     use SoftDeletes;
     use Subjectable;
 

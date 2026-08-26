@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\IngestLogFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,7 +22,7 @@ class IngestLog extends Model
     /** @use HasFactory<IngestLogFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
 
     /** @var list<string> */
     protected $fillable = [

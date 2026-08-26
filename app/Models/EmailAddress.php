@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EmailAddress extends Model
 {
-    use HasUuids;
+    use HasVersion7Uuids;
 
     /** @var list<string> */
     protected $fillable = ['email', 'is_invalid', 'opted_out'];

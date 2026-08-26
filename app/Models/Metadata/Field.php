@@ -3,7 +3,7 @@
 namespace App\Models\Metadata;
 
 use Database\Factories\Metadata\FieldFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,7 +44,7 @@ class Field extends Model
     /** @use HasFactory<FieldFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
     use SoftDeletes;
 
     /** @var list<string> */

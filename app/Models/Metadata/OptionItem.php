@@ -3,7 +3,7 @@
 namespace App\Models\Metadata;
 
 use Database\Factories\Metadata\OptionItemFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,7 +21,7 @@ class OptionItem extends Model
     /** @use HasFactory<OptionItemFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
 
     /** @var list<string> */
     protected $fillable = ['option_list_id', 'value', 'label', 'is_active', 'sort_order'];

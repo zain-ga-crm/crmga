@@ -4,7 +4,7 @@ namespace App\Models\Metadata;
 
 use App\Models\User;
 use Database\Factories\Metadata\ChangeFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,7 +29,7 @@ class Change extends Model
     /** @use HasFactory<ChangeFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
 
     /** @var list<string> */
     protected $fillable = [

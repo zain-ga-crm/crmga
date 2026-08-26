@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\PlatformUserFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,7 +21,7 @@ class PlatformUser extends Authenticatable
     /** @use HasFactory<PlatformUserFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
     use Notifiable;
 
     /** @var list<string> */

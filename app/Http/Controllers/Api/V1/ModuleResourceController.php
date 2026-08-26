@@ -285,10 +285,11 @@ final class ModuleResourceController extends Controller
     }
 
     /**
-     * Keyset pagination on `id` — HasUuids generates ordered (timestamp-prefixed)
-     * UUIDs, so ascending `id` order is stable insertion order. No `total`/`pages`:
-     * that is the whole point of cursor paging on a large collection (BACKEND_BRIEF
-     * §16 — no full-collection COUNT just to render a page).
+     * Keyset pagination on `id` — HasVersion7Uuids generates ordered
+     * (timestamp-prefixed) UUIDs, so ascending `id` order is stable insertion
+     * order. No `total`/`pages`: that is the whole point of cursor paging on a
+     * large collection (BACKEND_BRIEF §16 — no full-collection COUNT just to
+     * render a page).
      */
     /**
      * @param  Builder<Model>  $query

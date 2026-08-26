@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\RoleFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,7 +20,7 @@ class Role extends Model
     /** @use HasFactory<RoleFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
 
     /** @var list<string> */
     protected $fillable = ['name', 'description', 'is_system'];

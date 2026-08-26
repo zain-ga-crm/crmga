@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Support\Acl\AccessLevel;
 use Database\Factories\RoleModulePermissionFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,7 +30,7 @@ class RoleModulePermission extends Model
     /** @use HasFactory<RoleModulePermissionFactory> */
     use HasFactory;
 
-    use HasUuids;
+    use HasVersion7Uuids;
 
     /** @var list<string> */
     protected $fillable = [
