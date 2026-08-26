@@ -60,3 +60,17 @@ it('indexes affiliates.status', function () {
 
     expect($indexed)->toBeTrue();
 });
+
+/**
+ * §4's created_at/phone_mobile requirement applies per-column, not only to
+ * Contactable entities. `assessments` isn't Contactable (no shared macro)
+ * but independently has both columns.
+ */
+it('indexes created_at and phone_mobile on assessments', function () {
+    $indexes = collect(Schema::getIndexes('assessments'));
+
+    expect($indexes->contains(fn (array $index): bool => in_array('created_at', $index['columns'], true)))
+        ->toBeTrue()
+        ->and($indexes->contains(fn (array $index): bool => in_array('phone_mobile', $index['columns'], true)))
+        ->toBeTrue();
+});
