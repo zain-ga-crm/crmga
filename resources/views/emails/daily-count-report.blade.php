@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <body>
-    <h1>Daily lead &amp; student report — {{ $date->toDateString() }}</h1>
+    <h1>{{ $title }} — {{ $date->toDateString() }}</h1>
     <table>
         <tbody>
             @foreach ($counts as $label => $count)

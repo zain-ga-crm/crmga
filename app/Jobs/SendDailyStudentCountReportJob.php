@@ -2,9 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Enums\LeadStage;
 use App\Mail\DailyCountReportMail;
-use App\Models\Lead;
 use App\Models\Student;
 use App\Support\NotificationDedupGuard;
 use App\Support\Settings;
@@ -17,16 +15,17 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 /**
- * Daily lead and student count report (Z-4.2), mailed to the recipients an
- * administrator configured in the settings store (never .env — tenancy-ready
- * rule 3). A no-op until that list is set. Runs with no authenticated user,
- * so the ACL-scoped Lead model must bypass AppliesRecordAccess — this is a
+ * Daily student count notification (§11: `12 10 * * *` company time zone —
+ * the lead and student counts are two separate scheduled notifications, not
+ * one merged report; see SendDailyLeadCountReportJob for the other half).
+ * Recipients come from the settings store (never .env — tenancy-ready rule
+ * 3); a no-op until that list is set. Runs with no authenticated user, so
+ * the ACL-scoped Student model must bypass AppliesRecordAccess — this is a
  * company-wide digest, not scoped to any one owner. Guarded by
- * NotificationDedupGuard so it can never send twice for one company-local day
- * (BACKEND_BRIEF §11), computed in the company time zone rather than the
- * server's.
+ * NotificationDedupGuard so it can never send twice for one company-local
+ * day, computed in the company time zone rather than the server's.
  */
-final class SendDailyCountReportJob implements ShouldQueue
+final class SendDailyStudentCountReportJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -44,21 +43,15 @@ final class SendDailyCountReportJob implements ShouldQueue
         $timezone = is_string($timezoneRaw) ? $timezoneRaw : 'UTC';
         $today = Carbon::now($timezone)->startOfDay();
 
-        if (! $guard->claim('daily_count_report:'.$today->toDateString())) {
+        if (! $guard->claim('daily_student_count_report:'.$today->toDateString())) {
             return;
         }
 
         $counts = [
-            'new_leads_today' => Lead::withoutGlobalScopes()->whereDate('created_at', $today)->count(),
-            'total_leads' => Lead::withoutGlobalScopes()->count(),
-            'open_leads' => Lead::withoutGlobalScopes()
-                ->whereNotIn('stage', [LeadStage::Converted->value, LeadStage::Lost->value])
-                ->count(),
-            'hot_leads' => Lead::withoutGlobalScopes()->where('hot_lead', true)->count(),
             'new_students_today' => Student::withoutGlobalScopes()->whereDate('created_at', $today)->count(),
             'total_students' => Student::withoutGlobalScopes()->count(),
         ];
 
-        Mail::to($recipients)->send(new DailyCountReportMail($counts, $today));
+        Mail::to($recipients)->send(new DailyCountReportMail('Daily student count report', $counts, $today));
     }
 }
