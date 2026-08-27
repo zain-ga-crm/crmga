@@ -2,6 +2,7 @@
 
 use App\Jobs\SendDailyLeadCountReportJob;
 use App\Jobs\SendDailyStudentCountReportJob;
+use App\Jobs\SendFailedJobAlertJob;
 use App\Jobs\SendReminderNotificationsJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -23,6 +24,9 @@ Schedule::command('schema:prune-snapshots')->daily();
 Schedule::job(new SendDailyLeadCountReportJob)->dailyAt('10:07')->withoutOverlapping();
 Schedule::job(new SendDailyStudentCountReportJob)->dailyAt('10:12')->withoutOverlapping();
 Schedule::job(new SendReminderNotificationsJob)->everyFifteenMinutes()->withoutOverlapping();
+
+// §11: "hourly, notifies administrators when failures exceed a threshold."
+Schedule::job(new SendFailedJobAlertJob)->hourly()->withoutOverlapping();
 
 // Z-7.3: BACKEND_BRIEF's own open-question default -- "nightly dump to
 // object storage." withoutOverlapping guards against a slow dump still
