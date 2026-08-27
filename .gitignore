@@ -26,3 +26,5 @@ yarn-error.log
 *.sql.gz
 *.dump
 *.bak
+
+.claude/settings.local.json
