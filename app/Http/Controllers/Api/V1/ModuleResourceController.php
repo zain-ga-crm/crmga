@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\Api\ApiException;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Support\Acl;
+use App\Support\Acl\FieldAccess;
 use App\Support\Api\ApiDate;
 use App\Support\Api\ApiFilterBuilder;
 use App\Support\Api\ApiModuleRegistry;
@@ -48,6 +51,7 @@ final class ModuleResourceController extends Controller
         private readonly ApiModuleRegistry $registry,
         private readonly ApiFilterBuilder $filters,
         private readonly ApiValidationRuleBuilder $validationRules,
+        private readonly Acl $acl,
     ) {}
 
     public function index(Request $request, string $module): JsonResponse
@@ -95,6 +99,7 @@ final class ModuleResourceController extends Controller
         $rules = $this->validationRules->build($fields, forCreate: true);
 
         $attributes = $this->splitFullName($this->normalizeDatetimes($this->stringKeyedArray($request->validate($rules)), $fields));
+        $attributes = $this->stripUnwritableFields($attributes, $module, $request);
 
         /** @var Model $record */
         $record = $modelClass::create($attributes);
@@ -118,6 +123,7 @@ final class ModuleResourceController extends Controller
         $fields = $this->registry->fields($module);
         $rules = $this->validationRules->build($fields, forCreate: false);
         $attributes = $this->splitFullName($this->normalizeDatetimes($this->stringKeyedArray($request->validate($rules)), $fields));
+        $attributes = $this->stripUnwritableFields($attributes, $module, $request);
 
         $record->update($attributes);
         $record = $record->fresh() ?? $record;
@@ -200,11 +206,14 @@ final class ModuleResourceController extends Controller
             $columns[] = 'assigned_user_id';
         }
 
+        $hidden = $this->hiddenFieldNames($request, $module, $sparse);
+
         foreach ($sparse as $name) {
-            if (! in_array($name, $knownNames, true)) {
+            if (! in_array($name, $knownNames, true) || in_array($name, $hidden, true)) {
                 // Same validation toResourceObject() applies -- an unknown
                 // name (typo, stale client) is silently dropped there, so it
-                // must never reach a raw column list here either.
+                // must never reach a raw column list here either. A field
+                // this caller's role hides gets the same treatment.
                 continue;
             }
 
@@ -334,10 +343,11 @@ final class ModuleResourceController extends Controller
         $knownNames = $this->knownFieldNames($fieldTypes);
 
         $requested = $this->sparseFields($module, $request) ?? $knownNames;
+        $hidden = $this->hiddenFieldNames($request, $module, $requested);
 
         $attributes = [];
         foreach ($requested as $name) {
-            if (in_array($name, $knownNames, true)) {
+            if (in_array($name, $knownNames, true) && ! in_array($name, $hidden, true)) {
                 $attributes[$name] = $this->formatAttribute($record, $name, $fieldTypes);
             }
         }
@@ -393,6 +403,60 @@ final class ModuleResourceController extends Controller
         }
 
         return $value;
+    }
+
+    /**
+     * Field-level ACL (STUDIO_API_RBAC.md §3.2): which of the given field
+     * names this caller's role(s) hide entirely -- used to keep a hidden
+     * field out of both the response and, in applyColumnSelection(), the
+     * raw SQL select list.
+     *
+     * @param  list<string>  $names
+     * @return list<string>
+     */
+    private function hiddenFieldNames(Request $request, string $module, array $names): array
+    {
+        $user = $this->resolveUser($request);
+        if ($user === null) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            $names,
+            fn (string $name): bool => $this->acl->fieldAccess($user, $module, $name) === FieldAccess::Hidden,
+        ));
+    }
+
+    /**
+     * The write-side half of field-level ACL: a field marked read_only or
+     * hidden for this caller's role is dropped from the write, never
+     * rejected with an error -- the same "silently narrow, never guess"
+     * convention sparseFields() already uses for an unknown field name.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function stripUnwritableFields(array $attributes, string $module, Request $request): array
+    {
+        $user = $this->resolveUser($request);
+        if ($user === null) {
+            return $attributes;
+        }
+
+        foreach (array_keys($attributes) as $name) {
+            if ($this->acl->fieldAccess($user, $module, $name) !== FieldAccess::ReadWrite) {
+                unset($attributes[$name]);
+            }
+        }
+
+        return $attributes;
+    }
+
+    private function resolveUser(Request $request): ?User
+    {
+        $user = $request->user();
+
+        return $user instanceof User ? $user : null;
     }
 
     /**

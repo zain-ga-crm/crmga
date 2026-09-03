@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\RoleModulePermission;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
+use App\Support\Acl\FieldAccess;
 
 /**
  * The ACL resolution algorithm (BACKEND_BRIEF §8.2). One implementation,
@@ -60,6 +61,32 @@ final class Acl
         foreach (Module::query()->get() as $module) {
             $this->ensureRow($roleId, $module->key);
         }
+    }
+
+    /**
+     * Field-level access (STUDIO_API_RBAC.md §3.2) -- narrows a field within a
+     * module a user can otherwise see/edit. Absence of any matching row across
+     * every one of the user's roles means unrestricted ('read_write'); this
+     * never widens what effective() already grants at the module level, it
+     * only ever narrows a single field further.
+     */
+    public function fieldAccess(User $user, string $moduleKey, string $fieldName): FieldAccess
+    {
+        if ($user->isAdmin()) {
+            return FieldAccess::ReadWrite;
+        }
+
+        $access = null;
+        foreach ($user->roles as $role) {
+            /** @var Role $role */
+            $roleAccess = $role->fieldPermissionFor($moduleKey, $fieldName)?->access;
+            if ($roleAccess === null) {
+                continue;
+            }
+            $access = $access === null ? $roleAccess : FieldAccess::mostPermissive($access, $roleAccess);
+        }
+
+        return $access ?? FieldAccess::ReadWrite;
     }
 
     /**

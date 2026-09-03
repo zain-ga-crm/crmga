@@ -1,10 +1,12 @@
 <?php
 
 use App\Models\Role;
+use App\Models\RoleFieldPermission;
 use App\Models\RoleModulePermission;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
+use App\Support\Acl\FieldAccess;
 use Illuminate\Support\Str;
 use Laravel\Passport\Client;
 use League\OAuth2\Server\ResourceServer;
@@ -66,6 +68,23 @@ function grantAccess(User $user, string $moduleKey, AccessLevel $level, string $
     RoleModulePermission::query()->updateOrCreate(
         ['role_id' => $role->id, 'module_key' => $moduleKey],
         [$action => $level],
+    );
+    $user->roles()->attach($role);
+}
+
+/**
+ * Field-level counterpart to grantAccess() -- narrows a single field within a
+ * module a user can already see/edit (STUDIO_API_RBAC.md §3.2). Attaches a
+ * fresh role carrying only this one field grant, same updateOrCreate reasoning
+ * as grantAccess() (a Role::created listener may have already registered a
+ * default row for this module/field combination).
+ */
+function grantFieldAccess(User $user, string $moduleKey, string $fieldName, FieldAccess $access): void
+{
+    $role = Role::factory()->create();
+    RoleFieldPermission::query()->updateOrCreate(
+        ['role_id' => $role->id, 'module_key' => $moduleKey, 'field_name' => $fieldName],
+        ['access' => $access],
     );
     $user->roles()->attach($role);
 }

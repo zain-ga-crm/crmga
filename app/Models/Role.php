@@ -37,6 +37,12 @@ class Role extends Model
         return $this->hasMany(RoleModulePermission::class);
     }
 
+    /** @return HasMany<RoleFieldPermission, $this> */
+    public function fieldPermissions(): HasMany
+    {
+        return $this->hasMany(RoleFieldPermission::class);
+    }
+
     /** @return BelongsToMany<User, $this> */
     public function users(): BelongsToMany
     {
@@ -46,5 +52,12 @@ class Role extends Model
     public function permissionFor(string $moduleKey): ?RoleModulePermission
     {
         return $this->permissions->firstWhere('module_key', $moduleKey);
+    }
+
+    public function fieldPermissionFor(string $moduleKey, string $fieldName): ?RoleFieldPermission
+    {
+        return $this->fieldPermissions
+            ->where('module_key', $moduleKey)
+            ->firstWhere('field_name', $fieldName);
     }
 }
