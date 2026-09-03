@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\Contactable;
+use App\Models\Concerns\FiresWebhookEvents;
 use App\Models\Concerns\HasActivities;
 use App\Models\Concerns\HasCustomFields;
 use App\Models\Concerns\HasEmailAddresses;
@@ -30,6 +31,7 @@ class Student extends Model implements Aclable, AuditableContract
 {
     use Auditable;
     use Contactable;
+    use FiresWebhookEvents;
     use HasAcl;
     use HasActivities;
     use HasCustomFields;

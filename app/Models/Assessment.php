@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FiresWebhookEvents;
 use App\Models\Concerns\HasActivities;
 use App\Models\Concerns\HasCustomFields;
 use App\Support\Acl\Aclable;
@@ -45,6 +46,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 class Assessment extends Model implements Aclable, AuditableContract
 {
     use Auditable;
+    use FiresWebhookEvents;
     use HasAcl;
     use HasActivities;
     use HasCustomFields;

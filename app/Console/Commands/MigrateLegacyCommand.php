@@ -25,6 +25,7 @@ use App\Support\Etl\NoteTransformer;
 use App\Support\Etl\StudentTransformer;
 use App\Support\Etl\UserTransformer;
 use App\Support\Ingest\Canon;
+use App\Support\Webhooks\WebhookDispatcher;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -100,14 +101,16 @@ final class MigrateLegacyCommand extends Command
         $fromId = $this->stringOption('from-id');
 
         $matched = false;
-        foreach ($transformers as $transformer) {
-            if ($only !== null && $transformer->key() !== $only) {
-                continue;
-            }
+        WebhookDispatcher::suppress(function () use ($transformers, $only, $dryRun, $fromId, &$matched): void {
+            foreach ($transformers as $transformer) {
+                if ($only !== null && $transformer->key() !== $only) {
+                    continue;
+                }
 
-            $matched = true;
-            $this->migrate($transformer, $dryRun, $fromId);
-        }
+                $matched = true;
+                $this->migrate($transformer, $dryRun, $fromId);
+            }
+        });
 
         if (! $matched) {
             $this->error("No transformer matches --only={$only}.");
