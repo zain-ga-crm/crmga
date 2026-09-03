@@ -54,6 +54,20 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        # Filament's login/panel views @vite the custom theme (resources/css/filament/admin/theme.css)
+        # -- without a compiled manifest, Vite::class throws and every panel-rendering test 500s.
+        run: npm run build
+
       - name: Prepare application
         run: |
           cp .env.example .env

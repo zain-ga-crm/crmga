@@ -7,6 +7,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -29,9 +30,29 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('crmga')
+            ->font('Inter')
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            // Values from crmga_Frontend_Design_Spec.docx §2.1 -- brand-500 is the primary
+            // action/link color; the semantic four map 1:1 to Filament's own palette slots.
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#2E74B5'),
+                'danger' => Color::hex('#DC2626'),
+                'warning' => Color::hex('#D97706'),
+                'success' => Color::hex('#059669'),
+                'info' => Color::hex('#0891B2'),
             ])
+            // Groups from §4.1's sidebar map. Empty groups render nothing until Phase 2's
+            // module Resources register into them by name -- this call only fixes the order.
+            ->navigationGroups([
+                NavigationGroup::make('Sales & Intake'),
+                NavigationGroup::make('Directory'),
+                NavigationGroup::make('Delivery'),
+                NavigationGroup::make('Communication'),
+                NavigationGroup::make('Lists'),
+                NavigationGroup::make('Administration')->collapsed(),
+            ])
+            ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

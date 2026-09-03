@@ -1,0 +1,44 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config '../../../../tailwind.config.js';
+
+/**
+ * Design tokens (crmga_Frontend_Design_Spec.docx §2.3). Semantic and brand colors are set
+ * via Color::hex() in AdminPanelProvider, not here -- these are the tokens Filament has no
+ * panel-level option for.
+ */
+:root {
+    --crmga-space-1: 4px;
+    --crmga-space-2: 8px;
+    --crmga-space-3: 12px;
+    --crmga-space-4: 16px;
+    --crmga-space-6: 24px;
+    --crmga-space-8: 32px;
+    --crmga-space-12: 48px;
+    --crmga-space-16: 64px;
+
+    --crmga-radius-sm: 4px;
+    --crmga-radius-md: 8px;
+    --crmga-radius-full: 999px;
+
+    --crmga-shadow-sm: 0 1px 2px rgba(16, 24, 40, .06);
+    --crmga-shadow-md: 0 4px 12px rgba(16, 24, 40, .10);
+    --crmga-shadow-lg: 0 12px 32px rgba(16, 24, 40, .16);
+
+    --crmga-motion-fast: 120ms ease-out;
+    --crmga-motion-base: 200ms ease-out;
+    --crmga-motion-slow: 280ms ease-out;
+
+    --crmga-brand-900: #1F3864;
+    --crmga-brand-700: #27467E;
+}
+
+/* Sidebar background + active item (spec §3.1) -- Filament's own palette slots don't cover
+   the sidebar surface itself, only the accent colors layered on top of it. */
+.fi-sidebar {
+    background-color: var(--crmga-brand-900);
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: var(--crmga-brand-700);
+}
