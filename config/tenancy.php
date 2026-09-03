@@ -114,9 +114,10 @@ return [
          * Each disk listed in the 'disks' array will be suffixed by the suffix_base, followed by the tenant_id.
          */
         'suffix_base' => 'tenant',
+        // 'public' is deliberately NOT suffixed: nothing in the app stores tenant files on it
+        // (Documents uses the private 'local' disk, not 'public').
         'disks' => [
             'local',
-            'public',
             // 's3',
         ],
 
@@ -128,7 +129,6 @@ return [
         'root_override' => [
             // Disks whose roots should be overridden after storage_path() is suffixed.
             'local' => '%storage_path%/app/',
-            'public' => '%storage_path%/app/public/',
         ],
 
         /**
@@ -148,8 +148,16 @@ return [
          * packages that use asset() calls inside the tenant app. To avoid such issues, you can
          * disable asset() helper tenancy and explicitly use tenant_asset() calls in places
          * where you want to use tenant-specific assets (product images, avatars, etc).
+         *
+         * OFF here: nothing in this app serves tenant-specific files through asset() (Documents
+         * uses the private 'local' disk, not 'public'), and leaving this on unconditionally
+         * rewrites app.asset_url regardless of the 'disks' list above -- every compiled Vite
+         * asset (Filament's theme CSS/JS) then resolves under ".../tenant{id}/build/..."
+         * instead of the real ".../build/..." path, 404ing every panel view's stylesheet the
+         * moment a real tenant (not central) is active. Found live: S-1.1 shipped the first
+         * Vite asset this app has ever had, and it broke immediately for the promoted tenant.
          */
-        'asset_helper_tenancy' => true,
+        'asset_helper_tenancy' => false,
     ],
 
     /**
