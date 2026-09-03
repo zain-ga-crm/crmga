@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\PollImapMailboxesJob;
 use App\Jobs\SendDailyLeadCountReportJob;
 use App\Jobs\SendDailyStudentCountReportJob;
 use App\Jobs\SendFailedJobAlertJob;
@@ -27,6 +28,12 @@ Schedule::job(new SendReminderNotificationsJob)->everyFifteenMinutes()->withoutO
 
 // §11: "hourly, notifies administrators when failures exceed a threshold."
 Schedule::job(new SendFailedJobAlertJob)->hourly()->withoutOverlapping();
+
+// Generic IMAP intake (deferred item, ARCHITECTURE.md §"Mail intake"). No
+// cadence is specified anywhere in the docs -- 5 minutes is this job's own
+// choice, close enough to real-time without hammering a mailbox. A no-op
+// (empty mail.inbound.mailboxes setting) until an administrator configures one.
+Schedule::job(new PollImapMailboxesJob)->everyFiveMinutes()->withoutOverlapping();
 
 // Z-7.3: BACKEND_BRIEF's own open-question default -- "nightly dump to
 // object storage." withoutOverlapping guards against a slow dump still

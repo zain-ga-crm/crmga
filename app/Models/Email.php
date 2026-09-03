@@ -20,6 +20,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $body_text
  * @property string $status
  * @property Carbon|null $sent_at
+ * @property string|null $message_id
+ * @property string|null $in_reply_to
  */
 class Email extends Model
 {
@@ -31,7 +33,7 @@ class Email extends Model
     protected $fillable = [
         'subject_type', 'subject_id', 'assigned_user_id', 'created_by',
         'subject_line', 'from_address', 'to_addresses', 'cc_addresses',
-        'body_html', 'body_text', 'status', 'sent_at',
+        'body_html', 'body_text', 'status', 'sent_at', 'message_id', 'in_reply_to',
     ];
 
     /** @return array<string, string> */
