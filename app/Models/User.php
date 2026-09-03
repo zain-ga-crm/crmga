@@ -127,6 +127,12 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
         return $this->roles->contains('name', $name);
     }
 
+    /** @return BelongsToMany<Group, $this> */
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(Group::class, 'group_user');
+    }
+
     // ----- Two-factor authentication -----
 
     public function hasTwoFactorEnabled(): bool

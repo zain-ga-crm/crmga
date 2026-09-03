@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Group;
+use App\Models\GroupRecord;
 use App\Models\Metadata\Module;
 use App\Models\Role;
 use App\Models\RoleModulePermission;
@@ -148,4 +150,93 @@ it('enforces the policy layer consistently with the query scope', function () {
         ->and($policy->view($owner, $theirs))->toBeFalse()
         ->and($policy->update($owner, $mine))->toBeTrue()
         ->and($policy->delete($owner, $mine))->toBeFalse(); // no delete grant
+});
+
+function grantRecordToGroup(Group $group, ContactableFixture $record): GroupRecord
+{
+    return GroupRecord::factory()->create([
+        'group_id' => $group->id,
+        'recordable_type' => ContactableFixture::class,
+        'recordable_id' => $record->id,
+    ]);
+}
+
+it('lets a group-level user see only records granted to their group — in the query', function () {
+    $me = User::factory()->create();
+    $group = Group::factory()->create();
+    $group->users()->attach($me);
+    $me->roles()->attach(roleWithLevel('contactable_fixtures', 'view', AccessLevel::Group));
+
+    $granted = ContactableFixture::withoutGlobalScopes()->create(['first_name' => 'Granted', 'assigned_user_id' => User::factory()->create()->id]);
+    ContactableFixture::withoutGlobalScopes()->create(['first_name' => 'NotGranted', 'assigned_user_id' => User::factory()->create()->id]);
+    grantRecordToGroup($group, $granted);
+
+    $this->actingAs($me);
+
+    expect(ContactableFixture::query()->count())->toBe(1)
+        ->and(ContactableFixture::query()->first()->first_name)->toBe('Granted');
+});
+
+it('makes a record outside the user\'s groups invisible', function () {
+    $me = User::factory()->create();
+    $myGroup = Group::factory()->create();
+    $otherGroup = Group::factory()->create();
+    $myGroup->users()->attach($me);
+    $me->roles()->attach(roleWithLevel('contactable_fixtures', 'view', AccessLevel::Group));
+
+    $theirs = ContactableFixture::withoutGlobalScopes()->create(['first_name' => 'Theirs', 'assigned_user_id' => User::factory()->create()->id]);
+    grantRecordToGroup($otherGroup, $theirs);
+
+    $this->actingAs($me);
+
+    expect(ContactableFixture::find($theirs->id))->toBeNull();
+});
+
+it('lets a user in multiple groups see records granted to any of them', function () {
+    $me = User::factory()->create();
+    $groupA = Group::factory()->create();
+    $groupB = Group::factory()->create();
+    $me->groups()->attach([$groupA->id, $groupB->id]);
+    $me->roles()->attach(roleWithLevel('contactable_fixtures', 'view', AccessLevel::Group));
+
+    $viaA = ContactableFixture::withoutGlobalScopes()->create(['first_name' => 'ViaA', 'assigned_user_id' => User::factory()->create()->id]);
+    $viaB = ContactableFixture::withoutGlobalScopes()->create(['first_name' => 'ViaB', 'assigned_user_id' => User::factory()->create()->id]);
+    grantRecordToGroup($groupA, $viaA);
+    grantRecordToGroup($groupB, $viaB);
+
+    $this->actingAs($me);
+
+    expect(ContactableFixture::query()->pluck('first_name')->sort()->values()->all())->toBe(['ViaA', 'ViaB']);
+});
+
+it('ranks group above owner and below all when combining roles', function () {
+    $user = User::factory()->create();
+    $user->roles()->attach(roleWithLevel('contactable_fixtures', 'edit', AccessLevel::Owner));
+    $user->roles()->attach(roleWithLevel('contactable_fixtures', 'edit', AccessLevel::Group));
+
+    expect(app(Acl::class)->effective($user, 'contactable_fixtures', 'edit'))->toBe(AccessLevel::Group);
+
+    $user->roles()->attach(roleWithLevel('contactable_fixtures', 'edit', AccessLevel::All));
+    $user->unsetRelation('roles');
+
+    expect(app(Acl::class)->effective($user, 'contactable_fixtures', 'edit'))->toBe(AccessLevel::All);
+});
+
+it('enforces the policy layer consistently with the query scope for group level', function () {
+    $me = User::factory()->create();
+    $group = Group::factory()->create();
+    $group->users()->attach($me);
+    $me->roles()->attach(roleWithLevel('contactable_fixtures', 'view', AccessLevel::Group));
+    $me->roles()->attach(roleWithLevel('contactable_fixtures', 'edit', AccessLevel::Group));
+
+    $granted = ContactableFixture::withoutGlobalScopes()->create(['first_name' => 'Granted', 'assigned_user_id' => User::factory()->create()->id]);
+    $notGranted = ContactableFixture::withoutGlobalScopes()->create(['first_name' => 'NotGranted', 'assigned_user_id' => User::factory()->create()->id]);
+    grantRecordToGroup($group, $granted);
+
+    $policy = new ContactableFixturePolicy;
+
+    expect($policy->view($me, $granted))->toBeTrue()
+        ->and($policy->view($me, $notGranted))->toBeFalse()
+        ->and($policy->update($me, $granted))->toBeTrue()
+        ->and($policy->delete($me, $granted))->toBeFalse(); // no delete grant
 });

@@ -10,18 +10,22 @@ namespace App\Support\Acl;
 enum AccessLevel: string
 {
     case All = 'all';
+    case Group = 'group';
     case Owner = 'owner';
     case None = 'none';
     case NotSet = 'not_set';
 
     /**
      * Higher rank = more permissive. Used to pick the most permissive level
-     * across a user's roles (BACKEND_BRIEF §8.2).
+     * across a user's roles (BACKEND_BRIEF §8.2). Group ranks above Owner
+     * (a team is broader than one person) and below All (STUDIO_API_RBAC.md
+     * Appendix A2).
      */
     public function rank(): int
     {
         return match ($this) {
-            self::All => 3,
+            self::All => 4,
+            self::Group => 3,
             self::Owner => 2,
             self::None => 1,
             self::NotSet => 0,

@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Group;
 use App\Models\Metadata\Module;
 use App\Models\Role;
 use App\Models\RoleModulePermission;
@@ -59,6 +60,18 @@ final class Acl
         foreach (Module::query()->get() as $module) {
             $this->ensureRow($roleId, $module->key);
         }
+    }
+
+    /**
+     * The group IDs a user belongs to, for the "Group" access level -- shared
+     * by AppliesRecordAccess (query scope) and CrmPolicy (single-record check)
+     * so both agree on membership without duplicating the query.
+     *
+     * @return list<string>
+     */
+    public function groupIdsFor(User $user): array
+    {
+        return array_values($user->groups->map(fn (Group $group): string => $group->id)->all());
     }
 
     private function ensureRow(string $roleId, string $moduleKey): void

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Support\Acl;
 use App\Support\Acl\AccessLevel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * The policy layer of the three-layer ACL enforcement (BACKEND_BRIEF §8.3):
@@ -75,6 +76,11 @@ abstract class CrmPolicy
         return match ($level) {
             AccessLevel::All => true,
             AccessLevel::Owner => $model->getAttribute('assigned_user_id') === $user->id,
+            AccessLevel::Group => DB::table('group_records')
+                ->where('recordable_type', $model::class)
+                ->where('recordable_id', $model->getKey())
+                ->whereIn('group_id', app(Acl::class)->groupIdsFor($user))
+                ->exists(),
             AccessLevel::None, AccessLevel::NotSet => false,
         };
     }
