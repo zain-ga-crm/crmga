@@ -39,3 +39,12 @@ it('registers the sidebar groups from the design spec, in order', function () {
 it('enables the notification bell', function () {
     expect(Filament::getPanel('admin')->hasDatabaseNotifications())->toBeTrue();
 });
+
+it('sets the sidebar width, collapsed-icon mode, and content max-width from the design spec', function () {
+    $panel = Filament::getPanel('admin');
+
+    expect($panel->getSidebarWidth())->toBe('15.5rem')
+        ->and($panel->getCollapsedSidebarWidth())->toBe('4rem')
+        ->and($panel->isSidebarCollapsibleOnDesktop())->toBeTrue()
+        ->and($panel->getMaxContentWidth())->toBe('max-w-[1600px]');
+});
