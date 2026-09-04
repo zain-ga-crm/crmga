@@ -138,7 +138,9 @@ final class MetadataRepository
                     ->map(fn (Field $f): array => [
                         'name' => $f->name,
                         'type' => $f->type,
+                        'label' => $f->label,
                         'label_key' => $f->label_key,
+                        'help' => $f->help,
                         'storage' => $f->storage,
                         'is_custom' => $f->is_custom,
                         'required' => $f->required,
@@ -151,6 +153,7 @@ final class MetadataRepository
                         'related_module_id' => $f->related_module_id,
                         'related_display_field' => $f->related_display_field,
                         'default_value' => $f->default_value,
+                        'sort_order' => $f->sort_order,
                     ])->all(),
                 'layouts' => $m->layouts
                     ->keyBy('view')
