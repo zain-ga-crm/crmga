@@ -103,7 +103,7 @@ final class FieldTypeRegistry
             'date' => TextColumn::make($name)->date(),
             'datetime' => TextColumn::make($name)->dateTime(),
             'email' => TextColumn::make($name)->copyable()->url(fn (mixed $state): ?string => is_string($state) ? "mailto:{$state}" : null),
-            'phone' => TextColumn::make($name)->copyable()->url(fn (mixed $state): ?string => is_string($state) && $state !== '' ? 'tel:'.preg_replace('/[^\d+]/', '', $state) : null),
+            'phone' => TextColumn::make($name)->copyable()->url($this->phoneUrl(...)),
             'url' => TextColumn::make($name)->url(fn (mixed $state): ?string => is_string($state) ? $state : null),
             'image' => ImageColumn::make($name),
             default => TextColumn::make($name),
@@ -135,6 +135,27 @@ final class FieldTypeRegistry
         }
 
         return $select;
+    }
+
+    /**
+     * A do_not_call record (Contactable's own flag, present on most person-like
+     * modules) never gets a click-to-call link -- the audit's own scope notes
+     * flag click-to-call as cut telephony scope; a plain tel: href isn't
+     * telephony integration (no dialing infrastructure, nothing server-side),
+     * but sitting right next to the DNC flag it's a real compliance risk this
+     * CRM exists partly to prevent, so it's suppressed there regardless.
+     */
+    private function phoneUrl(mixed $state, mixed $record): ?string
+    {
+        if (! is_string($state) || $state === '') {
+            return null;
+        }
+
+        if (is_object($record) && method_exists($record, 'getAttribute') && $record->getAttribute('do_not_call')) {
+            return null;
+        }
+
+        return 'tel:'.preg_replace('/[^\d+]/', '', $state);
     }
 
     private function enumBadgeColumn(string $name, mixed $optionListId): BadgeColumn

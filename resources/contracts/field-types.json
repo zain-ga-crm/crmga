@@ -131,7 +131,7 @@
       "table_cell": "TextColumn(copyable, tel)",
       "filterable": true, "sortable": false, "indexable": true,
       "options": ["required", "help"],
-      "$note": "Store as entered but strip invisible Unicode marks (U+200E, U+200F, U+202A-U+202E) and zero-width characters on save. No telephony integration beyond a tel: link on the table cell (click-to-call via the OS/browser's own handler) — display only, nothing server-side dials out."
+      "$note": "Store as entered but strip invisible Unicode marks (U+200E, U+200F, U+202A-U+202E) and zero-width characters on save. No telephony integration beyond a tel: link on the table cell (click-to-call via the OS/browser's own handler) — display only, nothing server-side dials out. Suppressed entirely on a record whose do_not_call flag is true, regardless of module."
     },
     "url": {
       "label": "URL",

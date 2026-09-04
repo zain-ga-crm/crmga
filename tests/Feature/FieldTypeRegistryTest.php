@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Lead;
 use App\Models\Metadata\Module;
 use App\Models\Metadata\OptionItem;
 use App\Models\Metadata\OptionList;
@@ -146,13 +147,31 @@ it('maps table cells per the contract: badge for enum, boolean icon for bool, mo
 it('gives a phone table cell a tel: link, stripped of formatting characters, for click-to-call', function () {
     // Column::getUrl() evaluates its stored closure against the *bound
     // record's* current state (no bare-value argument) -- reflection reaches
-    // the closure this class actually built, which takes the raw state.
+    // the closure this class actually built, which takes the raw state/record.
+    $registry = app(FieldTypeRegistry::class);
+    $column = $registry->tableColumn(registryField('phone_mobile', 'phone'));
+    $urlClosure = (new ReflectionProperty(TextColumn::class, 'url'))->getValue($column);
+    $reachable = Lead::factory()->make(['do_not_call' => false]);
+
+    expect($urlClosure('+1 (416) 555-0134', $reachable))->toBe('tel:+14165550134')
+        ->and($urlClosure('', $reachable))->toBeNull();
+});
+
+it('suppresses the click-to-call link on a do_not_call record, regardless of module', function () {
+    $registry = app(FieldTypeRegistry::class);
+    $column = $registry->tableColumn(registryField('phone_mobile', 'phone'));
+    $urlClosure = (new ReflectionProperty(TextColumn::class, 'url'))->getValue($column);
+    $dnc = Lead::factory()->make(['do_not_call' => true]);
+
+    expect($urlClosure('+1 (416) 555-0134', $dnc))->toBeNull();
+});
+
+it('does not suppress click-to-call for a record with no do_not_call attribute at all', function () {
     $registry = app(FieldTypeRegistry::class);
     $column = $registry->tableColumn(registryField('phone_mobile', 'phone'));
     $urlClosure = (new ReflectionProperty(TextColumn::class, 'url'))->getValue($column);
 
-    expect($urlClosure('+1 (416) 555-0134'))->toBe('tel:+14165550134')
-        ->and($urlClosure(''))->toBeNull();
+    expect($urlClosure('+1 (416) 555-0134', null))->toBe('tel:+14165550134');
 });
 
 it('colours an enum table cell from each option item\'s own color, S-1.4 badge set', function () {
