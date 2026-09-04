@@ -143,6 +143,69 @@ it('maps table cells per the contract: badge for enum, boolean icon for bool, mo
         ->and($registry->tableColumn(registryField('photo', 'image')))->toBeInstanceOf(ImageColumn::class);
 });
 
+it('gives a phone table cell a tel: link, stripped of formatting characters, for click-to-call', function () {
+    // Column::getUrl() evaluates its stored closure against the *bound
+    // record's* current state (no bare-value argument) -- reflection reaches
+    // the closure this class actually built, which takes the raw state.
+    $registry = app(FieldTypeRegistry::class);
+    $column = $registry->tableColumn(registryField('phone_mobile', 'phone'));
+    $urlClosure = (new ReflectionProperty(TextColumn::class, 'url'))->getValue($column);
+
+    expect($urlClosure('+1 (416) 555-0134'))->toBe('tel:+14165550134')
+        ->and($urlClosure(''))->toBeNull();
+});
+
+it('colours an enum table cell from each option item\'s own color, S-1.4 badge set', function () {
+    $list = OptionList::factory()->create();
+    OptionItem::factory()->for($list, 'optionList')->create(['value' => 'won', 'label' => 'Won', 'color' => 'success']);
+    OptionItem::factory()->for($list, 'optionList')->create(['value' => 'lost', 'label' => 'Lost', 'color' => 'danger']);
+    OptionItem::factory()->for($list, 'optionList')->create(['value' => 'new', 'label' => 'New', 'color' => null]);
+
+    $registry = app(FieldTypeRegistry::class);
+    $column = $registry->tableColumn(registryField('stage', 'enum', ['option_list_id' => $list->id]));
+
+    expect($column->getColor('won'))->toBe('success')
+        ->and($column->getColor('lost'))->toBe('danger')
+        ->and($column->getColor('new'))->toBeNull();
+});
+
+it('leaves an enum table cell with no coloured option items at Filament\'s own default styling', function () {
+    $list = OptionList::factory()->create();
+    OptionItem::factory()->for($list, 'optionList')->create(['value' => 'a', 'label' => 'A', 'color' => null]);
+
+    $registry = app(FieldTypeRegistry::class);
+    $column = $registry->tableColumn(registryField('stage', 'enum', ['option_list_id' => $list->id]));
+
+    expect($column->getColor('a'))->toBeNull();
+});
+
+it('gives named boolean fields a colored badge instead of the generic checkbox icon', function () {
+    // isBadge()/getColor() evaluate their stored closure with no bound
+    // record when the closure asks for $state -- Filament auto-resolves
+    // $state via the column's own getState(), which needs a real record.
+    // Reflection reaches the closures this class actually built, which take
+    // the raw boolean directly, same reasoning as the relate-select test above.
+    $registry = app(FieldTypeRegistry::class);
+
+    foreach (['hot_lead' => 'Hot', 'warm_lead' => 'Warm', 'do_not_call' => 'DNC'] as $name => $label) {
+        $column = $registry->tableColumn(registryField($name, 'bool'));
+
+        $isBadge = (new ReflectionProperty(TextColumn::class, 'isBadge'))->getValue($column);
+        expect($column)->toBeInstanceOf(TextColumn::class)
+            ->and($isBadge(true))->toBeTrue()
+            ->and($column->formatState(true))->toBe($label)
+            ->and($column->formatState(false))->toBe('');
+    }
+});
+
+it('still uses the generic boolean icon for a bool field with no named badge', function () {
+    $registry = app(FieldTypeRegistry::class);
+
+    $column = $registry->tableColumn(registryField('is_archived', 'bool'));
+
+    expect($column)->toBeInstanceOf(IconColumn::class);
+});
+
 it('wires table column searchable/sortable straight from the contract, not the field metadata', function () {
     $registry = app(FieldTypeRegistry::class);
 

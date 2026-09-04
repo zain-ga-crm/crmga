@@ -21,7 +21,20 @@ it('compiles the seeded leads module and its option lists', function () {
         ->and($meta['modules']['leads']['fields'])
         ->toHaveKeys(['full_name', 'vertical', 'stage', 'primary_email', 'phone_mobile'])
         ->and($meta['option_lists'])->toHaveKeys(['lead_vertical', 'lead_stage'])
-        ->and($meta['option_lists']['lead_stage']['items'])->toContain(['value' => 'follow_up', 'label' => 'Follow up']);
+        ->and($meta['option_lists']['lead_stage']['items'])->toContain(['value' => 'follow_up', 'label' => 'Follow up', 'color' => 'warning']);
+});
+
+it('carries each option item\'s S-1.4 badge color through to the compiled structure', function () {
+    $this->seed(MetadataFixtureSeeder::class);
+
+    $meta = app(MetadataRepository::class)->compiled();
+    $stageItems = collect($meta['option_lists']['lead_stage']['items'])->keyBy('value');
+
+    expect($stageItems['converted']['color'])->toBe('success')
+        ->and($stageItems['lost']['color'])->toBe('danger')
+        // lead_vertical deliberately has no colour progression -- every item
+        // stays null, using Filament's own default badge styling.
+        ->and(collect($meta['option_lists']['lead_vertical']['items'])->pluck('color')->unique()->all())->toBe([null]);
 });
 
 it('gives every seeded field a real label and every module a label_plural', function () {

@@ -30,6 +30,11 @@ use Illuminate\Support\Facades\DB;
  *
  * DDL/validation stay elsewhere (SchemaManager, ApiValidationRuleBuilder); this class
  * only builds UI.
+ *
+ * S-1.4: enum table cells pick up a colour from each option item's own `color`
+ * column when set (any dropdown, not a fixed list); a handful of named boolean
+ * fields get a distinct colored badge instead of the generic checkbox icon via
+ * BadgeRegistry's fixed, named list.
  */
 final class FieldTypeRegistry
 {
@@ -86,15 +91,19 @@ final class FieldTypeRegistry
 
         $column = match ($type) {
             'textarea' => TextColumn::make($name)->limit(60),
-            'enum' => BadgeColumn::make($name),
+            'enum' => $this->enumBadgeColumn($name, $field['option_list_id'] ?? null),
+            // Colouring a multienum's badge *list* per-value would need Filament to
+            // colour each pill of an array state independently, which its color()
+            // closure doesn't do (one colour per cell, not per list item) -- left at
+            // the contract's default badge styling rather than a misleading single colour.
             'multienum' => BadgeColumn::make($name),
-            'bool' => IconColumn::make($name)->boolean(),
+            'bool' => BadgeRegistry::hasBooleanBadge($name) ? BadgeRegistry::booleanBadgeColumn($name) : IconColumn::make($name)->boolean(),
             'int', 'decimal' => TextColumn::make($name)->alignRight(),
             'currency' => TextColumn::make($name)->money('usd')->alignRight(),
             'date' => TextColumn::make($name)->date(),
             'datetime' => TextColumn::make($name)->dateTime(),
             'email' => TextColumn::make($name)->copyable()->url(fn (mixed $state): ?string => is_string($state) ? "mailto:{$state}" : null),
-            'phone' => TextColumn::make($name)->copyable(),
+            'phone' => TextColumn::make($name)->copyable()->url(fn (mixed $state): ?string => is_string($state) && $state !== '' ? 'tel:'.preg_replace('/[^\d+]/', '', $state) : null),
             'url' => TextColumn::make($name)->url(fn (mixed $state): ?string => is_string($state) ? $state : null),
             'image' => ImageColumn::make($name),
             default => TextColumn::make($name),
@@ -126,6 +135,18 @@ final class FieldTypeRegistry
         }
 
         return $select;
+    }
+
+    private function enumBadgeColumn(string $name, mixed $optionListId): BadgeColumn
+    {
+        $column = BadgeColumn::make($name);
+        $colors = $this->optionColors($optionListId);
+
+        if ($colors === []) {
+            return $column;
+        }
+
+        return $column->color(fn (mixed $state): ?string => is_string($state) ? ($colors[$state] ?? null) : null);
     }
 
     /**
@@ -198,6 +219,30 @@ final class FieldTypeRegistry
         return $list->items
             ->mapWithKeys(fn (OptionItem $item): array => [$item->value => $item->label])
             ->all();
+    }
+
+    /**
+     * @return array<string, string> option value => Filament colour name, items with no colour set omitted
+     */
+    private function optionColors(mixed $optionListId): array
+    {
+        if (! is_string($optionListId)) {
+            return [];
+        }
+
+        $list = OptionList::query()->with('items')->find($optionListId);
+        if ($list === null) {
+            return [];
+        }
+
+        $colors = [];
+        foreach ($list->items as $item) {
+            if (is_string($item->color) && $item->color !== '') {
+                $colors[$item->value] = $item->color;
+            }
+        }
+
+        return $colors;
     }
 
     private function relatedTable(string $relatedModuleId): ?string
