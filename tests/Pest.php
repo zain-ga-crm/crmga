@@ -167,3 +167,30 @@ function promotePrimaryTenant(): Tenant
 
     return $tenant;
 }
+
+/**
+ * A field entry in MetadataRepository::compiled()'s own shape (see its
+ * modules.*.fields map) -- for FieldTypeRegistryTest, which feeds
+ * FieldTypeRegistry raw compiled arrays rather than Field Eloquent models.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function registryField(string $name, string $type, array $overrides = []): array
+{
+    return array_merge([
+        'name' => $name,
+        'type' => $type,
+        'label' => null,
+        'label_key' => 'LBL_'.strtoupper($name),
+        'help' => null,
+        'required' => false,
+        'max_length' => null,
+        'precision' => null,
+        'scale' => null,
+        'option_list_id' => null,
+        'related_module_id' => null,
+        'related_display_field' => null,
+        'default_value' => null,
+    ], $overrides);
+}
