@@ -119,6 +119,158 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($companies, 'company_contact_status', 'text', ['filterable' => true, 'max_length' => 60]);
         $this->field($companies, 'lmia', 'text', ['filterable' => true, 'max_length' => 20]);
         $this->field($companies, 'website', 'url', ['max_length' => 500]);
+        // Hot/Warm applies across every Contactable module, not just leads
+        // (crmga-customizations: the legacy system had this on 7 modules) --
+        // BadgeRegistry keys on the field name alone, so this picks it up
+        // automatically once registered here.
+        $this->field($companies, 'hot_lead', 'bool', ['filterable' => true]);
+        $this->field($companies, 'warm_lead', 'bool', ['filterable' => true]);
+
+        Layout::updateOrCreate(
+            ['module_id' => $companies->id, 'view' => 'list'],
+            ['definition' => $this->companiesListLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $companies->id, 'view' => 'detail'],
+            ['definition' => $this->companiesDetailLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $companies->id, 'view' => 'edit'],
+            ['definition' => $this->companiesEditLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $companies->id, 'view' => 'search'],
+            ['definition' => $this->companiesSearchLayout(), 'version' => 1, 'is_published' => true],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function companiesListLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'list',
+            'module' => 'companies',
+            'content' => [
+                'default_sort' => ['field' => 'created_at', 'direction' => 'desc'],
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1, 'link' => true, 'width' => 200],
+                    ['field' => 'industry', 'priority' => 1, 'width' => 150],
+                    ['field' => 'company_contact_status', 'priority' => 1, 'label' => 'Status', 'width' => 150],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'contact_person_phone', 'priority' => 1, 'sortable' => false],
+                    ['field' => 'assigned_user_id', 'priority' => 2, 'label' => 'Owner', 'width' => 140],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function companiesDetailLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'detail',
+            'module' => 'companies',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'contact_person_name'], ['field' => 'contact_person_phone']],
+                            [['field' => 'primary_email'], ['field' => 'website']],
+                            [['field' => 'full_name', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'company_info',
+                        'label' => 'Company info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'industry'], ['field' => 'company_contact_status', 'label' => 'Status']],
+                            [['field' => 'lmia', 'span' => 'full']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function companiesEditLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'edit',
+            'module' => 'companies',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'contact_person_name'], ['field' => 'contact_person_phone']],
+                            [['field' => 'primary_email'], ['field' => 'website']],
+                        ],
+                    ],
+                    [
+                        'key' => 'company_info',
+                        'label' => 'Company info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'industry'], ['field' => 'company_contact_status', 'label' => 'Status']],
+                            [['field' => 'lmia', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'flags',
+                        'label' => 'Flags',
+                        'order' => 2,
+                        'rows' => [
+                            [['field' => 'hot_lead'], ['field' => 'warm_lead']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function companiesSearchLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'search',
+            'module' => 'companies',
+            'content' => [
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1],
+                    ['field' => 'industry', 'priority' => 1],
+                    ['field' => 'company_contact_status', 'priority' => 1],
+                    ['field' => 'lmia', 'priority' => 2],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'contact_person_phone', 'priority' => 2],
+                    ['field' => 'hot_lead', 'priority' => 2],
+                    ['field' => 'warm_lead', 'priority' => 2],
+                ],
+            ],
+        ];
     }
 
     private function seedAssessments(): void
