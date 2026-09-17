@@ -256,6 +256,7 @@ class MetadataFixtureSeeder extends Seeder
                     ['field' => 'stage', 'priority' => 1, 'width' => 120],
                     ['field' => 'primary_email', 'priority' => 1],
                     ['field' => 'phone_mobile', 'priority' => 1, 'sortable' => false],
+                    ['field' => 'assigned_user_id', 'priority' => 1, 'label' => 'Owner', 'width' => 140],
                 ],
             ],
         ];
@@ -271,15 +272,44 @@ class MetadataFixtureSeeder extends Seeder
             'view' => 'detail',
             'module' => 'leads',
             'content' => [
+                // S-2.1: exercises both tabs and a panel's visible_when against
+                // BuildsResourceFromMetadata -- 'source' stands in for a real
+                // qualification field so the fixture doesn't invent a column
+                // that doesn't exist on the leads table.
+                'tabs' => [
+                    ['key' => 'overview', 'label' => 'Overview', 'order' => 0],
+                    ['key' => 'flags', 'label' => 'Flags', 'order' => 1],
+                ],
                 'panels' => [
                     [
                         'key' => 'contact_details',
                         'label' => 'Contact details',
+                        'tab' => 'overview',
                         'order' => 0,
                         'columns' => 2,
                         'rows' => [
                             [['field' => 'primary_email'], ['field' => 'phone_mobile']],
                             [['field' => 'full_name', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'refugee_note',
+                        'label' => 'Refugee note',
+                        'tab' => 'overview',
+                        'order' => 1,
+                        'visible_when' => ['field' => 'vertical', 'operator' => 'eq', 'value' => 'Refugee'],
+                        'rows' => [
+                            [['field' => 'source', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'flags',
+                        'label' => 'Flags',
+                        'tab' => 'flags',
+                        'order' => 0,
+                        'rows' => [
+                            [['field' => 'hot_lead'], ['field' => 'warm_lead']],
+                            [['field' => 'do_not_call', 'span' => 'full']],
                         ],
                     ],
                 ],

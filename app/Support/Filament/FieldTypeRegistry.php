@@ -6,14 +6,18 @@ use App\Models\Metadata\Module;
 use App\Models\Metadata\OptionItem;
 use App\Models\Metadata\OptionList;
 use App\Support\FieldTypeContract;
-use Filament\Forms\Components\Component as FormComponent;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Field as FormField;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\Component as InfolistComponent;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\Column as TableColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -41,9 +45,23 @@ final class FieldTypeRegistry
     public function __construct(private readonly FieldTypeContract $contract) {}
 
     /**
+     * S-2.1: a public entry point onto the same option-list lookup
+     * formComponent() uses internally, for callers building something other
+     * than a form/table/infolist component from it (e.g. a Filament
+     * SelectFilter's own ->options()).
+     *
+     * @param  array<string, mixed>  $field
+     * @return array<string, string>
+     */
+    public function selectOptions(array $field): array
+    {
+        return $this->optionValues($field['option_list_id'] ?? null);
+    }
+
+    /**
      * @param  array<string, mixed>  $field  one entry from a compiled module's 'fields' map
      */
-    public function formComponent(array $field): FormComponent
+    public function formComponent(array $field): FormField
     {
         $name = $this->str($field['name'] ?? null);
         $type = $this->str($field['type'] ?? null, 'text');
@@ -82,6 +100,44 @@ final class FieldTypeRegistry
     }
 
     /**
+     * S-2.1: the detail-view counterpart of tableColumn() -- same type mapping,
+     * read-only Infolist entries instead of table columns. Kept in this class
+     * (not a separate registry) since it's the same per-type dispatch table,
+     * just a different Filament component family.
+     *
+     * @param  array<string, mixed>  $field
+     */
+    public function infolistEntry(array $field): InfolistComponent
+    {
+        $name = $this->str($field['name'] ?? null);
+        $type = $this->str($field['type'] ?? null, 'text');
+
+        $entry = match ($type) {
+            'enum' => $this->enumBadgeEntry($name, $field['option_list_id'] ?? null),
+            'multienum' => TextEntry::make($name)->badge(),
+            'bool' => IconEntry::make($name)->boolean(),
+            'currency' => TextEntry::make($name)->money('usd'),
+            'date' => TextEntry::make($name)->date(),
+            'datetime' => TextEntry::make($name)->dateTime(),
+            'email' => TextEntry::make($name)->copyable()->url(fn (mixed $state): ?string => is_string($state) ? "mailto:{$state}" : null),
+            'phone' => TextEntry::make($name)->copyable()->url($this->phoneUrl(...)),
+            'url' => TextEntry::make($name)->url(fn (mixed $state): ?string => is_string($state) ? $state : null),
+            'relate' => $this->relateEntry($field),
+            'image' => ImageEntry::make($name),
+            default => TextEntry::make($name),
+        };
+
+        $entry = $entry->label($this->labelFor($field, $name));
+
+        $help = $this->str($field['help'] ?? null);
+        if ($help !== '') {
+            $entry = $entry->helperText($help);
+        }
+
+        return $entry;
+    }
+
+    /**
      * @param  array<string, mixed>  $field
      */
     public function tableColumn(array $field): TableColumn
@@ -102,8 +158,15 @@ final class FieldTypeRegistry
             'currency' => TextColumn::make($name)->money('usd')->alignRight(),
             'date' => TextColumn::make($name)->date(),
             'datetime' => TextColumn::make($name)->dateTime(),
-            'email' => TextColumn::make($name)->copyable()->url(fn (mixed $state): ?string => is_string($state) ? "mailto:{$state}" : null),
-            'phone' => TextColumn::make($name)->copyable()->url($this->phoneUrl(...)),
+            // Table columns can't combine copyable() with url() -- Filament's own
+            // CanBeCopied::isClickDisabled() forces the cell to a plain
+            // click-to-copy div and drops the <a href> wrapper entirely the
+            // instant copyable() is set (confirmed against the real Blade
+            // template, not documented anywhere). The link wins here since
+            // that's this type's whole point (mailto/tel); copyable stays on
+            // the infolist entry, which has no such conflict.
+            'email' => TextColumn::make($name)->url(fn (mixed $state): ?string => is_string($state) ? "mailto:{$state}" : null),
+            'phone' => TextColumn::make($name)->url($this->phoneUrl(...)),
             'url' => TextColumn::make($name)->url(fn (mixed $state): ?string => is_string($state) ? $state : null),
             'image' => ImageColumn::make($name),
             default => TextColumn::make($name),
@@ -168,6 +231,43 @@ final class FieldTypeRegistry
         }
 
         return $column->color(fn (mixed $state): ?string => is_string($state) ? ($colors[$state] ?? null) : null);
+    }
+
+    private function enumBadgeEntry(string $name, mixed $optionListId): TextEntry
+    {
+        $entry = TextEntry::make($name)->badge();
+        $colors = $this->optionColors($optionListId);
+
+        if ($colors === []) {
+            return $entry;
+        }
+
+        return $entry->color(fn (mixed $state): ?string => is_string($state) ? ($colors[$state] ?? null) : null);
+    }
+
+    /**
+     * @param  array<string, mixed>  $field
+     */
+    private function relateEntry(array $field): TextEntry
+    {
+        $name = $this->str($field['name'] ?? null);
+        $displayField = $this->str($field['related_display_field'] ?? null, 'id');
+        $relatedModuleId = $field['related_module_id'] ?? null;
+        $table = is_string($relatedModuleId) ? $this->relatedTable($relatedModuleId) : null;
+
+        if ($table === null) {
+            return TextEntry::make($name);
+        }
+
+        return TextEntry::make($name)->formatStateUsing(function (mixed $state) use ($table, $displayField): ?string {
+            if (! is_string($state)) {
+                return null;
+            }
+
+            $label = DB::table($table)->where('id', $state)->value($displayField);
+
+            return is_string($label) ? $label : null;
+        });
     }
 
     /**

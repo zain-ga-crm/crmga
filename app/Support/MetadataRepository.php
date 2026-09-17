@@ -130,6 +130,7 @@ final class MetadataRepository
             ->map(fn (Module $m): array => [
                 'key' => $m->key,
                 'label' => $m->label,
+                'label_plural' => $m->label_plural,
                 'table_name' => $m->table_name,
                 'base_type' => $m->base_type,
                 'enabled' => $m->enabled,
