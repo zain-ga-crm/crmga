@@ -143,13 +143,16 @@ trait HasCustomFields
             return;
         }
 
-        $row = DB::table($this->customTable())->where('id_c', $this->getKey())->first();
+        // SchemaManager::createSidecarSql() gives the sidecar the same 'id'
+        // primary key name as the base table (see its own DDL) -- not a
+        // distinct 'id_c' foreign-key-style column.
+        $row = DB::table($this->customTable())->where('id', $this->getKey())->first();
         if ($row === null) {
             return;
         }
 
         foreach ((array) $row as $column => $value) {
-            if ($column !== 'id_c' && in_array($column, $names, true)) {
+            if ($column !== 'id' && in_array($column, $names, true)) {
                 $this->customFieldValues[$column] = $this->castAttribute($column, $value);
             }
         }
@@ -161,6 +164,6 @@ trait HasCustomFields
             return;
         }
 
-        DB::table($this->customTable())->updateOrInsert(['id_c' => $this->getKey()], $this->customFieldValues);
+        DB::table($this->customTable())->updateOrInsert(['id' => $this->getKey()], $this->customFieldValues);
     }
 }

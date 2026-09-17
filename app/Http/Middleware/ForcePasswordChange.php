@@ -21,7 +21,7 @@ class ForcePasswordChange
         if (
             $user instanceof User
             && $user->mustChangePassword()
-            && ! $request->is(ltrim((string) parse_url(ChangePassword::getUrl(), PHP_URL_PATH), '/'))
+            && ! $request->fullUrlIs(ChangePassword::getUrl())
         ) {
             return redirect(ChangePassword::getUrl());
         }

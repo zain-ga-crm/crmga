@@ -27,8 +27,10 @@ beforeEach(function () {
     }
 
     if (! Schema::hasTable('contactable_fixtures_custom')) {
+        // Same 'id' primary key name SchemaManager::createSidecarSql() gives
+        // every real sidecar -- not a distinct 'id_c' column.
         Schema::create('contactable_fixtures_custom', function (Blueprint $table) {
-            $table->uuid('id_c')->primary();
+            $table->uuid('id')->primary();
             $table->string('favourite_colour')->nullable();
             $table->boolean('newsletter_opt_in')->nullable();
         });
@@ -78,7 +80,7 @@ it('reads a custom field from the sidecar transparently', function () {
     Field::factory()->create(['module_id' => $module->id, 'name' => 'favourite_colour', 'type' => 'text']);
 
     $record = ContactableFixture::create(['first_name' => 'Amina']);
-    DB::table('contactable_fixtures_custom')->insert(['id_c' => $record->id, 'favourite_colour' => 'teal']);
+    DB::table('contactable_fixtures_custom')->insert(['id' => $record->id, 'favourite_colour' => 'teal']);
 
     $fresh = ContactableFixture::find($record->id);
     expect($fresh->favourite_colour)->toBe('teal');
@@ -92,7 +94,7 @@ it('writes a custom field to the sidecar on save', function () {
     $record->favourite_colour = 'crimson';
     $record->save();
 
-    expect(DB::table('contactable_fixtures_custom')->where('id_c', $record->id)->value('favourite_colour'))
+    expect(DB::table('contactable_fixtures_custom')->where('id', $record->id)->value('favourite_colour'))
         ->toBe('crimson');
 });
 
