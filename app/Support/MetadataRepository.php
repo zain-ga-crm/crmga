@@ -167,7 +167,7 @@ final class MetadataRepository
                 'key' => $ol->key,
                 'label' => $ol->label,
                 'items' => $ol->items
-                    ->map(fn (OptionItem $i): array => ['value' => $i->value, 'label' => $i->label])
+                    ->map(fn (OptionItem $i): array => ['value' => $i->value, 'label' => $i->label, 'color' => $i->color])
                     ->values()->all(),
             ])->all();
 

@@ -35,6 +35,18 @@ class MetadataFixtureSeeder extends Seeder
             'Stage',
             collect(LeadStage::cases())->mapWithKeys(fn (LeadStage $s) => [$s->value => $s->label()])->all(),
             isSystem: true,
+            // S-1.4: the stage badge set — a colour progression through the
+            // funnel, not just a label. Lead vertical has no equivalent
+            // good/bad semantic across its 16 values, so it stays uncoloured
+            // (Filament's own default badge styling).
+            colors: [
+                LeadStage::New->value => 'gray',
+                LeadStage::Contacted->value => 'info',
+                LeadStage::FollowUp->value => 'warning',
+                LeadStage::Qualified->value => 'primary',
+                LeadStage::Converted->value => 'success',
+                LeadStage::Lost->value => 'danger',
+            ],
         );
 
         $this->seedLeads($vertical, $stage);
@@ -192,8 +204,9 @@ class MetadataFixtureSeeder extends Seeder
 
     /**
      * @param  array<string, string>  $items  value => label
+     * @param  array<string, string>  $colors  value => Filament colour name, for the values that have one
      */
-    private function optionList(string $key, string $label, array $items, bool $isSystem = false): OptionList
+    private function optionList(string $key, string $label, array $items, bool $isSystem = false, array $colors = []): OptionList
     {
         $list = OptionList::updateOrCreate(['key' => $key], ['label' => $label, 'is_system' => $isSystem]);
 
@@ -201,7 +214,7 @@ class MetadataFixtureSeeder extends Seeder
         foreach ($items as $value => $itemLabel) {
             OptionItem::updateOrCreate(
                 ['option_list_id' => $list->id, 'value' => $value],
-                ['label' => $itemLabel, 'sort_order' => $order++],
+                ['label' => $itemLabel, 'color' => $colors[$value] ?? null, 'sort_order' => $order++],
             );
         }
 
