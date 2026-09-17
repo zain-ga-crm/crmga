@@ -118,9 +118,10 @@
       "cast": "string",
       "validation": ["nullable", "email:rfc", "max:255"],
       "component": "TextInput(email)",
-      "table_cell": "TextColumn(copyable, mailto)",
+      "table_cell": "TextColumn(mailto)",
       "filterable": true, "sortable": true, "indexable": true,
-      "options": ["required", "help"]
+      "options": ["required", "help"],
+      "$note": "Not copyable on the table cell -- Filament's TextColumn drops its <a href> the instant copyable() is set (CanBeCopied::isClickDisabled()), so the link wins there. The infolist entry has no such conflict and stays copyable."
     },
     "phone": {
       "label": "Phone",
@@ -128,10 +129,10 @@
       "cast": "string",
       "validation": ["nullable", "string", "max:50"],
       "component": "TextInput(tel)",
-      "table_cell": "TextColumn(copyable, tel)",
+      "table_cell": "TextColumn(tel)",
       "filterable": true, "sortable": false, "indexable": true,
       "options": ["required", "help"],
-      "$note": "Store as entered but strip invisible Unicode marks (U+200E, U+200F, U+202A-U+202E) and zero-width characters on save. No telephony integration beyond a tel: link on the table cell (click-to-call via the OS/browser's own handler) — display only, nothing server-side dials out. Suppressed entirely on a record whose do_not_call flag is true, regardless of module."
+      "$note": "Store as entered but strip invisible Unicode marks (U+200E, U+200F, U+202A-U+202E) and zero-width characters on save. No telephony integration beyond a tel: link on the table cell (click-to-call via the OS/browser's own handler) — display only, nothing server-side dials out. Suppressed entirely on a record whose do_not_call flag is true, regardless of module. Not copyable on the table cell -- Filament's TextColumn drops its <a href> the instant copyable() is set (CanBeCopied::isClickDisabled()), so the link wins there. The infolist entry has no such conflict and stays copyable."
     },
     "url": {
       "label": "URL",
