@@ -33,6 +33,14 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('crmga')
             ->font('Inter')
             ->viteTheme('resources/css/filament/admin/theme.css')
+            // §3.1: "Width 248px expanded, 64px collapsed (icons plus tooltips)."
+            // Filament has no built-in hover-tooltip for the collapsed rail; that
+            // part of §3.1 needs custom Alpine/CSS layered on top later.
+            ->sidebarWidth('15.5rem')
+            ->collapsedSidebarWidth('4rem')
+            ->sidebarCollapsibleOnDesktop()
+            // §3.1: "Content area ... maximum width 1600px, centred."
+            ->maxContentWidth('max-w-[1600px]')
             // Values from crmga_Frontend_Design_Spec.docx §2.1 -- brand-500 is the primary
             // action/link color; the semantic four map 1:1 to Filament's own palette slots.
             ->colors([
