@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Support\TwoFactorAuthentication;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Concerns\HasVersion7Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,8 +34,9 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * @property string|null $two_factor_secret
  * @property list<string>|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
+ * @property Carbon|null $password_changed_at
  */
-class User extends Authenticatable implements AuditableContract, OAuthenticatable
+class User extends Authenticatable implements AuditableContract, FilamentUser, OAuthenticatable
 {
     use Auditable;
     use HasApiTokens;
@@ -64,6 +67,7 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
         'locale',
         'timezone',
         'email_signature',
+        'password_changed_at',
     ];
 
     /** @var list<string> */
@@ -94,6 +98,7 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
             'two_factor_secret' => 'encrypted',
             'two_factor_recovery_codes' => 'array',
             'two_factor_confirmed_at' => 'datetime',
+            'password_changed_at' => 'datetime',
         ];
     }
 
@@ -102,6 +107,18 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
     public function isAdmin(): bool
     {
         return $this->is_admin;
+    }
+
+    /**
+     * Without this, Filament's own Authenticate middleware falls back to
+     * "any authenticated user, but only when app.env is exactly 'local'" --
+     * meaning nobody could ever reach the panel outside local development,
+     * including production. Every active user may log in; what they can
+     * then see/do is the ACL engine's job (Acl::effective()), not this gate.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->status === 'active';
     }
 
     /** @return BelongsTo<User, $this> */
@@ -125,6 +142,22 @@ class User extends Authenticatable implements AuditableContract, OAuthenticatabl
     public function hasRole(string $name): bool
     {
         return $this->roles->contains('name', $name);
+    }
+
+    // ----- Forced first-login password change (crmga_Frontend_Design_Spec.docx §7) -----
+
+    /**
+     * Null means the current password was system-generated (an invited user,
+     * or a fresh seed) and was never chosen by the user themselves.
+     */
+    public function mustChangePassword(): bool
+    {
+        return $this->password_changed_at === null;
+    }
+
+    public function markPasswordChanged(): void
+    {
+        $this->forceFill(['password_changed_at' => now()])->save();
     }
 
     /** @return BelongsToMany<Group, $this> */
