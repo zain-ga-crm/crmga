@@ -29,8 +29,21 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'password_changed_at' => now(),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * A user whose password was system-generated and never chosen by them
+     * (an admin invite, a fresh seed) -- must change it before reaching
+     * anything else in the panel (S-1.2's forced first-login flow).
+     */
+    public function mustChangePassword(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'password_changed_at' => null,
+        ]);
     }
 
     /**
