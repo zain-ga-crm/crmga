@@ -18,6 +18,7 @@ class ListCompanies extends ListRecords
     {
         return [
             CreateAction::make(),
+            ...CompanyResource::exportHeaderActions(),
         ];
     }
 }

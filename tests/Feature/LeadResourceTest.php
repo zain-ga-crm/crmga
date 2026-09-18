@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\LeadVertical;
+use App\Filament\Exports\LeadExporter;
 use App\Filament\Resources\LeadResource;
 use App\Filament\Resources\LeadResource\Pages\CreateLead;
 use App\Filament\Resources\LeadResource\Pages\EditLead;
@@ -179,4 +180,71 @@ it('keeps the phone click-to-call link for a reachable lead in the list', functi
     $this->get(LeadResource::getUrl('index'))
         ->assertSuccessful()
         ->assertSee('tel:+14165550134', false);
+});
+
+// S-2.4: bulk-action bar (delete/export) + header export -- gated on the
+// same ACL actions as everything else in BuildsResourceFromMetadata.
+
+it('shows the delete bulk action for a user with delete access', function () {
+    $user = User::factory()->create();
+    grantAccess($user, 'leads', AccessLevel::All, 'list');
+    grantAccess($user, 'leads', AccessLevel::All, 'delete');
+
+    $this->actingAs($user);
+
+    Livewire::test(ListLeads::class)->assertTableBulkActionExists('delete');
+});
+
+it('hides the delete bulk action for a user without delete access', function () {
+    $user = User::factory()->create();
+    grantAccess($user, 'leads', AccessLevel::All, 'list');
+
+    $this->actingAs($user);
+
+    Livewire::test(ListLeads::class)->assertTableBulkActionDoesNotExist('delete');
+});
+
+it('shows the export bulk action and header action for a user with export access', function () {
+    $user = User::factory()->create();
+    grantAccess($user, 'leads', AccessLevel::All, 'list');
+    grantAccess($user, 'leads', AccessLevel::All, 'export');
+
+    $this->actingAs($user);
+
+    Livewire::test(ListLeads::class)
+        ->assertTableBulkActionExists('export')
+        ->assertActionExists('export');
+});
+
+it('hides the export bulk action and header action for a user without export access', function () {
+    $user = User::factory()->create();
+    grantAccess($user, 'leads', AccessLevel::All, 'list');
+
+    $this->actingAs($user);
+
+    Livewire::test(ListLeads::class)
+        ->assertTableBulkActionDoesNotExist('export')
+        ->assertActionDoesNotExist('export');
+});
+
+it('bulk-deletes only the selected leads', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $toDelete = Lead::factory()->create();
+    $toKeep = Lead::factory()->create();
+
+    $this->actingAs($admin);
+
+    Livewire::test(ListLeads::class)
+        ->callTableBulkAction('delete', [$toDelete->id]);
+
+    expect(Lead::query()->find($toDelete->id))->toBeNull()
+        ->and(Lead::query()->find($toKeep->id))->not->toBeNull();
+});
+
+it('exports leads using the same list-layout columns the table shows', function () {
+    $columns = collect(LeadExporter::getColumns())
+        ->map(fn ($column) => $column->getName())
+        ->all();
+
+    expect($columns)->toContain('full_name', 'vertical', 'stage', 'primary_email', 'phone_mobile', 'assignedUser.name');
 });

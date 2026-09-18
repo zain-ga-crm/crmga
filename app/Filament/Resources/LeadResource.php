@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\LeadExporter;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
 use App\Filament\Resources\LeadResource\Pages;
 use App\Models\Lead;
+use Filament\Actions\Exports\Exporter;
 use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
 
@@ -27,6 +29,14 @@ class LeadResource extends Resource
     public static function moduleKey(): string
     {
         return 'leads';
+    }
+
+    /**
+     * @return class-string<Exporter>
+     */
+    public static function exporter(): ?string
+    {
+        return LeadExporter::class;
     }
 
     /**

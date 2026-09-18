@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\CompanyExporter;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
 use App\Models\Company;
+use Filament\Actions\Exports\Exporter;
 use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
 
@@ -26,6 +28,14 @@ class CompanyResource extends Resource
     public static function moduleKey(): string
     {
         return 'companies';
+    }
+
+    /**
+     * @return class-string<Exporter>
+     */
+    public static function exporter(): ?string
+    {
+        return CompanyExporter::class;
     }
 
     /**

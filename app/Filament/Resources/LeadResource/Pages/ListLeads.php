@@ -18,6 +18,7 @@ class ListLeads extends ListRecords
     {
         return [
             CreateAction::make(),
+            ...LeadResource::exportHeaderActions(),
         ];
     }
 }

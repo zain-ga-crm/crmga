@@ -4,12 +4,15 @@ namespace App\Filament\Resources\Concerns;
 
 use App\Models\User;
 use App\Support\Acl;
+use App\Support\Acl\AccessLevel;
 use App\Support\Acl\FieldAccess;
+use App\Support\Filament\Concerns\ReadsCompiledMetadata;
 use App\Support\Filament\EmptyStates;
 use App\Support\Filament\FieldTypeRegistry;
-use App\Support\MetadataRepository;
 use BackedEnum;
 use Closure;
+use Filament\Actions\ExportAction;
+use Filament\Actions\Exports\Exporter;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Component as FormComponent;
 use Filament\Forms\Components\Field as FormField;
@@ -25,13 +28,15 @@ use Filament\Infolists\Components\Tabs as InfolistTabs;
 use Filament\Infolists\Components\Tabs\Tab as InfolistTab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Columns\Column as TableColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use RuntimeException;
 
 /**
  * S-2.1: the DynamicResource mechanism -- builds a Resource's form, table,
@@ -64,9 +69,9 @@ use RuntimeException;
  */
 trait BuildsResourceFromMetadata
 {
-    private const OWNER_FIELD = 'assigned_user_id';
+    use ReadsCompiledMetadata;
 
-    abstract public static function moduleKey(): string;
+    private const OWNER_FIELD = 'assigned_user_id';
 
     public static function form(Form $form): Form
     {
@@ -109,7 +114,10 @@ trait BuildsResourceFromMetadata
             }
         }
 
-        $table = $table->columns($columns)->filters(self::buildFilters($module, $fields, $user));
+        $table = $table
+            ->columns($columns)
+            ->filters(self::buildFilters($module, $fields, $user))
+            ->bulkActions(self::buildBulkActions($user));
 
         $defaultSort = $content['default_sort'] ?? null;
         if (is_array($defaultSort)) {
@@ -147,6 +155,41 @@ trait BuildsResourceFromMetadata
     // check here would miss entirely. One ACL enforcement point, reused by
     // the query scope, the API, and now the UI -- never three copies that can
     // drift apart.
+
+    /**
+     * S-2.4: the Exporter class for this module (LeadExporter, CompanyExporter,
+     * ...), or null to skip export entirely. Not abstract -- a module that
+     * doesn't need export yet just doesn't override this, rather than every
+     * Resource being forced to declare one.
+     *
+     * @return class-string<Exporter>|null
+     */
+    public static function exporter(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * For a ListRecords page's own getHeaderActions() to include alongside
+     * CreateAction -- exports every record matching the current
+     * filters/search, not just a bulk selection. Returns [] (not null) so a
+     * page can just array_merge() this in without a null check.
+     *
+     * @return array<ExportAction>
+     */
+    public static function exportHeaderActions(): array
+    {
+        $exporterClass = static::exporter();
+        if ($exporterClass === null) {
+            return [];
+        }
+
+        if (self::acl()->effective(self::currentUser(), self::moduleKey(), 'export') === AccessLevel::None) {
+            return [];
+        }
+
+        return [ExportAction::make()->exporter($exporterClass)];
+    }
 
     // ---- form (edit layout) ----
 
@@ -407,6 +450,35 @@ trait BuildsResourceFromMetadata
         return $filters;
     }
 
+    /**
+     * S-2.4: the table's bulk-action bar. Gated on the same ACL actions as
+     * everything else here -- 'delete' for DeleteBulkAction, 'export' for
+     * ExportBulkAction (only when the concrete Resource declares an
+     * exporter()). Not per-record beyond what the table's own query scope
+     * (AppliesRecordAccess) already guarantees: an Owner-level user can only
+     * ever select rows they're allowed to see in the first place, so a
+     * module-level "has any delete access" check is sufficient here, the
+     * same reasoning the row-level EditAction/DeleteAction already rely on
+     * via the Policy.
+     *
+     * @return array<BulkActionGroup>
+     */
+    private static function buildBulkActions(User $user): array
+    {
+        $actions = [];
+
+        if (self::acl()->effective($user, self::moduleKey(), 'delete') !== AccessLevel::None) {
+            $actions[] = DeleteBulkAction::make();
+        }
+
+        $exporterClass = static::exporter();
+        if ($exporterClass !== null && self::acl()->effective($user, self::moduleKey(), 'export') !== AccessLevel::None) {
+            $actions[] = ExportBulkAction::make()->exporter($exporterClass);
+        }
+
+        return $actions === [] ? [] : [BulkActionGroup::make($actions)];
+    }
+
     // ---- infolist (detail layout) ----
 
     /**
@@ -556,23 +628,6 @@ trait BuildsResourceFromMetadata
     // ---- shared helpers ----
 
     /**
-     * @param  array<string, mixed>  $module
-     * @return array<string, array<string, mixed>>
-     */
-    private static function fieldsMap(array $module): array
-    {
-        $fields = self::assoc($module['fields'] ?? null);
-        $typed = [];
-        foreach ($fields as $name => $meta) {
-            if (is_array($meta)) {
-                $typed[$name] = self::assoc($meta);
-            }
-        }
-
-        return $typed;
-    }
-
-    /**
      * A real metadata field, or a small set of well-known base columns every
      * Contactable-based module has but that Studio never registers as
      * tenant_fields (assigned_user_id is handled separately -- see
@@ -687,23 +742,6 @@ trait BuildsResourceFromMetadata
         return is_string($tab) ? $tab : null;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function compiledModule(): array
-    {
-        $compiled = app(MetadataRepository::class)->compiled();
-        $modules = self::assoc($compiled['modules'] ?? null);
-        $key = self::moduleKey();
-
-        $module = $modules[$key] ?? null;
-        if (! is_array($module)) {
-            throw new RuntimeException("Module [{$key}] is not registered in the metadata registry.");
-        }
-
-        return self::assoc($module);
-    }
-
     private static function currentUser(): User
     {
         /** @var User $user */
@@ -715,61 +753,6 @@ trait BuildsResourceFromMetadata
     private static function acl(): Acl
     {
         return app(Acl::class);
-    }
-
-    /**
-     * @return array<int|string, mixed>
-     */
-    private static function arr(mixed $value): array
-    {
-        return is_array($value) ? $value : [];
-    }
-
-    /**
-     * Like arr(), but drops any element whose key isn't a string -- every
-     * object-shaped piece of the layout schema (a panel, a slot, "content"
-     * itself) is JSON-decoded into a string-keyed array; this is what lets
-     * a caller safely treat it as array<string, mixed>.
-     *
-     * @return array<string, mixed>
-     */
-    private static function assoc(mixed $value): array
-    {
-        if (! is_array($value)) {
-            return [];
-        }
-
-        $out = [];
-        foreach ($value as $k => $v) {
-            if (is_string($k)) {
-                $out[$k] = $v;
-            }
-        }
-
-        return $out;
-    }
-
-    /**
-     * Like assoc(), but for the layout schema's own list-of-*object* shapes
-     * (panels, tabs, columns, and a row's own slots) -- drops any element
-     * that isn't itself an object and reindexes.
-     *
-     * @return list<array<string, mixed>>
-     */
-    private static function listOfArrays(mixed $value): array
-    {
-        if (! is_array($value)) {
-            return [];
-        }
-
-        $out = [];
-        foreach ($value as $item) {
-            if (is_array($item)) {
-                $out[] = self::assoc($item);
-            }
-        }
-
-        return $out;
     }
 
     /**
@@ -795,11 +778,6 @@ trait BuildsResourceFromMetadata
         }
 
         return $out;
-    }
-
-    private static function str(mixed $value, string $default = ''): string
-    {
-        return is_string($value) ? $value : $default;
     }
 
     private static function int(mixed $value, int $default = 0): int

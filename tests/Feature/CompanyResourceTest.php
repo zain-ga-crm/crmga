@@ -1,5 +1,6 @@
 <?php
 
+use App\Filament\Exports\CompanyExporter;
 use App\Filament\Resources\CompanyResource;
 use App\Filament\Resources\CompanyResource\Pages\CreateCompany;
 use App\Filament\Resources\CompanyResource\Pages\EditCompany;
@@ -136,4 +137,24 @@ it('creates a company end to end through the create form', function () {
         ->assertHasNoFormErrors();
 
     expect(Company::query()->where('primary_email', 'hello@acme.example')->exists())->toBeTrue();
+});
+
+// S-2.4: bulk actions + export -- same gating as LeadResourceTest, kept
+// minimal here since the mechanism itself is already proven there.
+
+it('hides the delete bulk action for a user without delete access, same as leads', function () {
+    $user = User::factory()->create();
+    grantAccess($user, 'companies', AccessLevel::All, 'list');
+
+    $this->actingAs($user);
+
+    Livewire::test(ListCompanies::class)->assertTableBulkActionDoesNotExist('delete');
+});
+
+it('exports companies using the same list-layout columns the table shows', function () {
+    $columns = collect(CompanyExporter::getColumns())
+        ->map(fn ($column) => $column->getName())
+        ->all();
+
+    expect($columns)->toContain('full_name', 'industry', 'company_contact_status', 'primary_email', 'contact_person_phone', 'assignedUser.name');
 });
