@@ -42,6 +42,11 @@ it('mounts the chart widgets without error', function () {
 });
 
 it('lists only today\'s calls in the calls-to-make widget, with a working view link', function () {
+    // Pinned for the same reason as the todays-meetings widget test below --
+    // addHours(2) against the real clock can cross midnight and flake this
+    // near the end of a day.
+    Carbon\Carbon::setTestNow(Carbon\Carbon::parse('2026-01-15 09:00:00'));
+
     $today = Lead::factory()->create(['next_follow_up_at' => now()->addHours(2)]);
     $tomorrow = Lead::factory()->create(['next_follow_up_at' => now()->addDay()]);
 
@@ -49,6 +54,8 @@ it('lists only today\'s calls in the calls-to-make widget, with a working view l
         ->assertCanSeeTableRecords([$today])
         ->assertCanNotSeeTableRecords([$tomorrow])
         ->assertTableActionHasUrl('view', LeadResource::getUrl('view', ['record' => $today]), record: $today);
+
+    Carbon\Carbon::setTestNow();
 });
 
 it('lists overdue leads and clients in the attention-needed widget, sorted, with resolvable view urls', function () {
@@ -86,6 +93,13 @@ it('lists only my own open tasks in the my-tasks widget', function () {
 });
 
 it('lists only my own meetings happening today in the todays-meetings widget', function () {
+    // Pinned to a fixed mid-day instant, not real now() -- addHours(3)/addDay()
+    // against the real clock can cross midnight depending on when the suite
+    // happens to run, silently moving "today" into "tomorrow" and flaking
+    // this test only in a full-suite run late at night (caught exactly that
+    // way once already).
+    Carbon\Carbon::setTestNow(Carbon\Carbon::parse('2026-01-15 09:00:00'));
+
     $me = auth()->user();
     $subject = Lead::factory()->create();
     $base = ['subject_type' => Lead::class, 'subject_id' => $subject->id];
@@ -96,4 +110,6 @@ it('lists only my own meetings happening today in the todays-meetings widget', f
     Livewire::test(TodaysMeetingsWidget::class)
         ->assertCanSeeTableRecords([$myMeetingToday])
         ->assertCanNotSeeTableRecords([$myMeetingTomorrow, $someoneElsesMeetingToday]);
+
+    Carbon\Carbon::setTestNow();
 });
