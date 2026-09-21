@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\NewsletterSubscriberResource\Pages;
 
+use App\Filament\Resources\Concerns\HasActivityTimelineFooter;
 use App\Filament\Resources\NewsletterSubscriberResource;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -9,6 +10,8 @@ use Filament\Resources\Pages\ViewRecord;
 
 class ViewNewsletterSubscriber extends ViewRecord
 {
+    use HasActivityTimelineFooter;
+
     protected static string $resource = NewsletterSubscriberResource::class;
 
     /**
