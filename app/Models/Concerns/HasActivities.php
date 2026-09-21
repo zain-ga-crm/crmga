@@ -18,40 +18,50 @@ use Illuminate\Support\Collection;
  */
 trait HasActivities
 {
+    /**
+     * Eager-loads createdBy/assignedUser on every relation below -- Z-4.4:
+     * ActivityFeedFormatter::describe() reads both on every row of
+     * activityFeed(), and without this, every activity item on a record's
+     * timeline triggers two extra queries of its own.
+     *
+     * @var list<string>
+     */
+    private const ACTIVITY_EAGER_LOAD = ['createdBy', 'assignedUser'];
+
     /** @return MorphMany<Meeting, $this> */
     public function meetings(): MorphMany
     {
-        return $this->morphMany(Meeting::class, 'subject');
+        return $this->morphMany(Meeting::class, 'subject')->with(self::ACTIVITY_EAGER_LOAD);
     }
 
     /** @return MorphMany<Note, $this> */
     public function notes(): MorphMany
     {
-        return $this->morphMany(Note::class, 'subject');
+        return $this->morphMany(Note::class, 'subject')->with(self::ACTIVITY_EAGER_LOAD);
     }
 
     /** @return MorphMany<Document, $this> */
     public function documents(): MorphMany
     {
-        return $this->morphMany(Document::class, 'subject');
+        return $this->morphMany(Document::class, 'subject')->with(self::ACTIVITY_EAGER_LOAD);
     }
 
     /** @return MorphMany<Call, $this> */
     public function calls(): MorphMany
     {
-        return $this->morphMany(Call::class, 'subject');
+        return $this->morphMany(Call::class, 'subject')->with(self::ACTIVITY_EAGER_LOAD);
     }
 
     /** @return MorphMany<Task, $this> */
     public function tasks(): MorphMany
     {
-        return $this->morphMany(Task::class, 'subject');
+        return $this->morphMany(Task::class, 'subject')->with(self::ACTIVITY_EAGER_LOAD);
     }
 
     /** @return MorphMany<Email, $this> */
     public function emails(): MorphMany
     {
-        return $this->morphMany(Email::class, 'subject');
+        return $this->morphMany(Email::class, 'subject')->with(self::ACTIVITY_EAGER_LOAD);
     }
 
     /**

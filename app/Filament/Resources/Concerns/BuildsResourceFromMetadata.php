@@ -36,6 +36,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use RuntimeException;
 
@@ -117,10 +118,14 @@ trait BuildsResourceFromMetadata
         $content = self::assoc($layout['content'] ?? null);
 
         $columns = [];
+        $needsOwnerEagerLoad = false;
         foreach (self::listOfArrays($content['columns'] ?? null) as $columnDef) {
             $column = self::buildTableColumn($columnDef, $fields, $user);
             if ($column !== null) {
                 $columns[] = $column;
+            }
+            if (self::str($columnDef['field'] ?? null) === self::OWNER_FIELD) {
+                $needsOwnerEagerLoad = true;
             }
         }
 
@@ -128,6 +133,13 @@ trait BuildsResourceFromMetadata
             ->columns($columns)
             ->filters(self::buildFilters($module, $fields, $user))
             ->bulkActions(self::buildBulkActions($user));
+
+        // Z-4.4: the owner column reads assignedUser.name for every row --
+        // without this, every list page (10-25 rows) triggers one extra
+        // query per row just to resolve the owner's name.
+        if ($needsOwnerEagerLoad) {
+            $table = $table->modifyQueryUsing(fn (Builder $query): Builder => $query->with('assignedUser'));
+        }
 
         $defaultSort = $content['default_sort'] ?? null;
         if (is_array($defaultSort)) {
