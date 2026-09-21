@@ -32,6 +32,7 @@ final class SchemaManager
         'type', 'label', 'required', 'default_value', 'help', 'comments', 'max_length',
         'precision', 'scale', 'option_list_id', 'related_module_id',
         'related_display_field', 'filterable', 'sortable',
+        'validation', 'audited', 'mass_update', 'duplicate_merge', 'reportable', 'importable',
     ];
 
     public function __construct(
@@ -417,6 +418,29 @@ final class SchemaManager
     }
 
     /**
+     * Unlike the other option readers, absence is meaningful here: no key means
+     * "leave this flag as it is" (the caller supplies its own default -- the
+     * migration's column default on add, the existing Field's value on modify),
+     * not "false".
+     */
+    private function boolOption(FieldChangeRequest $r, string $key, bool $default): bool
+    {
+        $value = $r->option($key);
+
+        return is_bool($value) ? $value : $default;
+    }
+
+    /**
+     * @return array<mixed, mixed>|null
+     */
+    private function arrayOption(FieldChangeRequest $r, string $key): ?array
+    {
+        $value = $r->option($key);
+
+        return is_array($value) ? $value : null;
+    }
+
+    /**
      * No side effects — returns the SQL that apply() would execute, plus warnings.
      */
     public function plan(FieldChangeRequest $r): ChangePlan
@@ -486,6 +510,15 @@ final class SchemaManager
                 'filterable' => $this->contract->filterable((string) $r->type),
                 'sortable' => $this->contract->sortable((string) $r->type),
                 'is_custom' => true,
+                'validation' => $this->arrayOption($r, 'validation'),
+                // Same defaults as the fields table's own column defaults (Z-3.1's
+                // migration) -- an add with no behaviour flags given lands exactly
+                // where a plain `Schema::table()` column would.
+                'audited' => $this->boolOption($r, 'audited', false),
+                'mass_update' => $this->boolOption($r, 'mass_update', false),
+                'duplicate_merge' => $this->boolOption($r, 'duplicate_merge', false),
+                'reportable' => $this->boolOption($r, 'reportable', true),
+                'importable' => $this->boolOption($r, 'importable', true),
             ],
         );
     }
@@ -529,6 +562,12 @@ final class SchemaManager
                 'related_display_field' => $this->stringOption($r, 'related_display_field') ?? $existing->related_display_field,
                 'filterable' => $this->contract->filterable($type),
                 'sortable' => $this->contract->sortable($type),
+                'validation' => $this->arrayOption($r, 'validation') ?? $existing->validation,
+                'audited' => $this->boolOption($r, 'audited', (bool) $existing->audited),
+                'mass_update' => $this->boolOption($r, 'mass_update', (bool) $existing->mass_update),
+                'duplicate_merge' => $this->boolOption($r, 'duplicate_merge', (bool) $existing->duplicate_merge),
+                'reportable' => $this->boolOption($r, 'reportable', (bool) $existing->reportable),
+                'importable' => $this->boolOption($r, 'importable', (bool) $existing->importable),
             ],
         );
     }

@@ -528,3 +528,40 @@ it('rejects an add once the installation-wide custom field ceiling is reached', 
     expect(fn () => $manager->plan(new FieldChangeRequest('add', $module->key, 'zceiling_two', 'text')))
         ->toThrow(SchemaValidationException::class);
 });
+
+it('persists behaviour flags and validation rules on add, defaulting like the fields table itself', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $manager->apply($manager->plan(new FieldChangeRequest(
+        'add', $module->key, 'flagged_field', 'text',
+        ['audited' => true, 'mass_update' => true, 'validation' => ['rule' => 'max:50']],
+    )), actorId: null);
+
+    $field = Field::query()->where('module_id', $module->id)->where('name', 'flagged_field')->firstOrFail();
+
+    expect($field->audited)->toBeTrue()
+        ->and($field->mass_update)->toBeTrue()
+        ->and($field->duplicate_merge)->toBeFalse()
+        ->and($field->reportable)->toBeTrue()
+        ->and($field->importable)->toBeTrue()
+        ->and($field->validation)->toBe(['rule' => 'max:50']);
+});
+
+it('updates behaviour flags on modify and leaves the rest untouched', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $manager->apply($manager->plan(new FieldChangeRequest(
+        'add', $module->key, 'toggled_field', 'text', ['reportable' => true],
+    )), actorId: null);
+
+    $manager->apply($manager->plan(new FieldChangeRequest(
+        'modify', $module->key, 'toggled_field', options: ['reportable' => false],
+    )), actorId: null);
+
+    $field = Field::query()->where('module_id', $module->id)->where('name', 'toggled_field')->firstOrFail();
+
+    expect($field->reportable)->toBeFalse()
+        ->and($field->importable)->toBeTrue();
+});

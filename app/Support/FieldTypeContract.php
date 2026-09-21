@@ -39,6 +39,14 @@ final class FieldTypeContract
     }
 
     /**
+     * @return list<string> every type key the contract defines, in file order
+     */
+    public function types(): array
+    {
+        return array_map(fn (int|string $key): string => (string) $key, array_keys($this->types));
+    }
+
+    /**
      * @return array<int|string, mixed>
      */
     public function type(string $type): array
