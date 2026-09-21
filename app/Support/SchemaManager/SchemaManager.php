@@ -4,7 +4,9 @@ namespace App\Support\SchemaManager;
 
 use App\Models\Metadata\Change;
 use App\Models\Metadata\Field;
+use App\Models\Metadata\Layout;
 use App\Models\Metadata\Module;
+use App\Models\RoleFieldPermission;
 use App\Support\FieldTypeContract;
 use App\Support\MetadataRepository;
 use Illuminate\Support\Facades\Cache;
@@ -122,6 +124,13 @@ final class SchemaManager
                         'type change in the contract and cannot be applied.';
                 } elseif ($class === 'requires_confirmation' && ! $r->confirmLossy) {
                     $errors[] = "Changing [{$r->name}] from {$existing->type} to {$toType} requires confirm_lossy.";
+                }
+            }
+
+            if ($r->action === 'delete' && $existing !== null && ! $r->confirmLossy) {
+                $impact = $this->fieldImpact($module, $r->name);
+                if ($impact !== []) {
+                    $errors[] = "Field [{$r->name}] is referenced by [".implode(', ', $impact).'] and requires confirm_lossy to delete.';
                 }
             }
         } else {
@@ -274,6 +283,109 @@ final class SchemaManager
         }
 
         return DB::table($table)->whereNotNull($existing->name)->exists();
+    }
+
+    /**
+     * What references a field before it's deleted (Z-3.1's impact check) — the layout
+     * versions whose definition names it, and the roles narrowing it via
+     * role_field_permissions. Public so the Field Manager (S-3.1) can show the same
+     * warning before the user ever sends confirm_lossy.
+     *
+     * @return array{layouts: list<array{view: string, version: int, is_published: bool}>, roles: list<string>, integrations: list<string>}
+     */
+    public function impact(string $moduleKey, string $fieldName): array
+    {
+        $module = Module::query()->where('key', $moduleKey)->first();
+        if ($module === null) {
+            return ['layouts' => [], 'roles' => [], 'integrations' => []];
+        }
+
+        return [
+            'layouts' => $this->layoutsReferencing($module, $fieldName),
+            'roles' => $this->rolesReferencing($module, $fieldName),
+            // Nothing in this codebase scopes an integration to an individual field --
+            // WebhookSubscription::$event is module/event-scoped (BACKEND_BRIEF §2.2),
+            // not field-scoped. Kept as an explicit empty slot, matching the task's own
+            // "layouts, roles and integrations" wording, rather than omitting it.
+            'integrations' => [],
+        ];
+    }
+
+    /**
+     * @return list<string> short labels for the validation error message
+     */
+    private function fieldImpact(Module $module, string $fieldName): array
+    {
+        $labels = [];
+        foreach ($this->layoutsReferencing($module, $fieldName) as $layout) {
+            $labels[] = "layout:{$layout['view']}#{$layout['version']}";
+        }
+        foreach ($this->rolesReferencing($module, $fieldName) as $roleName) {
+            $labels[] = "role:{$roleName}";
+        }
+
+        return $labels;
+    }
+
+    /**
+     * @return list<array{view: string, version: int, is_published: bool}>
+     */
+    private function layoutsReferencing(Module $module, string $fieldName): array
+    {
+        $matches = [];
+        foreach (Layout::query()->where('module_id', $module->id)->get() as $layout) {
+            if ($this->definitionReferencesField($layout->definition, $fieldName)) {
+                $matches[] = ['view' => $layout->view, 'version' => $layout->version, 'is_published' => $layout->is_published];
+            }
+        }
+
+        return $matches;
+    }
+
+    /**
+     * The layout contract (resources/contracts/layout.schema.json) only ever names a
+     * field via a "field" key -- columns[].field, default_sort.field, panels rows'
+     * field/visible_when.field -- so a recursive scan for that one key, rather than a
+     * shape-specific walk, is both sufficient and won't need updating if panels grow
+     * new field-bearing properties.
+     */
+    private function definitionReferencesField(mixed $node, string $fieldName): bool
+    {
+        if (! is_array($node)) {
+            return false;
+        }
+
+        if (($node['field'] ?? null) === $fieldName) {
+            return true;
+        }
+
+        foreach ($node as $value) {
+            if ($this->definitionReferencesField($value, $fieldName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return list<string> distinct role names narrowing this field
+     */
+    private function rolesReferencing(Module $module, string $fieldName): array
+    {
+        $names = [];
+        foreach (RoleFieldPermission::query()
+            ->where('module_key', $module->key)
+            ->where('field_name', $fieldName)
+            ->with('role:id,name')
+            ->get() as $permission) {
+            $name = $permission->role?->name;
+            if ($name !== null && ! in_array($name, $names, true)) {
+                $names[] = $name;
+            }
+        }
+
+        return $names;
     }
 
     private function configInt(string $key, int $default): int

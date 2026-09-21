@@ -2,7 +2,10 @@
 
 use App\Models\Metadata\Change;
 use App\Models\Metadata\Field;
+use App\Models\Metadata\Layout;
 use App\Models\Metadata\Module;
+use App\Models\Role;
+use App\Models\RoleFieldPermission;
 use App\Models\User;
 use App\Support\SchemaManager\ChangeResult;
 use App\Support\SchemaManager\FieldChangeRequest;
@@ -192,6 +195,107 @@ it('soft-deletes the metadata row on delete and keeps the column', function () {
         ->and(Field::query()->where('module_id', $module->id)->where('name', 'temp_field')->exists())->toBeFalse()
         ->and(Field::withTrashed()->where('module_id', $module->id)->where('name', 'temp_field')->exists())->toBeTrue()
         ->and(Schema::hasColumn('leads_sm_test_custom', 'temp_field'))->toBeTrue();
+});
+
+it('blocks a delete when a layout references the field, until confirm_lossy', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $manager->apply(
+        $manager->plan(new FieldChangeRequest('add', $module->key, 'referenced_field', 'text')),
+        actorId: null,
+    );
+
+    Layout::factory()->create([
+        'module_id' => $module->id,
+        'view' => 'detail',
+        'definition' => [
+            'version' => 1,
+            'view' => 'detail',
+            'module' => $module->key,
+            'content' => ['panels' => [[
+                'key' => 'main',
+                'label' => 'Main',
+                'rows' => [[['field' => 'referenced_field']]],
+            ]]],
+        ],
+    ]);
+
+    expect(fn () => $manager->plan(new FieldChangeRequest('delete', $module->key, 'referenced_field')))
+        ->toThrow(SchemaValidationException::class);
+
+    $plan = $manager->plan(new FieldChangeRequest('delete', $module->key, 'referenced_field', confirmLossy: true));
+    expect($manager->apply($plan, actorId: null)->success)->toBeTrue();
+});
+
+it('blocks a delete when a role narrows the field, until confirm_lossy', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $manager->apply(
+        $manager->plan(new FieldChangeRequest('add', $module->key, 'role_narrowed_field', 'text')),
+        actorId: null,
+    );
+
+    $role = Role::factory()->create(['name' => 'Sales Rep']);
+    RoleFieldPermission::factory()->create([
+        'role_id' => $role->id,
+        'module_key' => $module->key,
+        'field_name' => 'role_narrowed_field',
+    ]);
+
+    expect(fn () => $manager->plan(new FieldChangeRequest('delete', $module->key, 'role_narrowed_field')))
+        ->toThrow(SchemaValidationException::class);
+
+    $plan = $manager->plan(new FieldChangeRequest('delete', $module->key, 'role_narrowed_field', confirmLossy: true));
+    expect($manager->apply($plan, actorId: null)->success)->toBeTrue();
+});
+
+it('reports which layouts and roles reference a field via impact()', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $manager->apply(
+        $manager->plan(new FieldChangeRequest('add', $module->key, 'watched_field', 'text')),
+        actorId: null,
+    );
+
+    Layout::factory()->create([
+        'module_id' => $module->id,
+        'view' => 'list',
+        'definition' => [
+            'version' => 1,
+            'view' => 'list',
+            'module' => $module->key,
+            'content' => ['columns' => [['field' => 'watched_field', 'priority' => 1]]],
+        ],
+    ]);
+    $role = Role::factory()->create(['name' => 'Sales Rep']);
+    RoleFieldPermission::factory()->create([
+        'role_id' => $role->id,
+        'module_key' => $module->key,
+        'field_name' => 'watched_field',
+    ]);
+
+    $impact = $manager->impact($module->key, 'watched_field');
+
+    expect($impact['layouts'])->toHaveCount(1)
+        ->and($impact['layouts'][0]['view'])->toBe('list')
+        ->and($impact['roles'])->toBe(['Sales Rep'])
+        ->and($impact['integrations'])->toBe([]);
+});
+
+it('does not require confirm_lossy to delete an unreferenced field', function () {
+    $module = leadsModule();
+    $manager = app(SchemaManager::class);
+
+    $manager->apply(
+        $manager->plan(new FieldChangeRequest('add', $module->key, 'unreferenced_field', 'text')),
+        actorId: null,
+    );
+
+    $plan = $manager->plan(new FieldChangeRequest('delete', $module->key, 'unreferenced_field'));
+    expect($manager->apply($plan, actorId: null)->success)->toBeTrue();
 });
 
 it('rolls back a delete without a snapshot, un-soft-deleting the field metadata', function () {
