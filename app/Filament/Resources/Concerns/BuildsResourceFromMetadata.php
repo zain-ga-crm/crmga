@@ -37,6 +37,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use RuntimeException;
 
 /**
  * S-2.1: the DynamicResource mechanism -- builds a Resource's form, table,
@@ -164,6 +165,34 @@ trait BuildsResourceFromMetadata
     // check here would miss entirely. One ACL enforcement point, reused by
     // the query scope, the API, and now the UI -- never three copies that can
     // drift apart.
+
+    /**
+     * canAccess() IS overridden, unlike the Policy-backed methods above --
+     * this is a different axis (a tenant admin switching a whole module off
+     * via the Settings screen's "Enabled modules" section, S-4.7/rule 3),
+     * not a re-implementation of per-record ACL. Filament's own
+     * registerNavigationItems() and CanAuthorizeResourceAccess both already
+     * call canAccess(), so overriding it here is the one place this needs to
+     * be wired for every DynamicResource at once.
+     *
+     * Unlike form()/table()/infolist(), an unregistered module here is not
+     * fatal: registerNavigationItems() calls canAccess() for every panel
+     * Resource on every page load (building the sidebar), not just the one
+     * actually being rendered, so this runs against modules that may
+     * legitimately not exist yet (a fresh test database, a tenant whose
+     * metadata seeder hasn't run). compiledModule() throwing there is right
+     * for a real render; here it just means "nothing to access".
+     */
+    public static function canAccess(): bool
+    {
+        try {
+            $enabled = self::compiledModule()['enabled'] ?? true;
+        } catch (RuntimeException) {
+            return false;
+        }
+
+        return (bool) $enabled && static::canViewAny();
+    }
 
     /**
      * S-2.4: the Exporter class for this module (LeadExporter, CompanyExporter,

@@ -7,6 +7,7 @@ use App\Filament\Resources\LeadResource\Pages\CreateLead;
 use App\Filament\Resources\LeadResource\Pages\EditLead;
 use App\Filament\Resources\LeadResource\Pages\ListLeads;
 use App\Models\Lead;
+use App\Models\Metadata\Module;
 use App\Models\User;
 use App\Support\Acl\AccessLevel;
 use App\Support\Acl\FieldAccess;
@@ -263,6 +264,28 @@ it('bulk-deletes only the selected leads', function () {
 
     expect(Lead::query()->find($toDelete->id))->toBeNull()
         ->and(Lead::query()->find($toKeep->id))->not->toBeNull();
+});
+
+it('denies the whole resource, even to an admin, when the module is disabled, per S-4.7', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    Module::query()->where('key', 'leads')->update(['enabled' => false]);
+    Cache::flush();
+
+    $this->actingAs($admin);
+
+    $this->get(LeadResource::getUrl('index'))->assertForbidden();
+});
+
+it('reports canAccess() as false, not a thrown exception, when the module is not registered at all', function () {
+    // Regression test: canAccess() runs for every panel Resource on every
+    // page load (Filament builds the whole sidebar, not just the page being
+    // rendered) -- a module missing from the compiled registry (a fresh
+    // database, a seeder that hasn't run yet) must not crash navigation for
+    // every OTHER page in the panel.
+    Module::query()->where('key', 'leads')->delete();
+    Cache::flush();
+
+    expect(LeadResource::canAccess())->toBeFalse();
 });
 
 it('exports leads using the same list-layout columns the table shows', function () {

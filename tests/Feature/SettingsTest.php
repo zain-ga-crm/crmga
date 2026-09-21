@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use App\Models\User;
 use App\Support\Settings;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 
@@ -52,6 +53,17 @@ it('decrypts a secret value again after the cache is flushed', function () {
     $settings->flush();
 
     expect($settings->get('mail.password'))->toBe('super-secret');
+});
+
+it('records the group and the updating user when given', function () {
+    $actor = User::factory()->create();
+    $settings = app(Settings::class);
+    $settings->set('mail.host', 'smtp.example.test', group: 'mail', updatedBy: $actor->id);
+
+    $raw = Setting::query()->where('key', 'mail.host')->first();
+
+    expect($raw->group)->toBe('mail')
+        ->and($raw->updated_by)->toBe($actor->id);
 });
 
 it('stores a non-secret value in plain json, unaffected by the secret flag', function () {

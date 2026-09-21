@@ -59,12 +59,17 @@ final class Settings
         return $this->loaded = $values;
     }
 
-    public function set(string $key, mixed $value, bool $secret = false): void
+    public function set(string $key, mixed $value, bool $secret = false, ?string $group = null, ?string $updatedBy = null): void
     {
         $encoded = json_encode($value) ?: 'null';
         $stored = $secret ? Crypt::encryptString($encoded) : $encoded;
 
-        Setting::query()->updateOrCreate(['key' => $key], ['value' => $stored, 'is_secret' => $secret]);
+        Setting::query()->updateOrCreate(['key' => $key], [
+            'value' => $stored,
+            'is_secret' => $secret,
+            'group' => $group,
+            'updated_by' => $updatedBy,
+        ]);
 
         $this->flush();
     }
