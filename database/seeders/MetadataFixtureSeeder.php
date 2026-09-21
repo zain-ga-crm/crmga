@@ -304,6 +304,147 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($students, 'get_started', 'text', ['filterable' => true, 'max_length' => 255]);
         $this->field($students, 'hot_lead', 'bool', ['filterable' => true]);
         $this->field($students, 'warm_lead', 'bool', ['filterable' => true]);
+
+        Layout::updateOrCreate(
+            ['module_id' => $students->id, 'view' => 'list'],
+            ['definition' => $this->studentsListLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $students->id, 'view' => 'detail'],
+            ['definition' => $this->studentsDetailLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $students->id, 'view' => 'edit'],
+            ['definition' => $this->studentsEditLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $students->id, 'view' => 'search'],
+            ['definition' => $this->studentsSearchLayout(), 'version' => 1, 'is_published' => true],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function studentsListLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'list',
+            'module' => 'students',
+            'content' => [
+                'default_sort' => ['field' => 'created_at', 'direction' => 'desc'],
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1, 'link' => true, 'width' => 200],
+                    ['field' => 'status', 'priority' => 1, 'width' => 150],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'phone_mobile', 'priority' => 1, 'sortable' => false],
+                    ['field' => 'get_started', 'priority' => 2, 'label' => 'Programme'],
+                    ['field' => 'assigned_user_id', 'priority' => 2, 'label' => 'Owner', 'width' => 140],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function studentsDetailLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'detail',
+            'module' => 'students',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'primary_email'], ['field' => 'phone_mobile']],
+                            [['field' => 'full_name', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'enrollment',
+                        'label' => 'Enrollment',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'status'], ['field' => 'get_started', 'label' => 'Programme']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function studentsEditLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'edit',
+            'module' => 'students',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'primary_email'], ['field' => 'phone_mobile']],
+                        ],
+                    ],
+                    [
+                        'key' => 'enrollment',
+                        'label' => 'Enrollment',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'status'], ['field' => 'get_started', 'label' => 'Programme']],
+                        ],
+                    ],
+                    [
+                        'key' => 'flags',
+                        'label' => 'Flags',
+                        'order' => 2,
+                        'rows' => [
+                            [['field' => 'hot_lead'], ['field' => 'warm_lead']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function studentsSearchLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'search',
+            'module' => 'students',
+            'content' => [
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1],
+                    ['field' => 'status', 'priority' => 1],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'phone_mobile', 'priority' => 2],
+                    ['field' => 'get_started', 'priority' => 2],
+                    ['field' => 'hot_lead', 'priority' => 2],
+                    ['field' => 'warm_lead', 'priority' => 2],
+                ],
+            ],
+        ];
     }
 
     private function seedClients(): void
@@ -321,6 +462,141 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($clients, 'case_type', 'text', ['filterable' => true, 'max_length' => 60]);
         $this->field($clients, 'fee_status', 'text', ['filterable' => true, 'max_length' => 30]);
         $this->field($clients, 'next_action_at', 'datetime', ['filterable' => true, 'sortable' => true]);
+
+        Layout::updateOrCreate(
+            ['module_id' => $clients->id, 'view' => 'list'],
+            ['definition' => $this->clientsListLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $clients->id, 'view' => 'detail'],
+            ['definition' => $this->clientsDetailLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $clients->id, 'view' => 'edit'],
+            ['definition' => $this->clientsEditLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $clients->id, 'view' => 'search'],
+            ['definition' => $this->clientsSearchLayout(), 'version' => 1, 'is_published' => true],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function clientsListLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'list',
+            'module' => 'clients',
+            'content' => [
+                'default_sort' => ['field' => 'created_at', 'direction' => 'desc'],
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1, 'link' => true, 'width' => 200],
+                    ['field' => 'client_status', 'priority' => 1, 'label' => 'Status', 'width' => 150],
+                    ['field' => 'case_type', 'priority' => 1, 'width' => 150],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'fee_status', 'priority' => 2],
+                    ['field' => 'next_action_at', 'priority' => 2, 'label' => 'Next action'],
+                    ['field' => 'assigned_user_id', 'priority' => 2, 'label' => 'Owner', 'width' => 140],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function clientsDetailLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'detail',
+            'module' => 'clients',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'primary_email', 'span' => 'full']],
+                            [['field' => 'full_name', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'case_info',
+                        'label' => 'Case info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'client_status', 'label' => 'Status'], ['field' => 'case_type']],
+                            [['field' => 'fee_status'], ['field' => 'next_action_at', 'label' => 'Next action']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function clientsEditLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'edit',
+            'module' => 'clients',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'primary_email', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'case_info',
+                        'label' => 'Case info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'client_status', 'label' => 'Status'], ['field' => 'case_type']],
+                            [['field' => 'fee_status'], ['field' => 'next_action_at', 'label' => 'Next action']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function clientsSearchLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'search',
+            'module' => 'clients',
+            'content' => [
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1],
+                    ['field' => 'client_status', 'priority' => 1],
+                    ['field' => 'case_type', 'priority' => 1],
+                    ['field' => 'fee_status', 'priority' => 2],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'next_action_at', 'priority' => 2],
+                ],
+            ],
+        ];
     }
 
     private function seedAffiliates(): void
@@ -337,6 +613,137 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($affiliates, 'username', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
         $this->field($affiliates, 'commission', 'decimal', ['filterable' => true, 'sortable' => true]);
         $this->field($affiliates, 'status', 'text', ['filterable' => true, 'max_length' => 30]);
+
+        Layout::updateOrCreate(
+            ['module_id' => $affiliates->id, 'view' => 'list'],
+            ['definition' => $this->affiliatesListLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $affiliates->id, 'view' => 'detail'],
+            ['definition' => $this->affiliatesDetailLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $affiliates->id, 'view' => 'edit'],
+            ['definition' => $this->affiliatesEditLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $affiliates->id, 'view' => 'search'],
+            ['definition' => $this->affiliatesSearchLayout(), 'version' => 1, 'is_published' => true],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function affiliatesListLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'list',
+            'module' => 'affiliates',
+            'content' => [
+                'default_sort' => ['field' => 'created_at', 'direction' => 'desc'],
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1, 'link' => true, 'width' => 200],
+                    ['field' => 'username', 'priority' => 1, 'width' => 150],
+                    ['field' => 'status', 'priority' => 1, 'width' => 120],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'commission', 'priority' => 2],
+                    ['field' => 'assigned_user_id', 'priority' => 2, 'label' => 'Owner', 'width' => 140],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function affiliatesDetailLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'detail',
+            'module' => 'affiliates',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'primary_email'], ['field' => 'username']],
+                            [['field' => 'full_name', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'affiliate_info',
+                        'label' => 'Affiliate info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'commission'], ['field' => 'status']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function affiliatesEditLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'edit',
+            'module' => 'affiliates',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'primary_email'], ['field' => 'username']],
+                        ],
+                    ],
+                    [
+                        'key' => 'affiliate_info',
+                        'label' => 'Affiliate info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'commission'], ['field' => 'status']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function affiliatesSearchLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'search',
+            'module' => 'affiliates',
+            'content' => [
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1],
+                    ['field' => 'username', 'priority' => 1],
+                    ['field' => 'status', 'priority' => 1],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'commission', 'priority' => 2],
+                ],
+            ],
+        ];
     }
 
     private function seedNewsletterSubscribers(): void
@@ -352,6 +759,135 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($subscribers, 'primary_email', 'email', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
         $this->field($subscribers, 'status', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 30]);
         $this->field($subscribers, 'source', 'text', ['filterable' => true, 'max_length' => 255]);
+
+        Layout::updateOrCreate(
+            ['module_id' => $subscribers->id, 'view' => 'list'],
+            ['definition' => $this->newsletterSubscribersListLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $subscribers->id, 'view' => 'detail'],
+            ['definition' => $this->newsletterSubscribersDetailLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $subscribers->id, 'view' => 'edit'],
+            ['definition' => $this->newsletterSubscribersEditLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $subscribers->id, 'view' => 'search'],
+            ['definition' => $this->newsletterSubscribersSearchLayout(), 'version' => 1, 'is_published' => true],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function newsletterSubscribersListLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'list',
+            'module' => 'newsletter_subscribers',
+            'content' => [
+                'default_sort' => ['field' => 'created_at', 'direction' => 'desc'],
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1, 'link' => true, 'width' => 200],
+                    ['field' => 'status', 'priority' => 1, 'width' => 120],
+                    ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'source', 'priority' => 2],
+                    ['field' => 'assigned_user_id', 'priority' => 2, 'label' => 'Owner', 'width' => 140],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function newsletterSubscribersDetailLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'detail',
+            'module' => 'newsletter_subscribers',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'primary_email', 'span' => 'full']],
+                            [['field' => 'full_name', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'subscription_info',
+                        'label' => 'Subscription info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'status'], ['field' => 'source']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function newsletterSubscribersEditLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'edit',
+            'module' => 'newsletter_subscribers',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'contact_details',
+                        'label' => 'Contact details',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'primary_email', 'span' => 'full']],
+                        ],
+                    ],
+                    [
+                        'key' => 'subscription_info',
+                        'label' => 'Subscription info',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'status'], ['field' => 'source']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function newsletterSubscribersSearchLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'search',
+            'module' => 'newsletter_subscribers',
+            'content' => [
+                'columns' => [
+                    ['field' => 'full_name', 'priority' => 1],
+                    ['field' => 'status', 'priority' => 1],
+                    ['field' => 'source', 'priority' => 2],
+                    ['field' => 'primary_email', 'priority' => 1],
+                ],
+            ],
+        ];
     }
 
     /**
