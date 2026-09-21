@@ -16,6 +16,111 @@ use Illuminate\Support\Str;
 
 uses(DatabaseTruncation::class);
 
+it('creates a new option list', function () {
+    $manager = app(OptionListManager::class);
+
+    $list = $manager->createList('lead_temperature', 'Lead temperature');
+
+    expect($list)->toBeInstanceOf(OptionList::class)
+        ->and($list->is_system)->toBeFalse()
+        ->and(OptionList::query()->where('key', 'lead_temperature')->exists())->toBeTrue();
+});
+
+it('rejects creating a list with a key that already exists', function () {
+    OptionList::factory()->create(['key' => 'lead_temperature']);
+    $manager = app(OptionListManager::class);
+
+    expect(fn () => $manager->createList('lead_temperature', 'Lead temperature'))
+        ->toThrow(MetadataValidationException::class);
+});
+
+it('rejects creating a list with a key that does not match the pattern', function () {
+    $manager = app(OptionListManager::class);
+
+    expect(fn () => $manager->createList('Lead Temperature', 'Lead temperature'))
+        ->toThrow(MetadataValidationException::class);
+});
+
+it('renames a list\'s label', function () {
+    $list = OptionList::factory()->create(['label' => 'Old label']);
+    $manager = app(OptionListManager::class);
+
+    $manager->renameList($list->key, 'New label');
+
+    expect($list->fresh()->label)->toBe('New label');
+});
+
+it('rejects renaming a system-locked list', function () {
+    $list = OptionList::factory()->create(['is_system' => true]);
+    $manager = app(OptionListManager::class);
+
+    expect(fn () => $manager->renameList($list->key, 'New label'))
+        ->toThrow(MetadataValidationException::class);
+});
+
+it('updates an item\'s label and color without needing confirm_lossy', function () {
+    $list = OptionList::factory()->create();
+    OptionItem::factory()->create(['option_list_id' => $list->id, 'value' => 'gold', 'label' => 'Gold', 'color' => null]);
+    $manager = app(OptionListManager::class);
+
+    $item = $manager->updateItem($list->key, 'gold', newLabel: 'Gold tier', newColor: 'warning');
+
+    expect($item->value)->toBe('gold')
+        ->and($item->label)->toBe('Gold tier')
+        ->and($item->color)->toBe('warning');
+});
+
+it('renames an unused item\'s value freely', function () {
+    $list = OptionList::factory()->create();
+    OptionItem::factory()->create(['option_list_id' => $list->id, 'value' => 'gold']);
+    $manager = app(OptionListManager::class);
+
+    $manager->updateItem($list->key, 'gold', newValue: 'platinum');
+
+    expect(OptionItem::query()->where('option_list_id', $list->id)->where('value', 'platinum')->exists())->toBeTrue()
+        ->and(OptionItem::query()->where('option_list_id', $list->id)->where('value', 'gold')->exists())->toBeFalse();
+});
+
+it('requires confirm_lossy to rename a value that is in use, then migrates stored rows', function () {
+    $list = OptionList::factory()->create();
+    OptionItem::factory()->create(['option_list_id' => $list->id, 'value' => 'gold']);
+
+    $module = optionListModuleWithColumn('tier');
+    Field::factory()->create(['module_id' => $module->id, 'name' => 'tier', 'type' => 'enum', 'option_list_id' => $list->id]);
+    $rowId = (string) Str::uuid();
+    DB::table($module->table_name)->insert(['id' => $rowId, 'tier' => 'gold']);
+
+    $manager = app(OptionListManager::class);
+
+    expect(fn () => $manager->updateItem($list->key, 'gold', newValue: 'platinum'))
+        ->toThrow(MetadataValidationException::class);
+
+    $manager->updateItem($list->key, 'gold', newValue: 'platinum', confirmLossy: true);
+
+    expect(DB::table($module->table_name)->where('id', $rowId)->value('tier'))->toBe('platinum');
+});
+
+it('migrates a renamed value inside a multienum json column', function () {
+    $list = OptionList::factory()->create();
+    OptionItem::factory()->create(['option_list_id' => $list->id, 'value' => 'gold']);
+
+    $table = 'ol_test_'.Str::random(8);
+    Schema::create($table, function (Blueprint $t): void {
+        $t->uuid('id')->primary();
+        $t->json('tiers')->nullable();
+        $t->timestamps();
+    });
+    $module = Module::factory()->create(['key' => $table, 'table_name' => $table, 'is_custom' => true]);
+    Field::factory()->create(['module_id' => $module->id, 'name' => 'tiers', 'type' => 'multienum', 'option_list_id' => $list->id]);
+    $rowId = (string) Str::uuid();
+    DB::table($table)->insert(['id' => $rowId, 'tiers' => json_encode(['gold', 'silver'])]);
+
+    $manager = app(OptionListManager::class);
+    $manager->updateItem($list->key, 'gold', newValue: 'platinum', confirmLossy: true);
+
+    expect(json_decode((string) DB::table($table)->where('id', $rowId)->value('tiers'), true))->toBe(['platinum', 'silver']);
+});
+
 it('adds an option item to a list', function () {
     $list = OptionList::factory()->create();
     $manager = app(OptionListManager::class);
