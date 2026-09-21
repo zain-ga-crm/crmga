@@ -73,6 +73,15 @@ trait BuildsResourceFromMetadata
 
     private const OWNER_FIELD = 'assigned_user_id';
 
+    /**
+     * S-4.5: a real column on every Contactable table (the shared
+     * contactable() migration macro), but only default-excluded from a
+     * module's list once it's actually registered as metadata -- see its one
+     * use in buildFilters() below, which special-cases the TernaryFilter this
+     * field gets to start on "only false" rather than "all".
+     */
+    private const DO_NOT_CALL_FIELD = 'do_not_call';
+
     public static function form(Form $form): Form
     {
         $module = self::compiledModule();
@@ -435,7 +444,12 @@ trait BuildsResourceFromMetadata
 
             $filter = match ($meta['type'] ?? null) {
                 'enum' => SelectFilter::make($name)->options(app(FieldTypeRegistry::class)->selectOptions($meta)),
-                'bool' => TernaryFilter::make($name),
+                // do_not_call starts on "only false" (Filament's own initial
+                // state), matching the query's own default exclusion above --
+                // still switchable to "all" or "only true" from the dropdown.
+                'bool' => $name === self::DO_NOT_CALL_FIELD
+                    ? TernaryFilter::make($name)->default(false)
+                    : TernaryFilter::make($name),
                 // Every other type would need a custom Filter::make()->form([...])
                 // text-search closure rather than a stock filter type -- left for
                 // a later pass; enum/bool cover this module's real search fields.

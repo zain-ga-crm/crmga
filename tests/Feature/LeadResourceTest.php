@@ -160,13 +160,37 @@ it('hides a visible_when panel\'s content on the detail view when its condition 
         ->assertDontSee('Referral programme XYZ');
 });
 
+it('excludes do_not_call leads from the list by default, per S-4.5', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $dnc = Lead::factory()->create(['do_not_call' => true]);
+    $reachable = Lead::factory()->create(['do_not_call' => false]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(ListLeads::class)
+        ->assertCanSeeTableRecords([$reachable])
+        ->assertCanNotSeeTableRecords([$dnc]);
+});
+
+it('shows do_not_call leads once the filter is switched to include them', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $dnc = Lead::factory()->create(['do_not_call' => true]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(ListLeads::class)
+        ->filterTable('do_not_call', true)
+        ->assertCanSeeTableRecords([$dnc]);
+});
+
 it('suppresses the phone click-to-call link on a do_not_call lead in the list, per S-1.4', function () {
     $admin = User::factory()->create(['is_admin' => true]);
     Lead::factory()->create(['phone_mobile' => '+1 (416) 555-0134', 'do_not_call' => true]);
 
     $this->actingAs($admin);
 
-    $this->get(LeadResource::getUrl('index'))
+    Livewire::test(ListLeads::class)
+        ->filterTable('do_not_call', true)
         ->assertSuccessful()
         ->assertDontSee('tel:+14165550134', false);
 });

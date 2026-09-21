@@ -151,6 +151,18 @@ it('hides the delete bulk action for a user without delete access, same as leads
     Livewire::test(ListCompanies::class)->assertTableBulkActionDoesNotExist('delete');
 });
 
+it('excludes do_not_call companies from the list by default, proving S-4.5 generalises past leads', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $dnc = Company::factory()->create(['do_not_call' => true]);
+    $reachable = Company::factory()->create(['do_not_call' => false]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(ListCompanies::class)
+        ->assertCanSeeTableRecords([$reachable])
+        ->assertCanNotSeeTableRecords([$dnc]);
+});
+
 it('exports companies using the same list-layout columns the table shows', function () {
     $columns = collect(CompanyExporter::getColumns())
         ->map(fn ($column) => $column->getName())

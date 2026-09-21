@@ -125,6 +125,11 @@ class MetadataFixtureSeeder extends Seeder
         // automatically once registered here.
         $this->field($companies, 'hot_lead', 'bool', ['filterable' => true]);
         $this->field($companies, 'warm_lead', 'bool', ['filterable' => true]);
+        // S-4.5: do_not_call is a real column on every Contactable table (the
+        // shared contactable() migration macro), not just leads -- registering
+        // it here is what lets BuildsResourceFromMetadata's default DNC
+        // exclusion and the compliance click-to-call suppression apply here too.
+        $this->field($companies, 'do_not_call', 'bool', ['filterable' => true]);
 
         Layout::updateOrCreate(
             ['module_id' => $companies->id, 'view' => 'list'],
@@ -242,6 +247,7 @@ class MetadataFixtureSeeder extends Seeder
                         'order' => 2,
                         'rows' => [
                             [['field' => 'hot_lead'], ['field' => 'warm_lead']],
+                            [['field' => 'do_not_call', 'span' => 'full']],
                         ],
                     ],
                 ],
@@ -268,6 +274,7 @@ class MetadataFixtureSeeder extends Seeder
                     ['field' => 'contact_person_phone', 'priority' => 2],
                     ['field' => 'hot_lead', 'priority' => 2],
                     ['field' => 'warm_lead', 'priority' => 2],
+                    ['field' => 'do_not_call', 'priority' => 2],
                 ],
             ],
         ];
@@ -304,6 +311,7 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($students, 'get_started', 'text', ['filterable' => true, 'max_length' => 255]);
         $this->field($students, 'hot_lead', 'bool', ['filterable' => true]);
         $this->field($students, 'warm_lead', 'bool', ['filterable' => true]);
+        $this->field($students, 'do_not_call', 'bool', ['filterable' => true]);
 
         Layout::updateOrCreate(
             ['module_id' => $students->id, 'view' => 'list'],
@@ -417,6 +425,7 @@ class MetadataFixtureSeeder extends Seeder
                         'order' => 2,
                         'rows' => [
                             [['field' => 'hot_lead'], ['field' => 'warm_lead']],
+                            [['field' => 'do_not_call', 'span' => 'full']],
                         ],
                     ],
                 ],
@@ -442,6 +451,7 @@ class MetadataFixtureSeeder extends Seeder
                     ['field' => 'get_started', 'priority' => 2],
                     ['field' => 'hot_lead', 'priority' => 2],
                     ['field' => 'warm_lead', 'priority' => 2],
+                    ['field' => 'do_not_call', 'priority' => 2],
                 ],
             ],
         ];
@@ -462,6 +472,7 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($clients, 'case_type', 'text', ['filterable' => true, 'max_length' => 60]);
         $this->field($clients, 'fee_status', 'text', ['filterable' => true, 'max_length' => 30]);
         $this->field($clients, 'next_action_at', 'datetime', ['filterable' => true, 'sortable' => true]);
+        $this->field($clients, 'do_not_call', 'bool', ['filterable' => true]);
 
         Layout::updateOrCreate(
             ['module_id' => $clients->id, 'view' => 'list'],
@@ -572,6 +583,14 @@ class MetadataFixtureSeeder extends Seeder
                             [['field' => 'fee_status'], ['field' => 'next_action_at', 'label' => 'Next action']],
                         ],
                     ],
+                    [
+                        'key' => 'flags',
+                        'label' => 'Flags',
+                        'order' => 2,
+                        'rows' => [
+                            [['field' => 'do_not_call', 'span' => 'full']],
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -594,6 +613,7 @@ class MetadataFixtureSeeder extends Seeder
                     ['field' => 'fee_status', 'priority' => 2],
                     ['field' => 'primary_email', 'priority' => 1],
                     ['field' => 'next_action_at', 'priority' => 2],
+                    ['field' => 'do_not_call', 'priority' => 2],
                 ],
             ],
         ];
@@ -613,6 +633,7 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($affiliates, 'username', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
         $this->field($affiliates, 'commission', 'decimal', ['filterable' => true, 'sortable' => true]);
         $this->field($affiliates, 'status', 'text', ['filterable' => true, 'max_length' => 30]);
+        $this->field($affiliates, 'do_not_call', 'bool', ['filterable' => true]);
 
         Layout::updateOrCreate(
             ['module_id' => $affiliates->id, 'view' => 'list'],
@@ -720,6 +741,14 @@ class MetadataFixtureSeeder extends Seeder
                             [['field' => 'commission'], ['field' => 'status']],
                         ],
                     ],
+                    [
+                        'key' => 'flags',
+                        'label' => 'Flags',
+                        'order' => 2,
+                        'rows' => [
+                            [['field' => 'do_not_call', 'span' => 'full']],
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -741,6 +770,7 @@ class MetadataFixtureSeeder extends Seeder
                     ['field' => 'status', 'priority' => 1],
                     ['field' => 'primary_email', 'priority' => 1],
                     ['field' => 'commission', 'priority' => 2],
+                    ['field' => 'do_not_call', 'priority' => 2],
                 ],
             ],
         ];
@@ -759,6 +789,7 @@ class MetadataFixtureSeeder extends Seeder
         $this->field($subscribers, 'primary_email', 'email', ['filterable' => true, 'sortable' => true, 'max_length' => 255]);
         $this->field($subscribers, 'status', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 30]);
         $this->field($subscribers, 'source', 'text', ['filterable' => true, 'max_length' => 255]);
+        $this->field($subscribers, 'do_not_call', 'bool', ['filterable' => true]);
 
         Layout::updateOrCreate(
             ['module_id' => $subscribers->id, 'view' => 'list'],
@@ -865,6 +896,14 @@ class MetadataFixtureSeeder extends Seeder
                             [['field' => 'status'], ['field' => 'source']],
                         ],
                     ],
+                    [
+                        'key' => 'flags',
+                        'label' => 'Flags',
+                        'order' => 2,
+                        'rows' => [
+                            [['field' => 'do_not_call', 'span' => 'full']],
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -885,6 +924,7 @@ class MetadataFixtureSeeder extends Seeder
                     ['field' => 'status', 'priority' => 1],
                     ['field' => 'source', 'priority' => 2],
                     ['field' => 'primary_email', 'priority' => 1],
+                    ['field' => 'do_not_call', 'priority' => 2],
                 ],
             ],
         ];

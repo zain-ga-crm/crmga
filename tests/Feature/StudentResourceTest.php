@@ -79,6 +79,18 @@ it('creates a student end to end through the create form', function () {
     expect(Student::query()->where('primary_email', 'priya@example.test')->exists())->toBeTrue();
 });
 
+it('excludes do_not_call students from the list by default, per S-4.5', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $dnc = Student::factory()->create(['do_not_call' => true]);
+    $reachable = Student::factory()->create(['do_not_call' => false]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(ListStudents::class)
+        ->assertCanSeeTableRecords([$reachable])
+        ->assertCanNotSeeTableRecords([$dnc]);
+});
+
 it('exports students using the same list-layout columns the table shows', function () {
     $columns = collect(StudentExporter::getColumns())
         ->map(fn ($column) => $column->getName())
