@@ -36,6 +36,12 @@ class ActivityTimelineWidget extends Widget
 {
     protected static string $view = 'filament.widgets.activity-timeline';
 
+    // Record-scoped, only ever used via HasActivityTimelineFooter's
+    // getFooterWidgets() -- without this, discoverWidgets() also registers
+    // it panel-wide on the general Dashboard, where it has no $record and
+    // permanently renders "No activity yet."
+    protected static bool $isDiscovered = false;
+
     public Lead|Company|Student|Client|Affiliate|NewsletterSubscriber|null $record = null;
 
     private const LIMIT = 50;
