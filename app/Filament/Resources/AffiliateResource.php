@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\AffiliateExporter;
 use App\Filament\Resources\AffiliateResource\Pages;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
+use App\Filament\Resources\Concerns\HasActivityRelationManagers;
 use App\Models\Affiliate;
 use Filament\Actions\Exports\Exporter;
 use Filament\Resources\Pages\PageRegistration;
@@ -17,6 +18,7 @@ use Filament\Resources\Resource;
 class AffiliateResource extends Resource
 {
     use BuildsResourceFromMetadata;
+    use HasActivityRelationManagers;
 
     protected static ?string $model = Affiliate::class;
 

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Exports\StudentExporter;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
+use App\Filament\Resources\Concerns\HasActivityRelationManagers;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Models\Student;
 use Filament\Actions\Exports\Exporter;
@@ -17,6 +18,7 @@ use Filament\Resources\Resource;
 class StudentResource extends Resource
 {
     use BuildsResourceFromMetadata;
+    use HasActivityRelationManagers;
 
     protected static ?string $model = Student::class;
 

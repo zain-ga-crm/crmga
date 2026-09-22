@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\CompanyExporter;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
+use App\Filament\Resources\Concerns\HasActivityRelationManagers;
 use App\Models\Company;
 use Filament\Actions\Exports\Exporter;
 use Filament\Resources\Pages\PageRegistration;
@@ -18,6 +19,7 @@ use Filament\Resources\Resource;
 class CompanyResource extends Resource
 {
     use BuildsResourceFromMetadata;
+    use HasActivityRelationManagers;
 
     protected static ?string $model = Company::class;
 

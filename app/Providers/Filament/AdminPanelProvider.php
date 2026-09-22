@@ -64,6 +64,14 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Administration')->collapsed(),
             ])
             ->databaseNotifications()
+            // S-4.3: every activity relation manager (Meetings/Tasks/Notes/
+            // Documents/Calls) lives on the View page, right below
+            // ActivityTimelineWidget -- Filament's own default makes relation
+            // managers read-only there (create/edit/delete hidden, list-only),
+            // meant for apps that split browsing (View) from managing (Edit).
+            // This app's whole S-4.3 design puts management on the View page
+            // itself, so that default is wrong here.
+            ->readOnlyRelationManagersOnResourceViewPagesByDefault(false)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\ClientExporter;
 use App\Filament\Resources\ClientResource\Pages;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
+use App\Filament\Resources\Concerns\HasActivityRelationManagers;
 use App\Models\Client;
 use Filament\Actions\Exports\Exporter;
 use Filament\Resources\Pages\PageRegistration;
@@ -17,6 +18,7 @@ use Filament\Resources\Resource;
 class ClientResource extends Resource
 {
     use BuildsResourceFromMetadata;
+    use HasActivityRelationManagers;
 
     protected static ?string $model = Client::class;
 

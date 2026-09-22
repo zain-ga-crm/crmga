@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Exports\NewsletterSubscriberExporter;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
+use App\Filament\Resources\Concerns\HasActivityRelationManagers;
 use App\Filament\Resources\NewsletterSubscriberResource\Pages;
 use App\Models\NewsletterSubscriber;
 use Filament\Actions\Exports\Exporter;
@@ -18,6 +19,7 @@ use Filament\Resources\Resource;
 class NewsletterSubscriberResource extends Resource
 {
     use BuildsResourceFromMetadata;
+    use HasActivityRelationManagers;
 
     protected static ?string $model = NewsletterSubscriber::class;
 

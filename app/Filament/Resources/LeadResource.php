@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Exports\LeadExporter;
 use App\Filament\Resources\Concerns\BuildsResourceFromMetadata;
+use App\Filament\Resources\Concerns\HasActivityRelationManagers;
 use App\Filament\Resources\LeadResource\Pages;
 use App\Models\Lead;
 use Filament\Actions\Exports\Exporter;
@@ -19,6 +20,7 @@ use Filament\Resources\Resource;
 class LeadResource extends Resource
 {
     use BuildsResourceFromMetadata;
+    use HasActivityRelationManagers;
 
     protected static ?string $model = Lead::class;
 
