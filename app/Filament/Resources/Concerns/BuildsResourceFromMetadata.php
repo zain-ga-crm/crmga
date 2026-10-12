@@ -207,6 +207,54 @@ trait BuildsResourceFromMetadata
     }
 
     /**
+     * S-4.7: global search. canGloballySearch() already gates on canAccess()
+     * (module-enabled + canViewAny()) and getGlobalSearchEloquentQuery()
+     * defaults to getEloquentQuery(), which carries AppliesRecordAccess'
+     * global scope the same as every other query against these models --
+     * "permitted modules" falls out of the existing ACL wiring for free,
+     * nothing new to scope here.
+     *
+     * These three Contactable base columns exist on all six resources this
+     * trait is used by (the shared Blueprint::contactable() macro), so one
+     * fixed list works generically -- no per-module metadata lookup needed.
+     *
+     * @return array<string>
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'last_name', 'primary_email', 'phone_mobile'];
+    }
+
+    /**
+     * full_name is the title/link column on every one of this app's six
+     * list layouts (confirmed in MetadataFixtureSeeder) -- fullName() is
+     * that same convention, not a different one invented for search.
+     */
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        if (method_exists($record, 'fullName')) {
+            $name = $record->fullName();
+
+            if (is_string($name) && $name !== '') {
+                return $name;
+            }
+        }
+
+        return static::getModelLabel();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return array_filter([
+            'Email' => self::str($record->getAttribute('primary_email')),
+            'Phone' => self::str($record->getAttribute('phone_mobile')),
+        ], fn (string $value): bool => $value !== '');
+    }
+
+    /**
      * S-2.4: the Exporter class for this module (LeadExporter, CompanyExporter,
      * ...), or null to skip export entirely. Not abstract -- a module that
      * doesn't need export yet just doesn't override this, rather than every
