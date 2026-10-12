@@ -79,4 +79,24 @@ final class ContactableModuleRegistry
 
         return '';
     }
+
+    /**
+     * The Resource for an arbitrary record, when it's one of these six --
+     * used wherever a polymorphic subject (an activity's subject(), for
+     * instance) needs a "view this record" link but could be any of them.
+     * A subject type outside this list (e.g. Assessment, which has no
+     * Resource yet) returns null rather than guessing.
+     *
+     * @return class-string<FilamentResource>|null
+     */
+    public static function resourceFor(Model $record): ?string
+    {
+        foreach (self::doNotCallModules() as $config) {
+            if ($record instanceof $config['model']) {
+                return $config['resource'];
+            }
+        }
+
+        return null;
+    }
 }
