@@ -8,11 +8,14 @@ use App\Filament\RelationManagers\NotesRelationManager;
 use App\Filament\RelationManagers\TasksRelationManager;
 use App\Filament\Resources\LeadResource;
 use App\Filament\Resources\LeadResource\Pages\ViewLead;
+use App\Mail\RecordEmail;
 use App\Models\Email;
+use App\Models\EmailTemplate;
 use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -112,7 +115,11 @@ it('creates a call through the calls relation manager', function () {
     expect($lead->calls()->where('outcome', 'connected')->exists())->toBeTrue();
 });
 
-it('never offers a create action for emails -- read-only by design', function () {
+it('offers compose, not a generic create row, for emails (S-5.4)', function () {
+    // Every Email row is either written by PollImapMailboxesJob (inbound) or
+    // EmailSender (outbound, via the 'compose' action below) -- a generic
+    // Filament create row would produce one that looks sent/received but
+    // isn't, with no message behind it, so that action stays absent.
     $lead = Lead::factory()->create();
     Email::create([
         'subject_type' => Lead::class, 'subject_id' => $lead->id,
@@ -122,5 +129,54 @@ it('never offers a create action for emails -- read-only by design', function ()
 
     Livewire::test(EmailsRelationManager::class, ['ownerRecord' => $lead, 'pageClass' => ViewLead::class])
         ->assertCanSeeTableRecords($lead->emails)
-        ->assertTableActionDoesNotExist('create');
+        ->assertTableActionDoesNotExist('create')
+        ->assertTableActionExists('compose');
+});
+
+it('composes and sends an email from a record, logging it against that record (S-5.4)', function () {
+    Mail::fake();
+    $lead = Lead::factory()->create(['first_name' => 'Amina', 'last_name' => 'Khan', 'primary_email' => 'amina@example.com']);
+
+    Livewire::test(EmailsRelationManager::class, ['ownerRecord' => $lead, 'pageClass' => ViewLead::class])
+        ->callTableAction('compose', data: [
+            'to' => ['amina@example.com'],
+            'subject' => 'Hello {{full_name}}',
+            'body_html' => '<p>Hi {{full_name}}, welcome.</p>',
+        ])
+        ->assertHasNoTableActionErrors();
+
+    $log = $lead->emails()->latest()->first();
+    expect($log)->not->toBeNull()
+        ->and($log->subject_line)->toBe('Hello Amina Khan')
+        ->and($log->body_html)->toBe('<p>Hi Amina Khan, welcome.</p>')
+        ->and($log->to_addresses)->toBe(['amina@example.com']);
+
+    Mail::assertSent(RecordEmail::class);
+});
+
+it('prefills the compose form\'s To field from the record\'s own primary_email', function () {
+    $lead = Lead::factory()->create(['primary_email' => 'prefill@example.com']);
+
+    Livewire::test(EmailsRelationManager::class, ['ownerRecord' => $lead, 'pageClass' => ViewLead::class])
+        ->mountTableAction('compose')
+        ->assertTableActionDataSet(['to' => ['prefill@example.com']]);
+});
+
+it('prefills subject and body from a chosen template, still editable before sending', function () {
+    Mail::fake();
+    $lead = Lead::factory()->create(['primary_email' => 'amina@example.com']);
+    $template = EmailTemplate::factory()->create([
+        'subject' => 'Welcome!',
+        'body_html' => '<p>Thanks for reaching out.</p>',
+    ]);
+
+    Livewire::test(EmailsRelationManager::class, ['ownerRecord' => $lead, 'pageClass' => ViewLead::class])
+        ->mountTableAction('compose')
+        ->setTableActionData(['template_id' => $template->id])
+        ->assertTableActionDataSet(['subject' => 'Welcome!', 'body_html' => '<p>Thanks for reaching out.</p>'])
+        ->setTableActionData(['to' => ['amina@example.com']])
+        ->callMountedTableAction()
+        ->assertHasNoTableActionErrors();
+
+    expect($lead->emails()->latest()->first()->subject_line)->toBe('Welcome!');
 });

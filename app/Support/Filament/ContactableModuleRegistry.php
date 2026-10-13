@@ -99,4 +99,21 @@ final class ContactableModuleRegistry
 
         return null;
     }
+
+    /**
+     * S-5.4: the module key EmailSender/MergeFieldResolver need to resolve
+     * merge fields and template filtering against. doNotCallModules()'s own
+     * array keys already are the six module keys, same as resourceFor()'s
+     * match -- no need to go through a Resource class to get one back out.
+     */
+    public static function moduleKeyFor(Model $record): ?string
+    {
+        foreach (self::doNotCallModules() as $moduleKey => $config) {
+            if ($record instanceof $config['model']) {
+                return $moduleKey;
+            }
+        }
+
+        return null;
+    }
 }
