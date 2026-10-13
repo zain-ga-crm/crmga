@@ -58,7 +58,7 @@ final class DocumentRevisionTransformer implements LegacyTransformer
             'revision_number' => $this->nullableInt($row['revision'] ?? null) ?? 1,
             'file_path' => $this->nullableString($row['doc_url'] ?? null) ?? "legacy://document-revisions/{$id}",
             'file_mime_type' => $this->nullableString($row['file_mime_type'] ?? null),
-            'created_by' => $this->nullableUuid($row['created_by'] ?? null),
+            'created_by' => $this->nullableUserId($row['created_by'] ?? null),
         ];
     }
 }

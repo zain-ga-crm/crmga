@@ -78,7 +78,7 @@ final class CompanyTransformer implements LegacyTransformer
                 'industry' => $this->nullableString($row['industry'] ?? null),
                 'website' => $this->nullableString($row['website'] ?? null),
                 'contact_person_name' => $this->nullableString($row['contact_person_name'] ?? null),
-                'contact_person_phone' => $this->nullableString($row['contactpersonphone'] ?? null),
+                'contact_person_phone' => $this->nullableTruncated($row['contactpersonphone'] ?? null, 50),
                 'rating' => $this->nullableInt($row['rating'] ?? null),
                 'lmia' => $this->nullableString($row['lmia'] ?? null),
                 'pnp_program' => $this->legacyBool($row['pnp_program_c'] ?? null),

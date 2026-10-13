@@ -223,6 +223,22 @@ it('keeps a genuinely UUID-shaped created_by that resolves to a real user', func
     expect(Company::withoutGlobalScopes()->find('legacy-company-1')->created_by)->toBe($user->id);
 });
 
+it('truncates an oversized contactpersonphone instead of failing the row (Z-6.2)', function () {
+    // Found via the real companies reconciliation gap: one legacy row had
+    // someone's name and credentials in this column instead of a phone
+    // number, 5 characters over the target's 50-char limit -- a raw
+    // insert fails the whole row with "Data too long for column"; the
+    // transformer must truncate instead.
+    $oversized = str_repeat('x', 60);
+    insertLegacyCompany(['contactpersonphone' => $oversized]);
+
+    $this->artisan('crm:migrate-legacy', ['--only' => 'companies'])->assertExitCode(0);
+
+    $company = Company::withoutGlobalScopes()->find('legacy-company-1');
+    expect($company)->not->toBeNull()
+        ->and($company->contact_person_phone)->toBe(str_repeat('x', 50));
+});
+
 it('re-runs idempotently without duplicating the row', function () {
     insertLegacyCompany();
 

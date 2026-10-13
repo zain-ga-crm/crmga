@@ -1,10 +1,12 @@
 <?php
 
 use App\Models\Assessment;
+use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 uses(DatabaseTruncation::class);
 
@@ -105,6 +107,35 @@ it('keeps unmapped scoring fields in the scores json blob', function () {
     $this->artisan('crm:migrate-legacy', ['--only' => 'assessments_score'])->assertExitCode(0);
 
     expect(Assessment::withoutGlobalScopes()->find('score-4')->scores)->toEqual(['field_of_study' => 'Engineering']);
+});
+
+it('drops a dangling assigned_user_id instead of failing the whole row (Z-6.2)', function () {
+    // Found via the real companies reconciliation gap: a well-formed UUID
+    // that doesn't correspond to any migrated user fails the FK
+    // constraint at save() time and silently kills the entire row's
+    // migration -- nullableUserId() must null it instead, not just check
+    // the UUID's shape (which nullableUuid() already did and which this
+    // value passes).
+    DB::connection('legacy')->table('ga_assessment_score')->insert([
+        'id' => 'score-dangling', 'crs_score' => '400', 'assigned_user_id' => (string) Str::uuid(),
+    ]);
+
+    $this->artisan('crm:migrate-legacy', ['--only' => 'assessments_score'])->assertExitCode(0);
+
+    $assessment = Assessment::withoutGlobalScopes()->find('score-dangling');
+    expect($assessment)->not->toBeNull()
+        ->and($assessment->assigned_user_id)->toBeNull();
+});
+
+it('keeps a real assigned_user_id when the user was actually migrated', function () {
+    $user = User::factory()->create();
+    DB::connection('legacy')->table('ga_assessment_score')->insert([
+        'id' => 'score-real-owner', 'crs_score' => '400', 'assigned_user_id' => $user->id,
+    ]);
+
+    $this->artisan('crm:migrate-legacy', ['--only' => 'assessments_score'])->assertExitCode(0);
+
+    expect(Assessment::withoutGlobalScopes()->find('score-real-owner')->assigned_user_id)->toBe($user->id);
 });
 
 it('re-runs idempotently without duplicating rows across either source', function () {

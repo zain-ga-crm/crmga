@@ -90,7 +90,7 @@ final class AssessmentRequestTransformer implements LegacyTransformer
             'phone_mobile' => $this->nullableString($row['phone_mobile'] ?? null),
             'marital_status' => $this->nullableString($row['marital_status'] ?? null),
             'education_level' => $this->nullableString($row['highest_level_education'] ?? null),
-            'assigned_user_id' => $this->nullableUuid($row['assigned_user_id'] ?? null),
+            'assigned_user_id' => $this->nullableUserId($row['assigned_user_id'] ?? null),
             'scores' => $scores,
         ];
     }

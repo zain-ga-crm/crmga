@@ -59,9 +59,9 @@ trait MapsContactableFields
             'date_reviewed' => LegacyDate::parseDate($this->nullableString($row['date_reviewed'] ?? null)),
             'lawful_basis_source' => $this->nullableString($row['lawful_basis_source'] ?? null),
             'primary_email' => $this->recoverEmail($id, $emailBeanModule) ?? $fallbackEmail,
-            'assigned_user_id' => $this->nullableUuid($row['assigned_user_id'] ?? null),
-            'created_by' => $this->nullableUuid($row['created_by'] ?? null),
-            'modified_by' => $this->nullableUuid($row['modified_user_id'] ?? null),
+            'assigned_user_id' => $this->nullableUserId($row['assigned_user_id'] ?? null),
+            'created_by' => $this->nullableUserId($row['created_by'] ?? null),
+            'modified_by' => $this->nullableUserId($row['modified_user_id'] ?? null),
         ];
     }
 }

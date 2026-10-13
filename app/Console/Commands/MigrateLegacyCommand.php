@@ -18,6 +18,7 @@ use App\Support\Etl\EmailTransformer;
 use App\Support\Etl\LeadModuleSpec;
 use App\Support\Etl\LeadModuleTransformer;
 use App\Support\Etl\LegacyTransformer;
+use App\Support\Etl\LegacyUserIdCache;
 use App\Support\Etl\MeetingTransformer;
 use App\Support\Etl\MigrationResult;
 use App\Support\Etl\NewsletterSubscriberTransformer;
@@ -68,6 +69,11 @@ final class MigrateLegacyCommand extends Command
         EmailTransformer $emails,
         EmailAddressTransformer $emailAddresses,
     ): int {
+        // Fresh per run -- matters when this command is invoked more than
+        // once in the same PHP process (the test suite does this
+        // constantly); a real CLI invocation only ever runs once anyway.
+        LegacyUserIdCache::reset();
+
         /** @var list<LegacyTransformer> $transformers */
         $transformers = [
             $users,

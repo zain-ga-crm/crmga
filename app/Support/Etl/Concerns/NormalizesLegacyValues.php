@@ -2,6 +2,8 @@
 
 namespace App\Support\Etl\Concerns;
 
+use App\Support\Etl\LegacyUserIdCache;
+
 /**
  * Small value-coercion helpers shared by every LegacyTransformer — SuiteCRM
  * columns are untyped strings at the PHP layer regardless of their declared SQL
@@ -28,6 +30,22 @@ trait NormalizesLegacyValues
     }
 
     /**
+     * Guards a target column's own length limit against free-text legacy
+     * garbage in a field that's typed for something much shorter (e.g. a
+     * "phone" column holding someone's name and credentials instead) --
+     * one bad value truncating is far better than it failing the whole
+     * row's insert outright (found via a `contact_person_phone` value 5
+     * characters over its 50-char column during the Z-6.2 companies
+     * reconciliation gap).
+     */
+    private function nullableTruncated(mixed $value, int $maxLength): ?string
+    {
+        $string = $this->nullableString($value);
+
+        return $string !== null ? mb_substr($string, 0, $maxLength) : null;
+    }
+
+    /**
      * A handful of legacy `created_by`/`modified_user_id`-style FK columns hold
      * free text ("Prince Saha", an email address) instead of a real user id —
      * a data-quality defect, not a real reference. Treat anything that isn't
@@ -44,6 +62,25 @@ trait NormalizesLegacyValues
         return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $string) === 1
             ? $string
             : null;
+    }
+
+    /**
+     * Z-6.2 fix: `nullableUuid()` only guards the FK column's SHAPE, not
+     * whether it points at a real row -- a well-formed UUID whose legacy
+     * `users` row was never recovered (deleted outright in the source,
+     * never just soft-deleted) still fails `assigned_user_id`/`created_by`/
+     * `modified_by`'s real FK constraint at save() time, which kills the
+     * ENTIRE parent row's migration over one unresolvable reference (found
+     * via 78 FK failures on assessments_score alone, all tracing to legacy
+     * user ids that genuinely don't exist in the legacy `users` table --
+     * confirmed per-id, not guessed). See LegacyUserIdCache for why this
+     * is one shared cache, not a static on this trait.
+     */
+    private function nullableUserId(mixed $value): ?string
+    {
+        $uuid = $this->nullableUuid($value);
+
+        return ($uuid !== null && isset(LegacyUserIdCache::ids()[$uuid])) ? $uuid : null;
     }
 
     /**

@@ -109,7 +109,7 @@ final class AssessmentScoreTransformer implements LegacyTransformer
             'clb_listening' => $this->nullableInt($row['listening'] ?? null),
             'clb_reading' => $this->nullableInt($row['reading'] ?? null),
             'clb_writing' => $this->nullableInt($row['writing'] ?? null),
-            'assigned_user_id' => $this->nullableUuid($row['assigned_user_id'] ?? null),
+            'assigned_user_id' => $this->nullableUserId($row['assigned_user_id'] ?? null),
             'scores' => $scores,
         ];
     }
