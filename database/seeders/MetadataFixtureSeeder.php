@@ -287,12 +287,200 @@ class MetadataFixtureSeeder extends Seeder
             ['label' => 'Assessments', 'label_plural' => 'Assessments', 'table_name' => 'assessments', 'base_type' => 'generic', 'enabled' => true],
         );
 
-        $this->field($assessments, 'first_name', 'text', ['filterable' => true, 'max_length' => 100]);
-        $this->field($assessments, 'last_name', 'text', ['filterable' => true, 'max_length' => 100]);
+        $this->field($assessments, 'first_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 100]);
+        $this->field($assessments, 'last_name', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 100]);
+        $this->field($assessments, 'primary_email', 'email', ['filterable' => true, 'max_length' => 255]);
+        $this->field($assessments, 'phone_mobile', 'phone', ['filterable' => true, 'max_length' => 50]);
         $this->field($assessments, 'case_type', 'text', ['filterable' => true, 'max_length' => 20]);
         $this->field($assessments, 'status', 'text', ['filterable' => true, 'sortable' => true, 'max_length' => 20]);
         $this->field($assessments, 'crs_score', 'int', ['filterable' => true, 'sortable' => true]);
         $this->field($assessments, 'fsw_score', 'int', ['filterable' => true, 'sortable' => true]);
+        $this->field($assessments, 'marital_status', 'text', ['filterable' => true, 'max_length' => 30]);
+        $this->field($assessments, 'education_level', 'text', ['max_length' => 255]);
+        $this->field($assessments, 'language_test_type', 'text', ['filterable' => true, 'max_length' => 30]);
+        $this->field($assessments, 'clb_speaking', 'int', []);
+        $this->field($assessments, 'clb_listening', 'int', []);
+        $this->field($assessments, 'clb_reading', 'int', []);
+        $this->field($assessments, 'clb_writing', 'int', []);
+        $this->field($assessments, 'assessed_at', 'datetime', ['sortable' => true]);
+
+        Layout::updateOrCreate(
+            ['module_id' => $assessments->id, 'view' => 'list'],
+            ['definition' => $this->assessmentsListLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $assessments->id, 'view' => 'detail'],
+            ['definition' => $this->assessmentsDetailLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $assessments->id, 'view' => 'edit'],
+            ['definition' => $this->assessmentsEditLayout(), 'version' => 1, 'is_published' => true],
+        );
+        Layout::updateOrCreate(
+            ['module_id' => $assessments->id, 'view' => 'search'],
+            ['definition' => $this->assessmentsSearchLayout(), 'version' => 1, 'is_published' => true],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function assessmentsListLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'list',
+            'module' => 'assessments',
+            'content' => [
+                'default_sort' => ['field' => 'created_at', 'direction' => 'desc'],
+                'columns' => [
+                    ['field' => 'first_name', 'priority' => 1, 'link' => true, 'width' => 150],
+                    ['field' => 'last_name', 'priority' => 1, 'link' => true, 'width' => 150],
+                    ['field' => 'case_type', 'priority' => 1, 'label' => 'Case', 'width' => 100],
+                    ['field' => 'status', 'priority' => 1, 'width' => 120],
+                    ['field' => 'crs_score', 'priority' => 1, 'label' => 'CRS', 'width' => 90],
+                    ['field' => 'fsw_score', 'priority' => 1, 'label' => 'FSW', 'width' => 90],
+                    ['field' => 'assigned_user_id', 'priority' => 2, 'label' => 'Owner', 'width' => 140],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function assessmentsDetailLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'detail',
+            'module' => 'assessments',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'candidate',
+                        'label' => 'Candidate',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'primary_email'], ['field' => 'phone_mobile']],
+                        ],
+                    ],
+                    [
+                        'key' => 'scores',
+                        'label' => 'Scores',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'case_type', 'label' => 'Case'], ['field' => 'status']],
+                            [['field' => 'crs_score', 'label' => 'CRS score'], ['field' => 'fsw_score', 'label' => 'FSW score']],
+                        ],
+                    ],
+                    [
+                        'key' => 'language_education',
+                        'label' => 'Language & education',
+                        'order' => 2,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'language_test_type', 'label' => 'Test type'], ['field' => 'education_level']],
+                            [['field' => 'clb_speaking', 'label' => 'CLB speaking'], ['field' => 'clb_listening', 'label' => 'CLB listening']],
+                            [['field' => 'clb_reading', 'label' => 'CLB reading'], ['field' => 'clb_writing', 'label' => 'CLB writing']],
+                        ],
+                    ],
+                    [
+                        'key' => 'processing',
+                        'label' => 'Processing',
+                        'order' => 3,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'marital_status'], ['field' => 'assessed_at']],
+                            [['field' => 'assigned_user_id', 'label' => 'Owner']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function assessmentsEditLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'edit',
+            'module' => 'assessments',
+            'content' => [
+                'panels' => [
+                    [
+                        'key' => 'candidate',
+                        'label' => 'Candidate',
+                        'order' => 0,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'first_name'], ['field' => 'last_name']],
+                            [['field' => 'primary_email'], ['field' => 'phone_mobile']],
+                        ],
+                    ],
+                    [
+                        'key' => 'scores',
+                        'label' => 'Scores',
+                        'order' => 1,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'case_type', 'label' => 'Case'], ['field' => 'status']],
+                            [['field' => 'crs_score', 'label' => 'CRS score'], ['field' => 'fsw_score', 'label' => 'FSW score']],
+                        ],
+                    ],
+                    [
+                        'key' => 'language_education',
+                        'label' => 'Language & education',
+                        'order' => 2,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'language_test_type', 'label' => 'Test type'], ['field' => 'education_level']],
+                            [['field' => 'clb_speaking', 'label' => 'CLB speaking'], ['field' => 'clb_listening', 'label' => 'CLB listening']],
+                            [['field' => 'clb_reading', 'label' => 'CLB reading'], ['field' => 'clb_writing', 'label' => 'CLB writing']],
+                        ],
+                    ],
+                    [
+                        'key' => 'processing',
+                        'label' => 'Processing',
+                        'order' => 3,
+                        'columns' => 2,
+                        'rows' => [
+                            [['field' => 'marital_status'], ['field' => 'assessed_at']],
+                            [['field' => 'assigned_user_id', 'label' => 'Owner']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function assessmentsSearchLayout(): array
+    {
+        return [
+            'version' => 1,
+            'view' => 'search',
+            'module' => 'assessments',
+            'content' => [
+                'columns' => [
+                    ['field' => 'first_name', 'priority' => 1],
+                    ['field' => 'last_name', 'priority' => 1],
+                    ['field' => 'case_type', 'priority' => 1],
+                    ['field' => 'status', 'priority' => 1],
+                    ['field' => 'crs_score', 'priority' => 2],
+                    ['field' => 'fsw_score', 'priority' => 2],
+                    ['field' => 'language_test_type', 'priority' => 2],
+                ],
+            ],
+        ];
     }
 
     private function seedStudents(): void
