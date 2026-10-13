@@ -3,6 +3,7 @@
 use App\Exceptions\Api\ApiExceptionRenderer;
 use App\Http\Middleware\Api\AuthenticateApiToken;
 use App\Http\Middleware\Api\RequireScope;
+use App\Http\Middleware\SetSecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -32,6 +33,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'scope' => RequireScope::class,
         ]);
+
+        // Z-7.1: every response, web and API alike, carries the same
+        // baseline security headers.
+        $middleware->append(SetSecurityHeaders::class);
 
         // ApiThrottle extends Laravel's own ThrottleRequests, and SortedMiddleware's
         // priority matching walks class_parents() — so it inherits ThrottleRequests'
