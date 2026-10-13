@@ -28,3 +28,6 @@ yarn-error.log
 *.bak
 
 .claude/settings.local.json
+rr
+rr.exe
+.rr.yaml
