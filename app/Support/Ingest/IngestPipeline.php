@@ -102,10 +102,15 @@ final class IngestPipeline
      * actually present wins; a later rule whose source key is absent must not
      * overwrite that real value with its own null/default.
      *
+     * Public so the S-5.2 integration hub's test-payload runner can preview a
+     * source's field mapping/transforms against a pasted sample payload
+     * without running the rest of the pipeline (validation, dedupe,
+     * create-or-update, events) against real data.
+     *
      * @param  array<string, mixed>  $rawPayload
      * @return array<string, mixed>
      */
-    private function mapFields(string $source, array $rawPayload): array
+    public function mapFields(string $source, array $rawPayload): array
     {
         $result = [];
         foreach ($this->fieldMaps->forSource($source) as $mapping) {
