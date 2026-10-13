@@ -16,9 +16,10 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 | route defined here on a path the real app already uses would silently win
 | the match, since Laravel's route lookup keys by method+URI and a later
 | registration overwrites an earlier one for the same key. The real CRM
-| routes (web.php, api.php, legacy_api.php, the Filament panel) are NOT
-| gated behind tenancy yet — see Z-8.2's PR description — so keep anything
-| registered here off paths those files use, e.g. under a dedicated prefix.
+| routes (web.php, api.php, legacy_api.php, the Filament panel) are ALREADY
+| gated behind tenancy as of Z-8.2 (InitializeTenancyByDomain is applied to
+| each of them directly) — so keep anything registered here off paths those
+| files use, e.g. under a dedicated prefix, to avoid a silent key collision.
 |
 | The route below is a diagnostic proving domain-based tenant resolution
 | actually works (tests/Feature/DomainIdentificationTest.php exercises it);

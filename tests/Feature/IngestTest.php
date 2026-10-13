@@ -2,6 +2,7 @@
 
 use App\Jobs\ProcessMetaLeadJob;
 use App\Models\Lead;
+use App\Models\Metadata\OptionList;
 use App\Models\Role;
 use App\Models\User;
 use App\Support\Ingest\Canon;
@@ -113,6 +114,27 @@ it('canonicalises an enum field against option value or label, and logs an unmat
         'vertical_choice' => 'not a real vertical at all',
     ], ['X-Api-Key' => 'test-wp-key'])->assertStatus(202);
     expect(Lead::find($unmatched->json('id'))->vertical)->toBeNull();
+});
+
+it('does not leak a prior request\'s unmatched-option report into this request (long-running worker safety)', function () {
+    // Canon::$unmatched is a process-wide static (see its docblock) -- ProcessMetaLeadJob
+    // and this HTTP endpoint both run IngestPipeline::run() inside a long-lived queue
+    // worker or Octane worker process, which calls run() many times without the process
+    // ever restarting. Without a reset at the top of run(), an unmatched entry from an
+    // earlier, unrelated request would still be sitting in the static array here.
+    Canon::resetUnmatchedReport();
+    $list = OptionList::factory()->create();
+    Canon::matchOption('stale value from a previous worker iteration', $list, 'previous-request', 'some_field');
+    expect(Canon::unmatchedReport())->toHaveCount(1);
+
+    app(Settings::class)->set('ingest.wordpress.field_map', [
+        ['source_field' => 'email', 'target_field' => 'primary_email'],
+    ]);
+    $this->postJson('/api/v1/ingest/wordpress', [
+        'email' => 'fresh@example.com',
+    ], ['X-Api-Key' => 'test-wp-key'])->assertStatus(202);
+
+    expect(Canon::unmatchedReport())->toBe([]);
 });
 
 it('dedupes by email in warn mode: creates a second record but flags it as a duplicate', function () {

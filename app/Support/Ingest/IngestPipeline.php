@@ -33,6 +33,12 @@ final class IngestPipeline
      */
     public function run(string $source, array $rawPayload, string $moduleKey = 'leads'): IngestResult
     {
+        // Canon::$unmatched is a static accumulator (see its docblock); a long-running
+        // queue worker or Octane request worker calls run() many times in one PHP
+        // process, so without this reset each call's unmatched-option report would
+        // silently include every prior call's entries from the same process.
+        Canon::resetUnmatchedReport();
+
         $log = IngestLog::create(['source' => $source, 'raw_payload' => $rawPayload, 'status' => 'received']);
 
         try {
