@@ -23,6 +23,8 @@ use Filament\Tables\Columns\Column as TableColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -112,6 +114,10 @@ final class FieldTypeRegistry
         $name = $this->str($field['name'] ?? null);
         $type = $this->str($field['type'] ?? null, 'text');
 
+        if ($name === 'full_name') {
+            return $this->fullNameInfolistEntry($field);
+        }
+
         $entry = match ($type) {
             'enum' => $this->enumBadgeEntry($name, $field['option_list_id'] ?? null),
             'multienum' => TextEntry::make($name)->badge(),
@@ -144,6 +150,10 @@ final class FieldTypeRegistry
     {
         $name = $this->str($field['name'] ?? null);
         $type = $this->str($field['type'] ?? null, 'text');
+
+        if ($name === 'full_name') {
+            return $this->fullNameTableColumn($field);
+        }
 
         $column = match ($type) {
             'textarea' => TextColumn::make($name)->limit(60),
@@ -208,6 +218,49 @@ final class FieldTypeRegistry
      * but sitting right next to the DNC flag it's a real compliance risk this
      * CRM exists partly to prevent, so it's suppressed there regardless.
      */
+    /**
+     * `full_name` is the title/link column on every one of the six
+     * Contactable modules' list and detail layouts (MetadataFixtureSeeder),
+     * registered as a plain `type: text` field for convenience -- but there
+     * is no real `full_name` column or Eloquent accessor anywhere
+     * (Contactable::fullName() is a plain method). Built generically like
+     * any other text field, Filament's default searchable()/sortable() both
+     * try to run `full_name LIKE ...` / `ORDER BY full_name` directly in
+     * SQL and throw "Unknown column", and the column/entry itself renders
+     * permanently blank since `$record->full_name` resolves to null. This
+     * is the fix: read through fullName(), and search/sort against the real
+     * first_name/last_name columns underneath it.
+     *
+     * @param  array<string, mixed>  $field
+     */
+    private function fullNameTableColumn(array $field): TableColumn
+    {
+        return TextColumn::make('full_name')
+            ->label($this->labelFor($field, 'full_name'))
+            ->getStateUsing(fn (Model $record): string => ContactableModuleRegistry::fullNameOf($record))
+            ->searchable(
+                query: fn (Builder $query, string $search): Builder => $query->where(
+                    fn (Builder $q) => $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                ),
+            )
+            ->sortable(
+                query: fn (Builder $query, string $direction): Builder => $query
+                    ->orderBy('last_name', $direction)
+                    ->orderBy('first_name', $direction),
+            );
+    }
+
+    /**
+     * @param  array<string, mixed>  $field
+     */
+    private function fullNameInfolistEntry(array $field): InfolistComponent
+    {
+        return TextEntry::make('full_name')
+            ->label($this->labelFor($field, 'full_name'))
+            ->getStateUsing(fn (Model $record): string => ContactableModuleRegistry::fullNameOf($record));
+    }
+
     private function phoneUrl(mixed $state, mixed $record): ?string
     {
         if (! is_string($state) || $state === '') {
