@@ -1,0 +1,430 @@
+openapi: 3.0.3
+info:
+  title: crmga REST API
+  version: "1.0"
+  description: |
+    The current, supported integration surface (`/api/v1`). Metadata-driven: the
+    set of fields on a module can change as an administrator customises Studio,
+    without a deployment -- call `GET /api/v1/meta/modules/{module}/fields` to
+    read a module's current fields rather than hard-coding them.
+
+    A separate legacy `/Api/V8/*` adapter exists only to keep the 133 pre-existing
+    n8n workflows running unchanged; new integrations should use `/api/v1` only.
+servers:
+  - url: /api/v1
+tags:
+  - name: Auth
+  - name: Records
+    description: The same index/show/store/update/destroy shape for every module below.
+  - name: Metadata
+    description: Makes the API self-describing -- a module's fields can change in Studio without breaking a caller that reads them here first.
+  - name: Ingest
+    description: Inbound lead capture from external sources.
+components:
+  securitySchemes:
+    oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            leads:read: Read leads
+            leads:write: Create/update leads
+            leads:delete: Delete leads
+            companies:read: Read companies
+            companies:write: Create/update companies
+            metadata:read: Read module/field/option-list metadata
+            users:read: Read user records (for assignment, ownership display)
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: A personal access token, created from the Security page in the admin panel.
+  parameters:
+    moduleParam:
+      name: module
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [leads, companies, students, clients, affiliates, newsletter_subscribers, assessments]
+    idParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    filterParam:
+      name: filter
+      in: query
+      style: deepObject
+      explode: true
+      schema:
+        type: object
+      description: |
+        `filter[field]=value` (equals), `filter[field][eq|neq]`, `filter[field][gt|gte|lt|lte]`,
+        `filter[field][in]=a,b,c`, `filter[field][like]=%text%` (only on filterable fields),
+        `filter[field][null]=true|false`. An unknown field returns 422, never silently ignored.
+    sortParam:
+      name: sort
+      in: query
+      schema:
+        type: string
+      description: "`field` ascending, `-field` descending, comma-separated for multiple."
+    pageSizeParam:
+      name: page[size]
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 25
+    pageNumberParam:
+      name: page[number]
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+    fieldsParam:
+      name: fields[module]
+      in: query
+      schema:
+        type: string
+      description: Comma-separated sparse fieldset for the requested module, e.g. `first_name,last_name,primary_email`.
+    includeParam:
+      name: include
+      in: query
+      schema:
+        type: string
+      description: Comma-separated relationship names to include, e.g. `assignee`.
+    qParam:
+      name: q
+      in: query
+      schema:
+        type: string
+      description: Free-text search across the module's indexed identity fields.
+  schemas:
+    Record:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string }
+        attributes: { type: object, additionalProperties: true }
+        relationships: { type: object, additionalProperties: true }
+        links:
+          type: object
+          properties:
+            self: { type: string }
+    RecordCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Record' }
+        meta:
+          type: object
+          properties:
+            total: { type: integer }
+            count: { type: integer }
+            page: { type: integer }
+            pages: { type: integer }
+            per_page: { type: integer }
+        links:
+          type: object
+          properties:
+            self: { type: string }
+            next: { type: string, nullable: true }
+            prev: { type: string, nullable: true }
+    RecordResource:
+      type: object
+      properties:
+        data: { $ref: '#/components/schemas/Record' }
+    ProblemDetails:
+      type: object
+      description: RFC 7807. Every non-2xx response takes this shape.
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        code: { type: string }
+        detail: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+        trace_id: { type: string }
+    Field:
+      type: object
+      properties:
+        name: { type: string }
+        label: { type: string }
+        type: { type: string, description: "text, textarea, enum, multienum, bool, int, decimal, currency, date, datetime, email, phone, url, relate, file, image" }
+        required: { type: boolean }
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              value: { type: string }
+              label: { type: string }
+        filterable: { type: boolean }
+        sortable: { type: boolean }
+    Module:
+      type: object
+      properties:
+        key: { type: string }
+        label: { type: string }
+        label_plural: { type: string }
+        count: { type: integer }
+  responses:
+    Unauthenticated:
+      description: Missing, expired or invalid token.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProblemDetails' } } }
+    Forbidden:
+      description: Authenticated but not permitted -- wrong role, or the token's scope doesn't cover this action.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProblemDetails' } } }
+    NotFound:
+      description: The record does not exist, or exists but the caller's record access excludes it (never 403 here -- that would confirm the record exists).
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProblemDetails' } } }
+    ValidationFailed:
+      description: One or more fields are invalid.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProblemDetails' } } }
+    Conflict:
+      description: "If-Match didn't match the record's current ETag."
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProblemDetails' } } }
+    RateLimited:
+      description: Too many requests. Retry-After header present.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProblemDetails' } } }
+security:
+  - oauth2ClientCredentials: []
+  - bearerAuth: []
+paths:
+  /{module}:
+    parameters:
+      - $ref: '#/components/parameters/moduleParam'
+    get:
+      tags: [Records]
+      summary: List records
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/pageNumberParam'
+        - $ref: '#/components/parameters/fieldsParam'
+        - $ref: '#/components/parameters/includeParam'
+        - $ref: '#/components/parameters/qParam'
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag: { schema: { type: string } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/RecordCollection' } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    post:
+      tags: [Records]
+      summary: Create a record
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          schema: { type: string }
+          description: A repeat with the same key within 24 hours returns the original response instead of creating a duplicate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+            example: { first_name: "Amina", last_name: "Khan", primary_email: "amina@example.com" }
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location: { schema: { type: string } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/RecordResource' } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /{module}/{id}:
+    parameters:
+      - $ref: '#/components/parameters/moduleParam'
+      - $ref: '#/components/parameters/idParam'
+    get:
+      tags: [Records]
+      summary: Get a record
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag: { schema: { type: string } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/RecordResource' } } }
+        '304': { description: Not modified (If-None-Match matched). }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Records]
+      summary: Update a record
+      parameters:
+        - name: If-Match
+          in: header
+          schema: { type: string }
+          description: Optimistic concurrency. A mismatch returns 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        '200':
+          description: OK
+          content: { application/json: { schema: { $ref: '#/components/schemas/RecordResource' } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+    delete:
+      tags: [Records]
+      summary: Soft-delete a record
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /meta/modules:
+    get:
+      tags: [Metadata]
+      summary: List modules the caller may see
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Module' } }
+  /meta/modules/{module}/fields:
+    parameters:
+      - $ref: '#/components/parameters/moduleParam'
+    get:
+      tags: [Metadata]
+      summary: List a module's current fields
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Field' } }
+  /meta/option-lists/{key}:
+    parameters:
+      - name: key
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Metadata]
+      summary: Get an option list's values and labels
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value: { type: string }
+                    label: { type: string }
+  /ingest/wordpress:
+    post:
+      tags: [Ingest]
+      summary: WordPress form submission (Contact Form 7, Gravity Forms, WPForms, Elementor)
+      security: []
+      parameters:
+        - name: X-Api-Key
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        '202':
+          description: Accepted -- queued for processing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  status: { type: string }
+        '401': { description: Missing or wrong X-Api-Key. }
+  /ingest/meta:
+    get:
+      tags: [Ingest]
+      summary: Meta webhook subscription verification (hub challenge)
+      security: []
+      parameters:
+        - name: hub_mode
+          in: query
+          schema: { type: string }
+        - name: hub_verify_token
+          in: query
+          schema: { type: string }
+        - name: hub_challenge
+          in: query
+          schema: { type: string }
+      responses:
+        '200': { description: Echoes hub_challenge back when the verify token matches. }
+        '403': { description: Verify token did not match. }
+    post:
+      tags: [Ingest]
+      summary: Meta Lead Ads leadgen webhook event
+      security: []
+      parameters:
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        '202': { description: Accepted -- one job queued per leadgen change. }
+        '403': { description: Missing or wrong signature. }
+  /ingest/{source}:
+    post:
+      tags: [Ingest]
+      summary: Generic signed ingest for any other source
+      security: []
+      parameters:
+        - name: source
+          in: path
+          required: true
+          schema: { type: string }
+        - name: X-Signature
+          in: header
+          required: true
+          schema: { type: string }
+          description: "sha256=<HMAC-SHA256 of the raw request body, using that source's configured secret>"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        '202':
+          description: Accepted -- queued for processing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  status: { type: string }
+        '403': { description: Missing or wrong X-Signature. }
