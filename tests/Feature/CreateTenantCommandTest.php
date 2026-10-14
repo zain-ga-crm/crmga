@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Metadata\Module;
 use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\User;
@@ -44,6 +45,11 @@ it('provisions a new tenant with its own database, domain, roles and first admin
 
     try {
         expect(Role::query()->where('name', 'Administrator')->exists())->toBeTrue();
+
+        // Without this, BuildsResourceFromMetadata resources (Leads, Companies,
+        // ...) would render completely empty for the new tenant -- see
+        // TenantProvisioner's own comment on this exact seeding step.
+        expect(Module::query()->where('key', 'leads')->exists())->toBeTrue();
 
         $admin = User::query()->where('email', 'ada@example.test')->first();
         expect($admin)->not->toBeNull()

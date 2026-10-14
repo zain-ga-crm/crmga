@@ -2,21 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Role;
-use App\Models\Tenant;
-use App\Models\User;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\SettingsCatalogueSeeder;
+use App\Support\Tenancy\TenantProvisioner;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 /**
- * Z-8.4 (BACKEND_BRIEF_ZAIN.md §14 step 6). Provisions a brand-new tenant:
- * database creation and `database/migrations/tenant` run automatically via
- * the TenantCreated event pipeline already wired in
- * App\Providers\TenancyServiceProvider (Z-8.1) -- this command's own job is
- * everything after that: the domain, the starter roles, and the first
- * System Administrator so the tenant is actually usable, not just present.
+ * Z-8.4 (BACKEND_BRIEF_ZAIN.md §14 step 6). CLI wrapper over
+ * TenantProvisioner -- see that class for what actually happens.
  */
 final class CreateTenantCommand extends Command
 {
@@ -28,7 +20,7 @@ final class CreateTenantCommand extends Command
 
     protected $description = 'Provision a new tenant: database, migrations, starter roles, first admin (BACKEND_BRIEF Z-8.4)';
 
-    public function handle(): int
+    public function handle(TenantProvisioner $provisioner): int
     {
         $domain = $this->argument('domain');
 
@@ -47,32 +39,7 @@ final class CreateTenantCommand extends Command
             return self::FAILURE;
         }
 
-        // Tenant::create() fires TenantCreated, which -- per Z-8.1's
-        // TenancyServiceProvider -- runs CreateDatabase then MigrateDatabase
-        // synchronously (shouldBeQueued(false)) before this returns.
-        $tenant = Tenant::create();
-        $tenant->createDomain($domain);
-
-        tenancy()->initialize($tenant);
-
-        try {
-            $this->call('db:seed', ['--class' => RoleSeeder::class, '--force' => true]);
-            $this->call('db:seed', ['--class' => SettingsCatalogueSeeder::class, '--force' => true]);
-
-            $admin = User::create([
-                'name' => $adminName,
-                'email' => $adminEmail,
-                'password' => $adminPassword,
-                'is_admin' => true,
-            ]);
-
-            $adminRole = Role::query()->where('name', 'Administrator')->first();
-            if ($adminRole) {
-                $admin->roles()->attach($adminRole);
-            }
-        } finally {
-            tenancy()->end();
-        }
+        $tenant = $provisioner->provision((string) $domain, $adminName, $adminEmail, $adminPassword);
 
         $this->info("Tenant {$tenant->id} created, reachable at {$domain}.");
 

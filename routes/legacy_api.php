@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Legacy\V8ModuleController;
+use App\Http\Middleware\AbortIfTenantSuspended;
 use App\Http\Middleware\Api\ApiThrottle;
 use App\Http\Middleware\Api\AuthenticateApiToken;
 use App\Http\Middleware\Api\LogApiRequest;
@@ -31,7 +32,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 |
 */
 
-Route::middleware([InitializeTenancyByDomain::class, EndTenancyAfterResponse::class])->group(function () {
+Route::middleware([InitializeTenancyByDomain::class, AbortIfTenantSuspended::class, EndTenancyAfterResponse::class])->group(function () {
     // Not AuthenticateApiToken -- issuing a token is the credential check itself,
     // same as Passport's own /oauth/token. Still throttled per Z-7.1: without
     // this it was a second, unthrottled entry point for brute-forcing

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\PlatformUser;
 use App\Models\User;
 
 return [
@@ -49,6 +50,14 @@ return [
             'driver' => 'passport',
             'provider' => 'users',
         ],
+
+        // Z-8.1/S-8.1: the platform panel's own guard -- PlatformUser lives on the
+        // central database (never a tenant's), and is never a CRM user of any one
+        // company, so it can't share the 'web' guard's 'users' provider.
+        'platform' => [
+            'driver' => 'session',
+            'provider' => 'platform_users',
+        ],
     ],
 
     /*
@@ -78,6 +87,11 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+
+        'platform_users' => [
+            'driver' => 'eloquent',
+            'model' => PlatformUser::class,
+        ],
     ],
 
     /*

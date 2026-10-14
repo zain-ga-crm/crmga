@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\Api\ApiExceptionRenderer;
+use App\Http\Middleware\AbortIfTenantSuspended;
 use App\Http\Middleware\Api\AuthenticateApiToken;
 use App\Http\Middleware\Api\RequireScope;
 use App\Http\Middleware\SetSecurityHeaders;
@@ -48,6 +49,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(
             before: ThrottleRequests::class,
             prepend: AuthenticateApiToken::class,
+        );
+
+        // S-8.1: same class_parents()/no-priority-entry gotcha as above --
+        // without an explicit slot, AbortIfTenantSuspended (unlisted) sorted
+        // AFTER AuthenticateApiToken (now listed, by the prepend above) despite
+        // routes/api.php/legacy_api.php putting it first in their outer group.
+        // A suspended tenant's API calls should never even reach a token check.
+        $middleware->prependToPriorityList(
+            before: AuthenticateApiToken::class,
+            prepend: AbortIfTenantSuspended::class,
         );
     })
     ->withExceptions(function (Exceptions $exceptions) {

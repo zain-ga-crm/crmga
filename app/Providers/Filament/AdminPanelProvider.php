@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use App\Http\Middleware\AbortIfTenantSuspended;
 use App\Http\Middleware\EndTenancyAfterResponse;
 use App\Http\Middleware\ForcePasswordChange;
 use Filament\Http\Middleware\Authenticate;
@@ -86,6 +87,7 @@ class AdminPanelProvider extends PanelProvider
                 // Z-8.3 -- must run before StartSession: DatabaseTenancyBootstrapper
                 // switches the DB connection sessions are stored on.
                 InitializeTenancyByDomain::class,
+                AbortIfTenantSuspended::class,
                 EndTenancyAfterResponse::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
