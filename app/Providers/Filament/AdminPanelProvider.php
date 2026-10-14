@@ -38,8 +38,10 @@ class AdminPanelProvider extends PanelProvider
             ->font('Inter')
             ->viteTheme('resources/css/filament/admin/theme.css')
             // §3.1: "Width 248px expanded, 64px collapsed (icons plus tooltips)."
-            // Filament has no built-in hover-tooltip for the collapsed rail; that
-            // part of §3.1 needs custom Alpine/CSS layered on top later.
+            // S-7.1: confirmed live -- Filament 3.3.54's sidebar item component
+            // already ships the collapsed-rail hover tooltip natively
+            // (x-tooltip.html bound to $store.sidebar.isOpen), nothing custom
+            // needed. This comment used to say otherwise; that was stale.
             ->sidebarWidth('15.5rem')
             ->collapsedSidebarWidth('4rem')
             ->sidebarCollapsibleOnDesktop()
