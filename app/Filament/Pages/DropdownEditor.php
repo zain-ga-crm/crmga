@@ -2,11 +2,13 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Metadata\Change;
 use App\Models\Metadata\OptionItem;
 use App\Models\Metadata\OptionList;
 use App\Models\User;
 use App\Support\MetadataValidationException;
 use App\Support\OptionListManager;
+use App\Support\Studio\StudioGovernance;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Select;
@@ -60,7 +62,10 @@ class DropdownEditor extends Page implements HasForms, HasTable
 
     public static function canAccess(): bool
     {
-        return (bool) Filament::auth()->user()?->isAdmin();
+        /** @var User|null $user */
+        $user = Filament::auth()->user();
+
+        return (bool) $user?->isAdmin() && ! StudioGovernance::isDisabled();
     }
 
     public function getTitle(): string
@@ -132,12 +137,17 @@ class DropdownEditor extends Page implements HasForms, HasTable
                         TextInput::make('label')->required(),
                     ])
                     ->action(function (array $data): void {
+                        $key = $this->stringValue($data, 'key');
+                        $label = $this->stringValue($data, 'label');
+
+                        if (StudioGovernance::shouldQueue()) {
+                            $this->queueOptionListRequest('createList', ['key' => $key, 'label' => $label], target: $key);
+
+                            return;
+                        }
+
                         try {
-                            $list = app(OptionListManager::class)->createList(
-                                $this->stringValue($data, 'key'),
-                                $this->stringValue($data, 'label'),
-                                actorId: $this->currentUserId(),
-                            );
+                            $list = app(OptionListManager::class)->createList($key, $label, actorId: $this->currentUserId());
                             $this->listKey = $list->key;
                             Notification::make()->title('List created')->success()->send();
                         } catch (MetadataValidationException $e) {
@@ -157,8 +167,16 @@ class DropdownEditor extends Page implements HasForms, HasTable
                             return;
                         }
 
+                        $label = $this->stringValue($data, 'label');
+
+                        if (StudioGovernance::shouldQueue()) {
+                            $this->queueOptionListRequest('renameList', ['list_key' => $list->key, 'new_label' => $label], target: $list->key);
+
+                            return;
+                        }
+
                         try {
-                            app(OptionListManager::class)->renameList($list->key, $this->stringValue($data, 'label'), actorId: $this->currentUserId());
+                            app(OptionListManager::class)->renameList($list->key, $label, actorId: $this->currentUserId());
                             Notification::make()->title('List renamed')->success()->send();
                         } catch (MetadataValidationException $e) {
                             Notification::make()->title('Could not rename list')->body($e->getMessage())->danger()->send();
@@ -202,6 +220,16 @@ class DropdownEditor extends Page implements HasForms, HasTable
                             return;
                         }
 
+                        if (StudioGovernance::shouldQueue()) {
+                            $this->queueOptionListRequest(
+                                'removeItem',
+                                ['list_key' => $list->key, 'value' => $record->value, 'confirm_lossy' => true],
+                                target: $list->key,
+                            );
+
+                            return;
+                        }
+
                         try {
                             app(OptionListManager::class)->removeItem($list->key, $record->value, confirmLossy: true, actorId: $this->currentUserId());
                             Notification::make()->title('Option deleted')->success()->send();
@@ -233,6 +261,16 @@ class DropdownEditor extends Page implements HasForms, HasTable
             }
         }
 
+        if (StudioGovernance::shouldQueue()) {
+            $this->queueOptionListRequest(
+                'reorderItems',
+                ['list_key' => $list->key, 'ordered_values' => $orderedValues],
+                target: $list->key,
+            );
+
+            return;
+        }
+
         try {
             app(OptionListManager::class)->reorderItems($list->key, $orderedValues, actorId: $this->currentUserId());
         } catch (MetadataValidationException $e) {
@@ -257,6 +295,34 @@ class DropdownEditor extends Page implements HasForms, HasTable
         $isActive = (bool) ($data['is_active'] ?? true);
         $confirmLossy = (bool) ($data['confirm_lossy'] ?? false);
 
+        if (StudioGovernance::shouldQueue()) {
+            if ($existingValue === null) {
+                $this->queueOptionListRequest(
+                    'addItem',
+                    ['list_key' => $list->key, 'value' => $newValue, 'label' => $label, 'color' => $color, 'is_active' => $isActive],
+                    target: $list->key,
+                );
+
+                return;
+            }
+
+            $this->queueOptionListRequest(
+                'updateItem',
+                [
+                    'list_key' => $list->key,
+                    'value' => $existingValue,
+                    'new_value' => $newValue,
+                    'new_label' => $label,
+                    'new_color' => $color,
+                    'new_is_active' => $isActive,
+                    'confirm_lossy' => $confirmLossy,
+                ],
+                target: $list->key,
+            );
+
+            return;
+        }
+
         try {
             if ($existingValue === null) {
                 $manager->addItem($list->key, $newValue, $label, color: $color, isActive: $isActive, actorId: $this->currentUserId());
@@ -279,6 +345,26 @@ class DropdownEditor extends Page implements HasForms, HasTable
         } catch (MetadataValidationException $e) {
             Notification::make()->title('Schema change rejected')->body($e->getMessage())->danger()->send();
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $args
+     */
+    private function queueOptionListRequest(string $method, array $args, string $target): void
+    {
+        Change::create([
+            'actor_id' => $this->currentUserId(),
+            'kind' => 'option.requested',
+            'target_module' => $target,
+            'payload' => ['method' => $method, 'args' => $args],
+            'status' => 'requested',
+        ]);
+
+        Notification::make()
+            ->title('Submitted for approval')
+            ->body('A platform operator must approve this change before it takes effect.')
+            ->success()
+            ->send();
     }
 
     private function deleteImpactDescription(OptionItem $record): string

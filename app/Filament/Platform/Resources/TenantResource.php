@@ -4,6 +4,7 @@ namespace App\Filament\Platform\Resources;
 
 use App\Filament\Platform\Resources\TenantResource\Pages;
 use App\Models\Tenant;
+use App\Support\Studio\StudioGovernance;
 use App\Support\Tenancy\TenantStats;
 use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
@@ -43,6 +44,15 @@ class TenantResource extends Resource
                     ->badge()
                     ->getStateUsing(fn (Tenant $record): string => self::statusOf($record))
                     ->color(fn (string $state): string => $state === 'suspended' ? 'danger' : 'success'),
+                TextColumn::make('studio_mode')
+                    ->label('Studio')
+                    ->badge()
+                    ->getStateUsing(fn (Tenant $record): string => StudioGovernance::modeOf($record))
+                    ->color(fn (string $state): string => match ($state) {
+                        StudioGovernance::MODE_DISABLED => 'danger',
+                        StudioGovernance::MODE_REQUEST_ONLY => 'warning',
+                        default => 'success',
+                    }),
                 TextColumn::make('users')
                     ->getStateUsing(fn (Tenant $record) => $stats->forTenant($record)['users']),
                 TextColumn::make('records')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Metadata\Change;
 use App\Models\Metadata\Field;
 use App\Models\Metadata\Layout;
 use App\Models\Metadata\Module;
@@ -9,6 +10,7 @@ use App\Models\User;
 use App\Support\Filament\LayoutRowPacker;
 use App\Support\LayoutManager;
 use App\Support\MetadataValidationException;
+use App\Support\Studio\StudioGovernance;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Component;
@@ -78,7 +80,10 @@ class LayoutEditor extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return (bool) Filament::auth()->user()?->isAdmin();
+        /** @var User|null $user */
+        $user = Filament::auth()->user();
+
+        return (bool) $user?->isAdmin() && ! StudioGovernance::isDisabled();
     }
 
     public function getTitle(): string
@@ -156,12 +161,35 @@ class LayoutEditor extends Page implements HasForms
             return;
         }
 
+        if (StudioGovernance::shouldQueue()) {
+            $this->queuePublish($layout);
+
+            return;
+        }
+
         try {
             app(LayoutManager::class)->publish($layout->id, actorId: $this->currentUserId());
             Notification::make()->title("Version {$layout->version} published")->success()->send();
         } catch (MetadataValidationException $e) {
             Notification::make()->title('Could not publish')->body($e->getMessage())->danger()->send();
         }
+    }
+
+    private function queuePublish(Layout $layout): void
+    {
+        Change::create([
+            'actor_id' => $this->currentUserId(),
+            'kind' => 'layout.requested',
+            'target_module' => $layout->module?->key,
+            'target_field' => $layout->view,
+            'payload' => ['layout_id' => $layout->id],
+            'status' => 'requested',
+        ]);
+
+        Notification::make()
+            ->title("Version {$layout->version} saved; submitted for approval to publish")
+            ->success()
+            ->send();
     }
 
     /**
@@ -186,6 +214,18 @@ class LayoutEditor extends Page implements HasForms
         $module = $this->currentModule();
         $layout = Layout::query()->find($layoutId);
         if ($module === null || $layout === null) {
+            return;
+        }
+
+        if (StudioGovernance::shouldQueue()) {
+            try {
+                $draft = app(LayoutManager::class)->draft($module->key, $this->viewName, $layout->definition, actorId: $this->currentUserId());
+                $this->queuePublish($draft);
+                $this->loadIntoForm();
+            } catch (MetadataValidationException $e) {
+                Notification::make()->title('Could not revert')->body($e->getMessage())->danger()->send();
+            }
+
             return;
         }
 

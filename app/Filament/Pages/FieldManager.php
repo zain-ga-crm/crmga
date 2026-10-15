@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Metadata\Change;
 use App\Models\Metadata\Field;
 use App\Models\Metadata\Module;
 use App\Models\Metadata\OptionList;
@@ -10,6 +11,7 @@ use App\Support\FieldTypeContract;
 use App\Support\SchemaManager\FieldChangeRequest;
 use App\Support\SchemaManager\SchemaManager;
 use App\Support\SchemaManager\SchemaValidationException;
+use App\Support\Studio\StudioGovernance;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Select;
@@ -54,7 +56,10 @@ class FieldManager extends Page implements HasForms, HasTable
 
     public static function canAccess(): bool
     {
-        return (bool) Filament::auth()->user()?->isAdmin();
+        /** @var User|null $user */
+        $user = Filament::auth()->user();
+
+        return (bool) $user?->isAdmin() && ! StudioGovernance::isDisabled();
     }
 
     public function getTitle(): string
@@ -203,17 +208,38 @@ class FieldManager extends Page implements HasForms, HasTable
 
         $type = isset($data['type']) && is_string($data['type']) ? $data['type'] : null;
         $confirmLossy = $confirmLossy || (bool) ($data['confirm_lossy'] ?? false);
+        $options = self::optionsFromFormData($data);
 
         try {
             $manager = app(SchemaManager::class);
-            $plan = $manager->plan(new FieldChangeRequest(
-                $action,
-                $module->key,
-                $fieldName,
-                $type,
-                self::optionsFromFormData($data),
-                $confirmLossy,
-            ));
+            $plan = $manager->plan(new FieldChangeRequest($action, $module->key, $fieldName, $type, $options, $confirmLossy));
+
+            if (StudioGovernance::shouldQueue()) {
+                Change::create([
+                    'actor_id' => $this->currentUserId(),
+                    'kind' => "field.{$action}",
+                    'target_module' => $module->key,
+                    'target_field' => $fieldName,
+                    'payload' => [
+                        'action' => $action,
+                        'module_key' => $module->key,
+                        'name' => $fieldName,
+                        'type' => $type,
+                        'options' => $options,
+                        'confirm_lossy' => $confirmLossy,
+                    ],
+                    'status' => 'requested',
+                ]);
+
+                Notification::make()
+                    ->title('Submitted for approval')
+                    ->body('A platform operator must approve this change before it takes effect.')
+                    ->success()
+                    ->send();
+
+                return;
+            }
+
             $result = $manager->apply($plan, actorId: $this->currentUserId());
 
             if (! $result->success) {
